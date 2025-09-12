@@ -67,6 +67,9 @@ export const AuthProvider = ({ children }) => {
     // Добавляем обработку ошибок для production
     axios.defaults.timeout = 10000; // 10 секунд таймаут
     
+    // Настраиваем axios для работы с cookies
+    axios.defaults.withCredentials = true;
+    
     // Синхронизируем время с сервером (только если API доступен)
     try {
       syncWithServer();
@@ -91,13 +94,6 @@ export const AuthProvider = ({ children }) => {
           const token = localStorage.getItem('accessToken');
           console.log('🔑 Токен для запроса:', token ? 'есть' : 'нет', config.url);
           
-          // Дополнительная проверка для production
-          const isProduction = window.location.hostname !== 'localhost';
-          if (isProduction && !token) {
-            console.log('🔑 Production домен без токена - не добавляем Authorization');
-            return config;
-          }
-          
           if (token) {
             config.headers.Authorization = `Bearer ${token}`;
             console.log('🔑 Добавлен заголовок Authorization для:', config.url);
@@ -114,7 +110,13 @@ export const AuthProvider = ({ children }) => {
       async (error) => {
         const originalRequest = error.config;
         
-        console.log('🚨 Ошибка запроса:', error.response?.status, originalRequest.url);
+        console.log('🚨 Ошибка запроса:', {
+          status: error.response?.status,
+          url: originalRequest.url,
+          method: originalRequest.method,
+          hasRetry: originalRequest._retry,
+          errorMessage: error.message
+        });
         
         // Only retry if it's a 401 error, not already retried, and not a refresh request
         if (error.response?.status === 401 && 
@@ -125,19 +127,23 @@ export const AuthProvider = ({ children }) => {
           originalRequest._retry = true;
           
           try {
+            console.log('🔄 Пытаемся обновить токен...');
             const response = await AuthService.refreshToken();
+            console.log('🔄 Ответ от refresh:', response);
             
             const { accessToken } = response;
             if (typeof window !== 'undefined' && window.localStorage) {
               localStorage.setItem('accessToken', accessToken);
+              console.log('🔄 Новый токен сохранен в localStorage');
             }
             dispatch({ type: 'LOGIN_SUCCESS', payload: { user: state.user, accessToken } });
             
             // Retry original request
             originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+            console.log('🔄 Повторяем оригинальный запрос с новым токеном');
             return axios(originalRequest);
           } catch (refreshError) {
-            console.log('❌ Refresh не удался, перенаправляем на логин');
+            console.log('❌ Refresh не удался, перенаправляем на логин:', refreshError.response?.status);
             if (typeof window !== 'undefined' && window.localStorage) {
               localStorage.removeItem('accessToken');
             }
@@ -237,21 +243,6 @@ export const AuthProvider = ({ children }) => {
       console.log('🔍 Начинаем проверку аутентификации...');
       console.log('🔍 Текущее состояние loading:', state.loading);
       
-      // Проверяем, нужно ли перенаправить на логин в production
-      if (typeof window !== 'undefined' && window.localStorage) {
-        const isProduction = window.location.hostname !== 'localhost';
-        const hasToken = localStorage.getItem('accessToken');
-        
-        if (isProduction && hasToken) {
-          console.log('🔄 Production домен с токеном - проверяем валидность');
-          // Не очищаем localStorage, просто проверяем токен
-        } else if (isProduction && !hasToken) {
-          console.log('🔄 Production домен без токена - перенаправляем на логин');
-          dispatch({ type: 'LOGOUT' });
-          return;
-        }
-      }
-      
       try {
         // Get stored access token
         const storedToken = typeof window !== 'undefined' && window.localStorage 
@@ -266,6 +257,7 @@ export const AuthProvider = ({ children }) => {
         }
 
         console.log('✅ Есть токен - проверяем его валидность...');
+        console.log('🔍 Токен для проверки:', storedToken.substring(0, 20) + '...');
         // Есть токен - проверяем его валидность
         try {
           const response = await AuthService.checkAuth();
