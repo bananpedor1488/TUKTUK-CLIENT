@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import axios from 'axios';
 import { useSocket } from '../contexts/SocketContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -26,6 +26,28 @@ const ChatWindow = ({ chat, onChatUpdate, onBackToChatList }) => {
 
   const { socket, isConnected, joinChat, leaveChat, sendMessage, startTyping, stopTyping } = useSocket();
   const { user } = useAuth();
+
+  const loadMessages = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const response = await axios.get(`/chat/${chat._id}/messages`);
+      setMessages(response.data.messages);
+    } catch (error) {
+      console.error('Failed to load messages:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [chat?._id]);
+
+  const markMessagesAsRead = useCallback(async () => {
+    if (!chat) return;
+    
+    try {
+      await axios.put(`/chat/${chat._id}/read`);
+    } catch (error) {
+      console.error('Failed to mark messages as read:', error);
+    }
+  }, [chat?._id]);
 
   // Отладка данных пользователя
   useEffect(() => {
@@ -72,16 +94,6 @@ const ChatWindow = ({ chat, onChatUpdate, onBackToChatList }) => {
       markMessagesAsRead();
     }
   }, [chat, markMessagesAsRead, messages.length]);
-
-  const markMessagesAsRead = async () => {
-    if (!chat) return;
-    
-    try {
-      await axios.put(`/chat/${chat._id}/read`);
-    } catch (error) {
-      console.error('Failed to mark messages as read:', error);
-    }
-  };
 
   // Socket event listeners
   useEffect(() => {
@@ -160,18 +172,6 @@ const ChatWindow = ({ chat, onChatUpdate, onBackToChatList }) => {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
-
-  const loadMessages = async () => {
-    try {
-      setIsLoading(true);
-      const response = await axios.get(`/chat/${chat._id}/messages`);
-      setMessages(response.data.messages);
-    } catch (error) {
-      console.error('Error loading messages:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });

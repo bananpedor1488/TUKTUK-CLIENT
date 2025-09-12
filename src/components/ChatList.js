@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { FiUsers, FiCircle, FiZap } from 'react-icons/fi';
-import { formatLastSeen, formatChatTime } from '../utils/timeUtils';
+import { FiUsers, FiZap } from 'react-icons/fi';
+import { formatChatTime } from '../utils/timeUtils';
 import { useAuth } from '../contexts/AuthContext';
 import SwipeableChatItem from './SwipeableChatItem';
 import ChatContextMenu from './ChatContextMenu';

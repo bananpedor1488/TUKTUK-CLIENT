@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { FiTrash2, FiMoreHorizontal, FiArchive, FiBellOff } from 'react-icons/fi';
 import styles from './SwipeableChatItem.module.css';
 
@@ -18,13 +18,13 @@ const SwipeableChatItem = ({
   const SWIPE_THRESHOLD = 80; // Минимальное расстояние для свайпа
 
   // Touch обработчики с правильным preventDefault
-  const handleTouchStart = (e) => {
+  const handleTouchStart = useCallback((e) => {
     if (!isMobile) return;
     setStartX(e.touches[0].clientX);
     setIsDragging(true);
-  };
+  }, [isMobile]);
 
-  const handleTouchEnd = () => {
+  const handleTouchEnd = useCallback(() => {
     if (!isMobile || !isDragging) return;
     setIsDragging(false);
     
@@ -34,7 +34,7 @@ const SwipeableChatItem = ({
       setIsSwiped(false);
       setCurrentX(0);
     }
-  };
+  }, [isMobile, isDragging, currentX]);
 
   // const handleTouchMove = (e) => {
   //   if (!isMobile || !isDragging) return;
@@ -62,12 +62,12 @@ const SwipeableChatItem = ({
   //   return;
   // };
 
-  const handleRightClick = (e) => {
+  const handleRightClick = useCallback((e) => {
     e.preventDefault();
     if (onMore) {
       onMore(e);
     }
-  };
+  }, [onMore]);
 
   const resetSwipe = () => {
     setIsSwiped(false);
