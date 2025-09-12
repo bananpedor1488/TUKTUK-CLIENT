@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
-import axios from 'axios';
+import axios from '../services/axiosConfig';
 import { syncWithServer } from '../utils/timeUtils';
 import AuthService from '../services/AuthService';
 
@@ -61,14 +61,7 @@ export const AuthProvider = ({ children }) => {
 
   // Configure axios defaults
   useEffect(() => {
-    const apiUrl = process.env.REACT_APP_API_URL || 'https://tuktuk-server.onrender.com/api';
-    axios.defaults.baseURL = apiUrl;
-    
-    // Добавляем обработку ошибок для production
-    axios.defaults.timeout = 10000; // 10 секунд таймаут
-    
-    // Настраиваем axios для работы с cookies
-    axios.defaults.withCredentials = true;
+    console.log('🔧 Настраиваем axios interceptors...');
     
     // Синхронизируем время с сервером (только если API доступен)
     try {
@@ -85,81 +78,6 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       console.warn('Не удалось синхронизировать время с сервером:', error);
     }
-    
-    // Add request interceptor to include access token
-    const requestInterceptor = axios.interceptors.request.use(
-      (config) => {
-        // Проверяем, что мы в браузере
-        if (typeof window !== 'undefined' && window.localStorage) {
-          const token = localStorage.getItem('accessToken');
-          console.log('🔑 Токен для запроса:', token ? 'есть' : 'нет', config.url);
-          
-          if (token) {
-            config.headers.Authorization = `Bearer ${token}`;
-            console.log('🔑 Добавлен заголовок Authorization для:', config.url);
-          }
-        }
-        return config;
-      },
-      (error) => Promise.reject(error)
-    );
-
-    // Add response interceptor to handle token refresh
-    const responseInterceptor = axios.interceptors.response.use(
-      (response) => response,
-      async (error) => {
-        const originalRequest = error.config;
-        
-        console.log('🚨 Ошибка запроса:', {
-          status: error.response?.status,
-          url: originalRequest.url,
-          method: originalRequest.method,
-          hasRetry: originalRequest._retry,
-          errorMessage: error.message
-        });
-        
-        // Only retry if it's a 401 error, not already retried, and not a refresh request
-        if (error.response?.status === 401 && 
-            !originalRequest._retry && 
-            !originalRequest.url?.includes('/auth/refresh') &&
-            !originalRequest.url?.includes('/auth/login') &&
-            !originalRequest.url?.includes('/auth/register')) {
-          originalRequest._retry = true;
-          
-          try {
-            console.log('🔄 Пытаемся обновить токен...');
-            const response = await AuthService.refreshToken();
-            console.log('🔄 Ответ от refresh:', response);
-            
-            const { accessToken } = response;
-            if (typeof window !== 'undefined' && window.localStorage) {
-              localStorage.setItem('accessToken', accessToken);
-              console.log('🔄 Новый токен сохранен в localStorage');
-            }
-            dispatch({ type: 'LOGIN_SUCCESS', payload: { user: state.user, accessToken } });
-            
-            // Retry original request
-            originalRequest.headers.Authorization = `Bearer ${accessToken}`;
-            console.log('🔄 Повторяем оригинальный запрос с новым токеном');
-            return axios(originalRequest);
-          } catch (refreshError) {
-            console.log('❌ Refresh не удался, перенаправляем на логин:', refreshError.response?.status);
-            if (typeof window !== 'undefined' && window.localStorage) {
-              localStorage.removeItem('accessToken');
-            }
-            dispatch({ type: 'LOGOUT' });
-            return Promise.reject(refreshError);
-          }
-        }
-        
-        return Promise.reject(error);
-      }
-    );
-
-    return () => {
-      axios.interceptors.request.eject(requestInterceptor);
-      axios.interceptors.response.eject(responseInterceptor);
-    };
   }, []); // Remove dependencies to prevent infinite loop
 
   // Define updateOnlineStatus function before using it
@@ -167,16 +85,25 @@ export const AuthProvider = ({ children }) => {
     console.log('📡 updateOnlineStatus вызвана:', isOnline, 'isAuthenticated:', state.isAuthenticated);
     
     // Проверяем, есть ли токен в localStorage
-    const hasToken = typeof window !== 'undefined' && window.localStorage && localStorage.getItem('accessToken');
-    console.log('📡 Токен в localStorage:', hasToken ? 'есть' : 'нет');
+    const token = typeof window !== 'undefined' && window.localStorage && localStorage.getItem('accessToken');
+    console.log('📡 Токен в localStorage:', token ? 'есть' : 'нет');
+    if (token) {
+      console.log('📡 Токен preview:', token.substring(0, 20) + '...');
+    }
     
-    if (!state.isAuthenticated || !hasToken) {
+    if (!state.isAuthenticated || !token) {
       console.log('📡 Пользователь не авторизован или нет токена, пропускаем обновление статуса');
       return;
     }
     
     try {
       console.log('📡 Отправляем запрос на обновление статуса');
+      console.log('📡 Axios defaults:', {
+        baseURL: axios.defaults.baseURL,
+        withCredentials: axios.defaults.withCredentials,
+        timeout: axios.defaults.timeout
+      });
+      
       await axios.put('/user/status', { isOnline });
       dispatch({ type: 'UPDATE_USER', payload: { isOnline, lastSeen: new Date() } });
       console.log('📡 Статус обновлен успешно');
@@ -242,6 +169,17 @@ export const AuthProvider = ({ children }) => {
     const checkAuth = async () => {
       console.log('🔍 Начинаем проверку аутентификации...');
       console.log('🔍 Текущее состояние loading:', state.loading);
+      
+      // Проверяем localStorage сразу
+      if (typeof window !== 'undefined' && window.localStorage) {
+        const allKeys = Object.keys(localStorage);
+        console.log('🔍 Все ключи в localStorage:', allKeys);
+        const token = localStorage.getItem('accessToken');
+        console.log('🔍 Токен в localStorage:', token ? 'есть' : 'нет');
+        if (token) {
+          console.log('🔍 Токен preview:', token.substring(0, 20) + '...');
+        }
+      }
       
       try {
         // Get stored access token
