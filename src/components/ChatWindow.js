@@ -37,7 +37,7 @@ const ChatWindow = ({ chat, onChatUpdate, onBackToChatList }) => {
     } finally {
       setIsLoading(false);
     }
-  }, [chat?._id]);
+  }, [chat]);
 
   const markMessagesAsRead = useCallback(async () => {
     if (!chat) return;
@@ -47,7 +47,7 @@ const ChatWindow = ({ chat, onChatUpdate, onBackToChatList }) => {
     } catch (error) {
       console.error('Failed to mark messages as read:', error);
     }
-  }, [chat?._id]);
+  }, [chat]);
 
   // Отладка данных пользователя
   useEffect(() => {
