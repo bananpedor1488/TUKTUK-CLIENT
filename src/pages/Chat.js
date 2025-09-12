@@ -33,7 +33,7 @@ const Chat = () => {
   const [showAIChat, setShowAIChat] = useState(false); // Состояние для показа чата с ИИ
   const [showMobileProfile, setShowMobileProfile] = useState(false); // Состояние для показа мобильной страницы профиля
 
-  const { user, logout } = useAuth();
+  const { user, logout, isAuthenticated } = useAuth();
   const { socket, isConnected } = useSocket();
   const { theme } = useTheme();
   const isMobile = useIsMobile();
