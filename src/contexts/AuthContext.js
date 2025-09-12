@@ -64,20 +64,34 @@ export const AuthProvider = ({ children }) => {
     const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
     axios.defaults.baseURL = apiUrl;
     
-    // Синхронизируем время с сервером
-    syncWithServer();
+    // Добавляем обработку ошибок для production
+    axios.defaults.timeout = 10000; // 10 секунд таймаут
     
-    // Периодическая синхронизация времени (каждые 5 минут)
-    const syncInterval = setInterval(() => {
+    // Синхронизируем время с сервером (только если API доступен)
+    try {
       syncWithServer();
-    }, 5 * 60 * 1000);
+      
+      // Периодическая синхронизация времени (каждые 5 минут)
+      const syncInterval = setInterval(() => {
+        syncWithServer().catch(error => {
+          console.warn('Синхронизация времени не удалась:', error);
+        });
+      }, 5 * 60 * 1000);
+      
+      return () => clearInterval(syncInterval);
+    } catch (error) {
+      console.warn('Не удалось синхронизировать время с сервером:', error);
+    }
     
     // Add request interceptor to include access token
     const requestInterceptor = axios.interceptors.request.use(
       (config) => {
-        const token = localStorage.getItem('accessToken');
-        if (token) {
-          config.headers.Authorization = `Bearer ${token}`;
+        // Проверяем, что мы в браузере
+        if (typeof window !== 'undefined' && window.localStorage) {
+          const token = localStorage.getItem('accessToken');
+          if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+          }
         }
         return config;
       },
@@ -102,7 +116,9 @@ export const AuthProvider = ({ children }) => {
             const response = await AuthService.refreshToken();
             
             const { accessToken } = response;
-            localStorage.setItem('accessToken', accessToken);
+            if (typeof window !== 'undefined' && window.localStorage) {
+              localStorage.setItem('accessToken', accessToken);
+            }
             dispatch({ type: 'LOGIN_SUCCESS', payload: { user: state.user, accessToken } });
             
             // Retry original request
@@ -110,7 +126,9 @@ export const AuthProvider = ({ children }) => {
             return axios(originalRequest);
           } catch (refreshError) {
             console.log('Refresh failed, logging out user');
-            localStorage.removeItem('accessToken');
+            if (typeof window !== 'undefined' && window.localStorage) {
+              localStorage.removeItem('accessToken');
+            }
             dispatch({ type: 'LOGOUT' });
             return Promise.reject(refreshError);
           }
@@ -123,7 +141,6 @@ export const AuthProvider = ({ children }) => {
     return () => {
       axios.interceptors.request.eject(requestInterceptor);
       axios.interceptors.response.eject(responseInterceptor);
-      clearInterval(syncInterval);
     };
   }, []); // Remove dependencies to prevent infinite loop
 
@@ -203,7 +220,9 @@ export const AuthProvider = ({ children }) => {
       
       try {
         // Get stored access token
-        const storedToken = localStorage.getItem('accessToken');
+        const storedToken = typeof window !== 'undefined' && window.localStorage 
+          ? localStorage.getItem('accessToken') 
+          : null;
         console.log('📱 Токен в localStorage:', storedToken ? 'есть' : 'нет');
         
         if (!storedToken) {
@@ -231,7 +250,9 @@ export const AuthProvider = ({ children }) => {
             const refreshResponse = await AuthService.refreshToken();
             
             const { accessToken } = refreshResponse;
-            localStorage.setItem('accessToken', accessToken);
+            if (typeof window !== 'undefined' && window.localStorage) {
+              localStorage.setItem('accessToken', accessToken);
+            }
             console.log('🔄 Токен обновлен, получаем данные пользователя...');
             
             // Try to get user info again with new token
@@ -246,14 +267,18 @@ export const AuthProvider = ({ children }) => {
             });
           } catch (refreshError) {
             console.log('❌ Обновление токена не удалось, выходим из системы:', refreshError.response?.status);
-            localStorage.removeItem('accessToken');
+            if (typeof window !== 'undefined' && window.localStorage) {
+              localStorage.removeItem('accessToken');
+            }
             dispatch({ type: 'LOGOUT' });
           }
         }
       } catch (error) {
         console.error('💥 Ошибка при проверке аутентификации:', error);
         // В случае любой ошибки - выходим из системы
-        localStorage.removeItem('accessToken');
+        if (typeof window !== 'undefined' && window.localStorage) {
+          localStorage.removeItem('accessToken');
+        }
         dispatch({ type: 'LOGOUT' });
       }
     };
@@ -274,7 +299,7 @@ export const AuthProvider = ({ children }) => {
         const { user, accessToken } = response;
         
         // Store access token in localStorage
-        if (accessToken) {
+        if (accessToken && typeof window !== 'undefined' && window.localStorage) {
           localStorage.setItem('accessToken', accessToken);
         }
         
@@ -305,7 +330,7 @@ export const AuthProvider = ({ children }) => {
         const { user, accessToken } = response;
         
         // Store access token in localStorage
-        if (accessToken) {
+        if (accessToken && typeof window !== 'undefined' && window.localStorage) {
           localStorage.setItem('accessToken', accessToken);
         }
         
@@ -336,7 +361,7 @@ export const AuthProvider = ({ children }) => {
         const { user, accessToken } = response;
         
         // Store access token in localStorage
-        if (accessToken) {
+        if (accessToken && typeof window !== 'undefined' && window.localStorage) {
           localStorage.setItem('accessToken', accessToken);
         }
         
@@ -365,7 +390,9 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
-      localStorage.removeItem('accessToken');
+      if (typeof window !== 'undefined' && window.localStorage) {
+        localStorage.removeItem('accessToken');
+      }
       dispatch({ type: 'LOGOUT' });
     }
   };

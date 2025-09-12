@@ -4,13 +4,20 @@ const ThemeContext = createContext();
 
 export const ThemeProvider = ({ children }) => {
   const [theme, setTheme] = useState(() => {
-    const savedTheme = localStorage.getItem('tuktuk-theme');
-    return savedTheme || 'dark';
+    if (typeof window !== 'undefined' && window.localStorage) {
+      const savedTheme = localStorage.getItem('tuktuk-theme');
+      return savedTheme || 'dark';
+    }
+    return 'dark';
   });
 
   useEffect(() => {
-    localStorage.setItem('tuktuk-theme', theme);
-    document.documentElement.setAttribute('data-theme', theme);
+    if (typeof window !== 'undefined' && window.localStorage) {
+      localStorage.setItem('tuktuk-theme', theme);
+    }
+    if (typeof document !== 'undefined') {
+      document.documentElement.setAttribute('data-theme', theme);
+    }
   }, [theme]);
 
   const toggleTheme = () => {

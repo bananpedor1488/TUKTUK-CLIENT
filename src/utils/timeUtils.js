@@ -16,11 +16,13 @@ export const setServerTimeOffset = (offset) => {
 export const syncWithServer = async () => {
   try {
     const startTime = Date.now();
-    const response = await fetch('/api/time', {
+    const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+    const response = await fetch(`${apiUrl}/time`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
       },
+      timeout: 5000, // 5 секунд таймаут
     });
     
     if (response.ok) {

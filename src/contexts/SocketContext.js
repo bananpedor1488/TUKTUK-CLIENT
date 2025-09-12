@@ -18,11 +18,14 @@ export const SocketProvider = ({ children }) => {
           socket.close();
         }
 
-        const newSocket = io(process.env.REACT_APP_SOCKET_URL || 'http://localhost:5000', {
+        const socketUrl = process.env.REACT_APP_SOCKET_URL || 'http://localhost:5000';
+        const newSocket = io(socketUrl, {
           auth: {
             token: accessToken
           },
-          transports: ['websocket']
+          transports: ['websocket', 'polling'], // Добавляем polling как fallback
+          timeout: 10000, // 10 секунд таймаут
+          forceNew: true // Принудительно создаем новое соединение
         });
 
         newSocket.on('connect', () => {

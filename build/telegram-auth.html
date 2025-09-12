@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, maximum-scale=1.0, user-scalable=no" />
+  <title>TukTuk - Авторизация через Telegram</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    @font-face {
+      font-family: 'SF Pro Display';
+      src: url('/font/sf-pro-display-medium.otf') format('opentype');
+      font-weight: normal;
+      font-style: normal;
+    }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      background-color: #181818;
+      color: #fff;
+      font-family: 'SF Pro Display', sans-serif;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    .container {
+      text-align: center;
+    }
+    h2 {
+      font-size: 1.5rem;
+      margin-bottom: 20px;
+    }
+    .dots {
+      display: flex;
+      gap: 5px;
+      margin-bottom: 20px;
+      justify-content: center;
+      align-items: center;
+    }
+    .dot {
+      width: 8px;
+      height: 8px;
+      background-color: #fff;
+      border-radius: 50%;
+      animation: bounce 1.5s infinite;
+    }
+    .dot:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+    .dot:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+    @keyframes bounce {
+      0%, 80%, 100% {
+        transform: translateY(0);
+      }
+      40% {
+        transform: translateY(-8px);
+      }
+    }
+    .loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .spinner {
+      width: 20px;
+      height: 20px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top: 2px solid white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .error {
+      background: rgba(244, 67, 54, 0.2);
+      border: 1px solid rgba(244, 67, 54, 0.5);
+      border-radius: 8px;
+      padding: 15px;
+      margin-top: 20px;
+      color: #ffcdd2;
+    }
+    .success {
+      background: rgba(76, 175, 80, 0.2);
+      border: 1px solid rgba(76, 175, 80, 0.5);
+      border-radius: 8px;
+      padding: 15px;
+      margin-top: 20px;
+      color: #c8e6c9;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Авторизация через Telegram</h2>
+    <div class="dots">
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+    </div>
+    <div id="telegram-login-container"></div>
+    <div id="status"></div>
+    
+    <!-- Тестовая кнопка для разработки -->
+    <div style="margin-top: 20px;">
+      <button id="test-login-btn" style="
+        background: #0088cc;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-family: 'SF Pro Display', sans-serif;
+        margin-bottom: 10px;
+        width: 100%;
+      ">Тестовая авторизация (для разработки)</button>
+      
+      <!-- Поле для ввода токена от бота -->
+      <div style="margin-top: 15px;">
+        <input type="text" id="token-input" placeholder="Введите токен от Telegram бота" style="
+          width: 100%;
+          padding: 10px;
+          border: 1px solid #333;
+          border-radius: 8px;
+          background: #222;
+          color: white;
+          font-family: 'SF Pro Display', sans-serif;
+          margin-bottom: 10px;
+        ">
+        <button id="token-login-btn" style="
+          background: #28a745;
+          color: white;
+          border: none;
+          padding: 10px 20px;
+          border-radius: 8px;
+          cursor: pointer;
+          font-family: 'SF Pro Display', sans-serif;
+          width: 100%;
+        ">Войти с токеном</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    window.onload = function() {
+      const statusDiv = document.getElementById('status');
+      
+      // Показываем загрузку
+      statusDiv.innerHTML = '<div class="loading"><div class="spinner"></div><span>Загрузка...</span></div>';
+
+      // Создаем скрипт Telegram Widget
+      const scriptTag = document.createElement('script');
+      scriptTag.src = 'https://telegram.org/js/telegram-widget.js?22';
+      scriptTag.setAttribute('data-telegram-login', 'tucktuck_auth_bot'); // Ваш реальный username бота
+      scriptTag.setAttribute('data-size', 'large');
+      // Для локальной разработки используем localhost
+      const authUrl = window.location.hostname === 'localhost' 
+        ? 'http://localhost:5000/api/auth/telegram-callback'
+        : window.location.origin + '/api/auth/telegram-callback';
+      scriptTag.setAttribute('data-auth-url', authUrl);
+      scriptTag.setAttribute('data-request-access', 'write');
+      scriptTag.setAttribute('data-radius', '8');
+      
+      document.getElementById('telegram-login-container').appendChild(scriptTag);
+
+      // Обработка ошибок
+      scriptTag.onerror = function() {
+        statusDiv.innerHTML = '<div class="error">Ошибка загрузки Telegram Widget. Проверьте подключение к интернету.</div>';
+      };
+
+      // Тестовая авторизация для разработки
+      const testBtn = document.getElementById('test-login-btn');
+      testBtn.addEventListener('click', function() {
+        statusDiv.innerHTML = '<div class="loading"><div class="spinner"></div><span>Тестовая авторизация...</span></div>';
+        
+        // Тестовые данные пользователя
+        const testUser = {
+          id: '123456789',
+          username: 'testuser',
+          first_name: 'Test',
+          last_name: 'User',
+          photo_url: null
+        };
+
+        fetch('/api/auth/telegram', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            chat_id: testUser.id,
+            username: testUser.username,
+            first_name: testUser.first_name,
+            last_name: testUser.last_name,
+            photo_url: testUser.photo_url
+          })
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            statusDiv.innerHTML = '<div class="success">Тестовая авторизация успешна! Перенаправление...</div>';
+            
+            // Сохраняем токены
+            if (data.accessToken) {
+              localStorage.setItem('accessToken', data.accessToken);
+            }
+            if (data.refreshToken) {
+              localStorage.setItem('refreshToken', data.refreshToken);
+            }
+            
+            // Перенаправляем на главную страницу
+            setTimeout(() => {
+              window.opener.postMessage({
+                type: 'TELEGRAM_AUTH_SUCCESS',
+                user: data.user,
+                tokens: {
+                  accessToken: data.accessToken,
+                  refreshToken: data.refreshToken
+                }
+              }, window.location.origin);
+              window.close();
+            }, 1000);
+          } else {
+            statusDiv.innerHTML = `<div class="error">Ошибка тестовой авторизации: ${data.error || 'Неизвестная ошибка'}</div>`;
+          }
+        })
+        .catch(error => {
+          console.error('Ошибка тестовой авторизации:', error);
+          statusDiv.innerHTML = '<div class="error">Ошибка тестовой авторизации. Проверьте подключение к серверу.</div>';
+        });
+      });
+
+      // Обработчик для входа с токеном от бота
+      const tokenLoginBtn = document.getElementById('token-login-btn');
+      const tokenInput = document.getElementById('token-input');
+      
+      tokenLoginBtn.addEventListener('click', function() {
+        const token = tokenInput.value.trim();
+        
+        if (!token) {
+          statusDiv.innerHTML = '<div class="error">Введите токен от Telegram бота</div>';
+          return;
+        }
+        
+        statusDiv.innerHTML = '<div class="loading"><div class="spinner"></div><span>Авторизация с токеном...</span></div>';
+        
+        // Сохраняем токен и перенаправляем
+        localStorage.setItem('accessToken', token);
+        
+        // Проверяем токен через API
+        fetch('/api/auth/me', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.user) {
+            statusDiv.innerHTML = '<div class="success">Авторизация успешна! Перенаправление...</div>';
+            
+            // Перенаправляем на главную страницу
+            setTimeout(() => {
+              window.opener.postMessage({
+                type: 'TELEGRAM_AUTH_SUCCESS',
+                user: data.user,
+                tokens: {
+                  accessToken: token,
+                  refreshToken: localStorage.getItem('refreshToken')
+                }
+              }, window.location.origin);
+              window.close();
+            }, 1000);
+          } else {
+            statusDiv.innerHTML = '<div class="error">Неверный токен. Проверьте правильность токена от бота.</div>';
+            localStorage.removeItem('accessToken');
+          }
+        })
+        .catch(error => {
+          console.error('Ошибка проверки токена:', error);
+          statusDiv.innerHTML = '<div class="error">Ошибка проверки токена. Проверьте подключение к серверу.</div>';
+          localStorage.removeItem('accessToken');
+        });
+      });
+    };
+
+    // Инициализация Telegram WebApp
+    window.Telegram.WebApp.ready();
+
+    // Проверяем, есть ли уже данные пользователя
+    const user = window.Telegram.WebApp.initDataUnsafe?.user;
+
+    if (user) {
+      const statusDiv = document.getElementById('status');
+      statusDiv.innerHTML = '<div class="loading"><div class="spinner"></div><span>Авторизация...</span></div>';
+      
+      fetch('/api/auth/telegram', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          chat_id: user.id,
+          username: user.username,
+          first_name: user.first_name,
+          last_name: user.last_name,
+          photo_url: user.photo_url
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          statusDiv.innerHTML = '<div class="success">Авторизация успешна! Перенаправление...</div>';
+          
+          // Сохраняем токены
+          if (data.accessToken) {
+            localStorage.setItem('accessToken', data.accessToken);
+          }
+          if (data.refreshToken) {
+            localStorage.setItem('refreshToken', data.refreshToken);
+          }
+          
+          // Перенаправляем на главную страницу
+          setTimeout(() => {
+            window.opener.postMessage({
+              type: 'TELEGRAM_AUTH_SUCCESS',
+              user: data.user,
+              tokens: {
+                accessToken: data.accessToken,
+                refreshToken: data.refreshToken
+              }
+            }, window.location.origin);
+            window.close();
+          }, 1000);
+        } else {
+          statusDiv.innerHTML = `<div class="error">Ошибка авторизации: ${data.error || 'Неизвестная ошибка'}</div>`;
+        }
+      })
+      .catch(error => {
+        console.error('Ошибка авторизации:', error);
+        statusDiv.innerHTML = '<div class="error">Ошибка авторизации. Попробуйте еще раз.</div>';
+      });
+    }
+
+    // Обработка успешной авторизации через виджет
+    function onTelegramAuth(user) {
+      const statusDiv = document.getElementById('status');
+      statusDiv.innerHTML = '<div class="loading"><div class="spinner"></div><span>Авторизация...</span></div>';
+      
+      fetch('/api/auth/telegram', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          chat_id: user.id,
+          username: user.username,
+          first_name: user.first_name,
+          last_name: user.last_name,
+          photo_url: user.photo_url
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          statusDiv.innerHTML = '<div class="success">Авторизация успешна! Перенаправление...</div>';
+          
+          // Сохраняем токены
+          if (data.accessToken) {
+            localStorage.setItem('accessToken', data.accessToken);
+          }
+          if (data.refreshToken) {
+            localStorage.setItem('refreshToken', data.refreshToken);
+          }
+          
+          // Перенаправляем на главную страницу
+          setTimeout(() => {
+            window.opener.postMessage({
+              type: 'TELEGRAM_AUTH_SUCCESS',
+              user: data.user,
+              tokens: {
+                accessToken: data.accessToken,
+                refreshToken: data.refreshToken
+              }
+            }, window.location.origin);
+            window.close();
+          }, 1000);
+        } else {
+          statusDiv.innerHTML = `<div class="error">Ошибка авторизации: ${data.error || 'Неизвестная ошибка'}</div>`;
+        }
+      })
+      .catch(error => {
+        console.error('Ошибка авторизации:', error);
+        statusDiv.innerHTML = '<div class="error">Ошибка авторизации. Попробуйте еще раз.</div>';
+      });
+    }
+  </script>
+</body>
+</html>

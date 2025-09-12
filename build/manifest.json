@@ -1,12 +1,17 @@
 {
-  "short_name": "Tuktuk",
-  "name": "Tuktuk Messenger",
-  "description": "A modern real-time chat application",
+  "short_name": "Тук-Тук",
+  "name": "Тук-Тук",
+  "description": "Современный мессенджер для общения в реальном времени",
   "icons": [
     {
       "src": "favicon.ico",
       "sizes": "64x64 32x32 24x24 16x16",
       "type": "image/x-icon"
+    },
+    {
+      "src": "favicon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any"
     },
     {
       "src": "logo192.png",
@@ -21,7 +26,7 @@
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#000000",
+  "theme_color": "#D0BCFF",
   "background_color": "#ffffff",
   "orientation": "portrait-primary"
 }
