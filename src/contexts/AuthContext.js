@@ -89,8 +89,10 @@ export const AuthProvider = ({ children }) => {
         // Проверяем, что мы в браузере
         if (typeof window !== 'undefined' && window.localStorage) {
           const token = localStorage.getItem('accessToken');
+          console.log('🔑 Токен для запроса:', token ? 'есть' : 'нет', config.url);
           if (token) {
             config.headers.Authorization = `Bearer ${token}`;
+            console.log('🔑 Добавлен заголовок Authorization для:', config.url);
           }
         }
         return config;
@@ -103,6 +105,8 @@ export const AuthProvider = ({ children }) => {
       (response) => response,
       async (error) => {
         const originalRequest = error.config;
+        
+        console.log('🚨 Ошибка запроса:', error.response?.status, originalRequest.url);
         
         // Only retry if it's a 401 error, not already retried, and not a refresh request
         if (error.response?.status === 401 && 
@@ -146,11 +150,17 @@ export const AuthProvider = ({ children }) => {
 
   // Define updateOnlineStatus function before using it
   const updateOnlineStatus = React.useCallback(async (isOnline) => {
-    if (!state.isAuthenticated) return;
+    console.log('📡 updateOnlineStatus вызвана:', isOnline, 'isAuthenticated:', state.isAuthenticated);
+    if (!state.isAuthenticated) {
+      console.log('📡 Пользователь не авторизован, пропускаем обновление статуса');
+      return;
+    }
     
     try {
+      console.log('📡 Отправляем запрос на обновление статуса');
       await axios.put('/user/status', { isOnline });
       dispatch({ type: 'UPDATE_USER', payload: { isOnline, lastSeen: new Date() } });
+      console.log('📡 Статус обновлен успешно');
     } catch (error) {
       console.error('Failed to update online status:', error);
     }
@@ -205,19 +215,24 @@ export const AuthProvider = ({ children }) => {
       console.log('🔍 Начинаем проверку аутентификации...');
       console.log('🔍 Текущее состояние loading:', state.loading);
       
-      // Очищаем localStorage при первой загрузке в production
+      // Очищаем localStorage при переходе на production домен
       // Это поможет избежать проблем с токенами от localhost
       if (typeof window !== 'undefined' && window.localStorage) {
-        const isFirstLoad = !localStorage.getItem('appLoaded');
         const isProduction = window.location.hostname !== 'localhost';
+        const lastDomain = localStorage.getItem('lastDomain');
+        const currentDomain = window.location.hostname;
         
-        if (isFirstLoad && isProduction) {
-          console.log('🔄 Первая загрузка в production - очищаем localStorage');
+        if (isProduction) {
+          console.log('🔄 Production домен - очищаем localStorage от localhost токенов');
+          console.log('🔄 Текущий домен:', currentDomain);
           localStorage.removeItem('accessToken');
-          localStorage.setItem('appLoaded', 'true');
+          localStorage.setItem('lastDomain', currentDomain);
           dispatch({ type: 'LOGOUT' });
           return;
         }
+        
+        // Сохраняем текущий домен
+        localStorage.setItem('lastDomain', currentDomain);
       }
       
       try {
