@@ -85,6 +85,11 @@ const AuthService = {
         console.error('Данные ответа:', error.response.data);
         console.error('Статус ответа:', error.response.status);
         console.error('Заголовки ответа:', error.response.headers);
+        
+        // Показываем детали ошибок валидации
+        if (error.response.data.errors) {
+          console.error('Детали ошибок валидации:', error.response.data.errors);
+        }
       }
       throw error;
     }

@@ -90,6 +90,14 @@ export const AuthProvider = ({ children }) => {
         if (typeof window !== 'undefined' && window.localStorage) {
           const token = localStorage.getItem('accessToken');
           console.log('🔑 Токен для запроса:', token ? 'есть' : 'нет', config.url);
+          
+          // Дополнительная проверка для production
+          const isProduction = window.location.hostname !== 'localhost';
+          if (isProduction && !token) {
+            console.log('🔑 Production домен без токена - не добавляем Authorization');
+            return config;
+          }
+          
           if (token) {
             config.headers.Authorization = `Bearer ${token}`;
             console.log('🔑 Добавлен заголовок Authorization для:', config.url);
@@ -129,7 +137,7 @@ export const AuthProvider = ({ children }) => {
             originalRequest.headers.Authorization = `Bearer ${accessToken}`;
             return axios(originalRequest);
           } catch (refreshError) {
-            console.log('Refresh failed, logging out user');
+            console.log('❌ Refresh не удался, перенаправляем на логин');
             if (typeof window !== 'undefined' && window.localStorage) {
               localStorage.removeItem('accessToken');
             }
@@ -173,7 +181,11 @@ export const AuthProvider = ({ children }) => {
 
   // Handle online status based on page visibility and connection
   useEffect(() => {
-    if (!state.isAuthenticated) return;
+    console.log('🔄 useEffect для online status, isAuthenticated:', state.isAuthenticated);
+    if (!state.isAuthenticated) {
+      console.log('🔄 Пользователь не авторизован, пропускаем настройку online status');
+      return;
+    }
 
     const handleVisibilityChange = () => {
       if (document.hidden) {
@@ -195,8 +207,13 @@ export const AuthProvider = ({ children }) => {
       updateOnlineStatus(false);
     };
 
-    // Set initial online status
-    updateOnlineStatus(true);
+    // Set initial online status with delay to ensure state is updated
+    setTimeout(() => {
+      if (state.isAuthenticated) {
+        console.log('🔄 Устанавливаем начальный статус онлайн');
+        updateOnlineStatus(true);
+      }
+    }, 100);
 
     // Add event listeners
     document.addEventListener('visibilitychange', handleVisibilityChange);
@@ -220,24 +237,19 @@ export const AuthProvider = ({ children }) => {
       console.log('🔍 Начинаем проверку аутентификации...');
       console.log('🔍 Текущее состояние loading:', state.loading);
       
-      // Очищаем localStorage при переходе на production домен
-      // Это поможет избежать проблем с токенами от localhost
+      // Проверяем, нужно ли перенаправить на логин в production
       if (typeof window !== 'undefined' && window.localStorage) {
         const isProduction = window.location.hostname !== 'localhost';
-        const lastDomain = localStorage.getItem('lastDomain');
-        const currentDomain = window.location.hostname;
+        const hasToken = localStorage.getItem('accessToken');
         
-        if (isProduction) {
-          console.log('🔄 Production домен - очищаем localStorage от localhost токенов');
-          console.log('🔄 Текущий домен:', currentDomain);
-          localStorage.removeItem('accessToken');
-          localStorage.setItem('lastDomain', currentDomain);
+        if (isProduction && hasToken) {
+          console.log('🔄 Production домен с токеном - проверяем валидность');
+          // Не очищаем localStorage, просто проверяем токен
+        } else if (isProduction && !hasToken) {
+          console.log('🔄 Production домен без токена - перенаправляем на логин');
           dispatch({ type: 'LOGOUT' });
           return;
         }
-        
-        // Сохраняем текущий домен
-        localStorage.setItem('lastDomain', currentDomain);
       }
       
       try {

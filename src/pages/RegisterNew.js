@@ -56,8 +56,10 @@ const Register = () => {
       setError('Имя пользователя не должно превышать 16 символов');
       return false;
     }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      setError('Пожалуйста, введите корректный email');
+    // Более строгая валидация email
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!emailRegex.test(formData.email)) {
+      setError('Пожалуйста, введите корректный email (например: user@example.com)');
       return false;
     }
     if (formData.password.length < 6) {
