@@ -151,8 +151,13 @@ export const AuthProvider = ({ children }) => {
   // Define updateOnlineStatus function before using it
   const updateOnlineStatus = React.useCallback(async (isOnline) => {
     console.log('📡 updateOnlineStatus вызвана:', isOnline, 'isAuthenticated:', state.isAuthenticated);
-    if (!state.isAuthenticated) {
-      console.log('📡 Пользователь не авторизован, пропускаем обновление статуса');
+    
+    // Проверяем, есть ли токен в localStorage
+    const hasToken = typeof window !== 'undefined' && window.localStorage && localStorage.getItem('accessToken');
+    console.log('📡 Токен в localStorage:', hasToken ? 'есть' : 'нет');
+    
+    if (!state.isAuthenticated || !hasToken) {
+      console.log('📡 Пользователь не авторизован или нет токена, пропускаем обновление статуса');
       return;
     }
     

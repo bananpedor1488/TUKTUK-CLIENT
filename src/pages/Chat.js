@@ -40,20 +40,22 @@ const Chat = () => {
 
   // Load chats on component mount
   useEffect(() => {
-    loadChats();
-  }, []);
+    if (isAuthenticated) {
+      loadChats();
+    }
+  }, [isAuthenticated]);
 
   // Fallback: periodically refresh chat list to ensure it's up to date
   useEffect(() => {
     const refreshInterval = setInterval(() => {
-      if (socket && isConnected) {
+      if (socket && isConnected && isAuthenticated) {
         console.log('🔄 Periodic chat list refresh');
         loadChats();
       }
     }, 30000); // Refresh every 30 seconds
 
     return () => clearInterval(refreshInterval);
-  }, [socket, isConnected]);
+  }, [socket, isConnected, isAuthenticated]);
 
   // Socket event listeners
   useEffect(() => {
@@ -123,13 +125,24 @@ const Chat = () => {
   }, [socket, selectedChat]);
 
   const loadChats = async () => {
+    console.log('📱 loadChats вызвана, isAuthenticated:', isAuthenticated);
+    
+    // Проверяем авторизацию перед запросом
+    if (!isAuthenticated) {
+      console.log('📱 Пользователь не авторизован, пропускаем загрузку чатов');
+      setIsLoading(false);
+      return;
+    }
+    
     try {
+      console.log('📱 Загружаем чаты...');
       const response = await axios.get('/chat');
       // Удаляем дубликаты по _id
       const uniqueChats = response.data.chats.filter((chat, index, self) => 
         index === self.findIndex(c => c._id === chat._id)
       );
       setChats(uniqueChats);
+      console.log('📱 Чаты загружены:', uniqueChats.length);
     } catch (error) {
       console.error('Error loading chats:', error);
     } finally {
