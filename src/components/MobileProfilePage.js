@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { FiArrowLeft, FiUser, FiBell, FiShield, FiLogOut, FiEdit3, FiSave, FiSettings, FiEye, FiVolume2 } from 'react-icons/fi';
+import React, { useState, useEffect } from 'react';
+import { FiArrowLeft, FiUser, FiBell, FiShield, FiLogOut, FiEdit3, FiSave, FiSettings, FiEye, FiVolume2, FiVolumeX, FiBellOff, FiEyeOff } from 'react-icons/fi';
 import ThemeToggle from './ThemeToggle/ThemeToggle';
 import styles from './MobileProfilePage.module.css';
 
@@ -49,12 +49,12 @@ const MobileProfilePage = ({ isOpen, onClose, user }) => {
     }));
   };
 
-  // const handleThemeChange = (theme) => {
-  //   handleSettingChange('theme', theme);
-  //   // Применяем тему мгновенно
-  //   document.documentElement.setAttribute('data-theme', theme);
-  //   localStorage.setItem('tuktuk-theme', theme);
-  // };
+  const handleThemeChange = (theme) => {
+    handleSettingChange('theme', theme);
+    // Применяем тему мгновенно
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('tuktuk-theme', theme);
+  };
 
   const handleSave = () => {
     // Сохраняем настройки

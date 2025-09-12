@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { AuthProvider } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { SocketProvider } from './contexts/SocketContext';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -12,30 +12,10 @@ import About from './pages/About';
 import RegisterProfile from './pages/RegisterProfile';
 import Chat from './pages/Chat';
 import ThemeDemo from './pages/ThemeDemo';
-import DebugAuth from './components/DebugAuth';
 import './App.css';
 import './styles/theme.css';
 import './styles/uikit.css';
 import './styles/messenger.css';
-
-// Компонент для умного редиректа с главной страницы
-const HomeRedirect = () => {
-  const { isAuthenticated, loading } = useAuth();
-  
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="loading-spinner"></div>
-      </div>
-    );
-  }
-  
-  if (isAuthenticated) {
-    return <Navigate to="/chat" replace />;
-  }
-  
-  return <Navigate to="/login" replace />;
-};
 
 function App() {
   return (
@@ -58,7 +38,6 @@ function App() {
                   } 
                 />
                 <Route path="/themes" element={<ThemeDemo />} />
-                <Route path="/debug" element={<DebugAuth />} />
                 <Route 
                   path="/chat" 
                   element={
@@ -69,7 +48,7 @@ function App() {
                     </ProtectedRoute>
                   } 
                 />
-                <Route path="/" element={<HomeRedirect />} />
+                <Route path="/" element={<Navigate to="/login" replace />} />
               </Routes>
             </div>
           </Router>

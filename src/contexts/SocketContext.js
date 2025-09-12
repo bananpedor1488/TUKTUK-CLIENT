@@ -56,7 +56,7 @@ export const SocketProvider = ({ children }) => {
         socket.close();
       }
     };
-  }, [isAuthenticated, accessToken, socket]);
+  }, [isAuthenticated, accessToken]);
 
   const joinChat = (chatId) => {
     if (socket && isConnected) {

@@ -161,70 +161,70 @@ export const useThemeManager = () => {
   }, [notifyThemeChange]);
 
   // Переключение на дефолтную тему
-  // const switchToDefaultTheme = useCallback(async () => {
-  //   await applyTheme('default');
-  // }, [applyTheme]);
+  const switchToDefaultTheme = useCallback(async () => {
+    await applyTheme('default');
+  }, [applyTheme]);
 
   // Переключение на блюрную тему
-  // const switchToBlurTheme = useCallback(async () => {
-  //   await applyTheme('blur');
-  // }, [applyTheme]);
+  const switchToBlurTheme = useCallback(async () => {
+    await applyTheme('blur');
+  }, [applyTheme]);
 
   // Переключение на белую тему
-  // const switchToLightTheme = useCallback(async () => {
-  //   await applyTheme('light');
-  // }, [applyTheme]);
+  const switchToLightTheme = useCallback(async () => {
+    await applyTheme('light');
+  }, [applyTheme]);
 
   // Переключение на тему midnight
-  // const switchToMidnightTheme = useCallback(async () => {
-  //   await applyTheme('midnight');
-  // }, [applyTheme]);
+  const switchToMidnightTheme = useCallback(async () => {
+    await applyTheme('midnight');
+  }, [applyTheme]);
 
   // Переключение на тему ocean
-  // const switchToOceanTheme = useCallback(async () => {
-  //   await applyTheme('ocean');
-  // }, [applyTheme]);
+  const switchToOceanTheme = useCallback(async () => {
+    await applyTheme('ocean');
+  }, [applyTheme]);
 
   // Переключение на тему sunset
-  // const switchToSunsetTheme = useCallback(async () => {
-  //   await applyTheme('sunset');
-  // }, [applyTheme]);
+  const switchToSunsetTheme = useCallback(async () => {
+    await applyTheme('sunset');
+  }, [applyTheme]);
 
   // Переключение на тему forest
-  // const switchToForestTheme = useCallback(async () => {
-  //   await applyTheme('forest');
-  // }, [applyTheme]);
+  const switchToForestTheme = useCallback(async () => {
+    await applyTheme('forest');
+  }, [applyTheme]);
 
   // Переключение на тему aurora
-  // const switchToAuroraTheme = useCallback(async () => {
-  //   await applyTheme('aurora');
-  // }, [applyTheme]);
+  const switchToAuroraTheme = useCallback(async () => {
+    await applyTheme('aurora');
+  }, [applyTheme]);
 
   // Переключение на тему cosmic
-  // const switchToCosmicTheme = useCallback(async () => {
-  //   await applyTheme('cosmic');
-  // }, [applyTheme]);
+  const switchToCosmicTheme = useCallback(async () => {
+    await applyTheme('cosmic');
+  }, [applyTheme]);
 
   // Переключение на тему neon
-  // const switchToNeonTheme = useCallback(async () => {
-  //   await applyTheme('neon');
-  // }, [applyTheme]);
+  const switchToNeonTheme = useCallback(async () => {
+    await applyTheme('neon');
+  }, [applyTheme]);
 
   // Переключение на тему vintage
-  // const switchToVintageTheme = useCallback(async () => {
-  //   await applyTheme('vintage');
-  // }, [applyTheme]);
+  const switchToVintageTheme = useCallback(async () => {
+    await applyTheme('vintage');
+  }, [applyTheme]);
 
   // Переключение на тему pickme
-  // const switchToPickmeTheme = useCallback(async () => {
-  //   await applyTheme('pickme');
-  // }, [applyTheme]);
+  const switchToPickmeTheme = useCallback(async () => {
+    await applyTheme('pickme');
+  }, [applyTheme]);
 
   // Переключение между темами
-  // const toggleTheme = useCallback(async () => {
-  //   const newTheme = currentTheme === 'default' ? 'blur' : 'default';
-  //   await applyTheme(newTheme);
-  // }, [currentTheme, applyTheme]);
+  const toggleTheme = useCallback(async () => {
+    const newTheme = currentTheme === 'default' ? 'blur' : 'default';
+    await applyTheme(newTheme);
+  }, [currentTheme, applyTheme]);
 
   // Инициализация темы при загрузке
   useEffect(() => {

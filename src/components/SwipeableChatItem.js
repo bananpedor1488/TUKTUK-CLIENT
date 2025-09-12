@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { FiTrash2, FiMoreHorizontal, FiArchive, FiBellOff } from 'react-icons/fi';
 import styles from './SwipeableChatItem.module.css';
 
@@ -18,13 +18,24 @@ const SwipeableChatItem = ({
   const SWIPE_THRESHOLD = 80; // Минимальное расстояние для свайпа
 
   // Touch обработчики с правильным preventDefault
-  const handleTouchStart = useCallback((e) => {
+  const handleTouchStart = (e) => {
     if (!isMobile) return;
     setStartX(e.touches[0].clientX);
     setIsDragging(true);
-  }, [isMobile]);
+  };
 
-  const handleTouchEnd = useCallback(() => {
+  const handleTouchMove = (e) => {
+    if (!isMobile || !isDragging) return;
+    const deltaX = e.touches[0].clientX - startX; // Возвращаем обратно
+    setCurrentX(deltaX);
+    
+    // Ограничиваем свайп только влево (отрицательные значения)
+    if (deltaX < 0) {
+      setIsSwiped(Math.abs(deltaX) > SWIPE_THRESHOLD);
+    }
+  };
+
+  const handleTouchEnd = () => {
     if (!isMobile || !isDragging) return;
     setIsDragging(false);
     
@@ -34,40 +45,30 @@ const SwipeableChatItem = ({
       setIsSwiped(false);
       setCurrentX(0);
     }
-  }, [isMobile, isDragging, currentX]);
+  };
 
-  // const handleTouchMove = (e) => {
-  //   if (!isMobile || !isDragging) return;
-  //   const deltaX = e.touches[0].clientX - startX; // Возвращаем обратно
-  //   setCurrentX(deltaX);
-    
-  //   // Ограничиваем свайп только влево (отрицательные значения)
-  //   if (deltaX < 0) {
-  //     setIsSwiped(Math.abs(deltaX) > SWIPE_THRESHOLD);
-  //   }
-  // };
+  // Отключаем свайп на десктопе - только ПКМ меню
+  const handleMouseDown = (e) => {
+    // Не обрабатываем свайп на десктопе
+    return;
+  };
 
-  // const handleMouseDown = (e) => {
-  //   // Не обрабатываем свайп на десктопе
-  //   return;
-  // };
+  const handleMouseMove = (e) => {
+    // Не обрабатываем свайп на десктопе
+    return;
+  };
 
-  // const handleMouseMove = (e) => {
-  //   // Не обрабатываем свайп на десктопе
-  //   return;
-  // };
+  const handleMouseUp = () => {
+    // Не обрабатываем свайп на десктопе
+    return;
+  };
 
-  // const handleMouseUp = () => {
-  //   // Не обрабатываем свайп на десктопе
-  //   return;
-  // };
-
-  const handleRightClick = useCallback((e) => {
+  const handleRightClick = (e) => {
     e.preventDefault();
     if (onMore) {
       onMore(e);
     }
-  }, [onMore]);
+  };
 
   const resetSwipe = () => {
     setIsSwiped(false);
@@ -109,7 +110,7 @@ const SwipeableChatItem = ({
         container.removeEventListener('contextmenu', handleRightClick);
       };
     }
-  }, [isMobile, isDragging, currentX, startX, handleRightClick, handleTouchEnd, handleTouchStart]);
+  }, [isMobile, isDragging, currentX, startX]);
 
   return (
     <div className={styles.swipeableContainer}>

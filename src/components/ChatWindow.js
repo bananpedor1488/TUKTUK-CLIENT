@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { useSocket } from '../contexts/SocketContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -27,28 +27,6 @@ const ChatWindow = ({ chat, onChatUpdate, onBackToChatList }) => {
   const { socket, isConnected, joinChat, leaveChat, sendMessage, startTyping, stopTyping } = useSocket();
   const { user } = useAuth();
 
-  const loadMessages = useCallback(async () => {
-    try {
-      setIsLoading(true);
-      const response = await axios.get(`/chat/${chat._id}/messages`);
-      setMessages(response.data.messages);
-    } catch (error) {
-      console.error('Failed to load messages:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [chat]);
-
-  const markMessagesAsRead = useCallback(async () => {
-    if (!chat) return;
-    
-    try {
-      await axios.put(`/chat/${chat._id}/read`);
-    } catch (error) {
-      console.error('Failed to mark messages as read:', error);
-    }
-  }, [chat]);
-
   // Отладка данных пользователя
   useEffect(() => {
     // console.log('👤 User data in ChatWindow:', {
@@ -73,7 +51,7 @@ const ChatWindow = ({ chat, onChatUpdate, onBackToChatList }) => {
         leaveChat(chat._id);
       }
     };
-  }, [chat, isConnected, joinChat, leaveChat, loadMessages, socket]);
+  }, [chat?._id]); // Убираем socket и isConnected из зависимостей
 
   // Подключаемся к чату при изменении состояния соединения
   useEffect(() => {
@@ -86,14 +64,24 @@ const ChatWindow = ({ chat, onChatUpdate, onBackToChatList }) => {
         leaveChat(chat._id);
       }
     };
-  }, [chat, joinChat, leaveChat, socket, isConnected]);
+  }, [socket, isConnected, chat?._id]);
 
   // Mark messages as read when chat is opened
   useEffect(() => {
     if (chat && messages.length > 0) {
       markMessagesAsRead();
     }
-  }, [chat, markMessagesAsRead, messages.length]);
+  }, [chat?._id, messages.length]);
+
+  const markMessagesAsRead = async () => {
+    if (!chat) return;
+    
+    try {
+      await axios.put(`/chat/${chat._id}/read`);
+    } catch (error) {
+      console.error('Failed to mark messages as read:', error);
+    }
+  };
 
   // Socket event listeners
   useEffect(() => {
@@ -166,12 +154,24 @@ const ChatWindow = ({ chat, onChatUpdate, onBackToChatList }) => {
         socket.off('chat_updated', handleChatUpdated);
       };
     }
-  }, [socket, chat, onChatUpdate]);
+  }, [socket, chat?._id, onChatUpdate]);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  const loadMessages = async () => {
+    try {
+      setIsLoading(true);
+      const response = await axios.get(`/chat/${chat._id}/messages`);
+      setMessages(response.data.messages);
+    } catch (error) {
+      console.error('Error loading messages:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });

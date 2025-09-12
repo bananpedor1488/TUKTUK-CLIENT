@@ -8,33 +8,33 @@ const MessageBubble = ({ message, isOwn, senderName, senderAvatar, disableAnimat
     return formatMessageTime(date);
   };
 
-  // const formatDate = (date) => {
-  //   const messageDate = new Date(date);
-  //   const today = new Date();
-  //   const yesterday = new Date(today);
-  //   yesterday.setDate(yesterday.getDate() - 1);
+  const formatDate = (date) => {
+    const messageDate = new Date(date);
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
 
-  //   if (messageDate.toDateString() === today.toDateString()) {
-  //     return null; // Не показываем дату для сегодняшних сообщений
-  //   } else if (messageDate.toDateString() === yesterday.toDateString()) {
-  //     return 'Вчера';
-  //   } else {
-  //     return messageDate.toLocaleDateString('ru-RU', { 
-  //       day: 'numeric',
-  //       month: 'short',
-  //       year: messageDate.getFullYear() !== today.getFullYear() ? 'numeric' : undefined
-  //     });
-  //   }
-  // };
+    if (messageDate.toDateString() === today.toDateString()) {
+      return null; // Не показываем дату для сегодняшних сообщений
+    } else if (messageDate.toDateString() === yesterday.toDateString()) {
+      return 'Вчера';
+    } else {
+      return messageDate.toLocaleDateString('ru-RU', { 
+        day: 'numeric',
+        month: 'short',
+        year: messageDate.getFullYear() !== today.getFullYear() ? 'numeric' : undefined
+      });
+    }
+  };
 
-  // const shouldShowDate = (currentMessage, previousMessage) => {
-  //   if (!previousMessage) return true;
+  const shouldShowDate = (currentMessage, previousMessage) => {
+    if (!previousMessage) return true;
     
-  //   const currentDate = new Date(currentMessage.createdAt).toDateString();
-  //   const previousDate = new Date(previousMessage.createdAt).toDateString();
+    const currentDate = new Date(currentMessage.createdAt).toDateString();
+    const previousDate = new Date(previousMessage.createdAt).toDateString();
     
-  //   return currentDate !== previousDate;
-  // };
+    return currentDate !== previousDate;
+  };
 
   const getMessageContent = () => {
     switch (message.type) {
