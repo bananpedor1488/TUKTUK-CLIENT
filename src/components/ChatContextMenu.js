@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { FiTrash2, FiArchive, FiBellOff, FiMoreHorizontal, FiUser, FiSettings } from 'react-icons/fi';
+import React, { useEffect, useRef } from 'react';
+import { FiTrash2, FiArchive, FiBellOff, FiUser, FiSettings } from 'react-icons/fi';
 import { useAuth } from '../contexts/AuthContext';
 import styles from './ChatContextMenu.module.css';
 

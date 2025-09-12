@@ -19,7 +19,7 @@ const Register = () => {
   const [success, setSuccess] = useState('');
 
   const { register, isAuthenticated } = useAuth();
-  const { theme } = useTheme();
+  // const { theme } = useTheme();
   const isMobile = useIsMobile();
   const navigate = useNavigate();
 

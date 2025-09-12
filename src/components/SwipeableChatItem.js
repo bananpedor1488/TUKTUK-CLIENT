@@ -24,17 +24,6 @@ const SwipeableChatItem = ({
     setIsDragging(true);
   };
 
-  const handleTouchMove = (e) => {
-    if (!isMobile || !isDragging) return;
-    const deltaX = e.touches[0].clientX - startX; // Возвращаем обратно
-    setCurrentX(deltaX);
-    
-    // Ограничиваем свайп только влево (отрицательные значения)
-    if (deltaX < 0) {
-      setIsSwiped(Math.abs(deltaX) > SWIPE_THRESHOLD);
-    }
-  };
-
   const handleTouchEnd = () => {
     if (!isMobile || !isDragging) return;
     setIsDragging(false);
@@ -47,21 +36,31 @@ const SwipeableChatItem = ({
     }
   };
 
-  // Отключаем свайп на десктопе - только ПКМ меню
-  const handleMouseDown = (e) => {
-    // Не обрабатываем свайп на десктопе
-    return;
-  };
+  // const handleTouchMove = (e) => {
+  //   if (!isMobile || !isDragging) return;
+  //   const deltaX = e.touches[0].clientX - startX; // Возвращаем обратно
+  //   setCurrentX(deltaX);
+    
+  //   // Ограничиваем свайп только влево (отрицательные значения)
+  //   if (deltaX < 0) {
+  //     setIsSwiped(Math.abs(deltaX) > SWIPE_THRESHOLD);
+  //   }
+  // };
 
-  const handleMouseMove = (e) => {
-    // Не обрабатываем свайп на десктопе
-    return;
-  };
+  // const handleMouseDown = (e) => {
+  //   // Не обрабатываем свайп на десктопе
+  //   return;
+  // };
 
-  const handleMouseUp = () => {
-    // Не обрабатываем свайп на десктопе
-    return;
-  };
+  // const handleMouseMove = (e) => {
+  //   // Не обрабатываем свайп на десктопе
+  //   return;
+  // };
+
+  // const handleMouseUp = () => {
+  //   // Не обрабатываем свайп на десктопе
+  //   return;
+  // };
 
   const handleRightClick = (e) => {
     e.preventDefault();
@@ -110,7 +109,7 @@ const SwipeableChatItem = ({
         container.removeEventListener('contextmenu', handleRightClick);
       };
     }
-  }, [isMobile, isDragging, currentX, startX]);
+  }, [isMobile, isDragging, currentX, startX, handleRightClick, handleTouchEnd, handleTouchStart]);
 
   return (
     <div className={styles.swipeableContainer}>

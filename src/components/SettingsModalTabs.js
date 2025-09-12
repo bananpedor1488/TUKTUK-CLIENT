@@ -52,12 +52,12 @@ const SettingsModalTabs = ({ isOpen, onClose, user }) => {
     }
   }, [user]);
 
-  const handleThemeChange = (theme) => {
-    handleSettingChange('theme', theme);
-    // Применяем тему мгновенно
-    document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('tuktuk-theme', theme);
-  };
+  // const handleThemeChange = (theme) => {
+  //   handleSettingChange('theme', theme);
+  //   // Применяем тему мгновенно
+  //   document.documentElement.setAttribute('data-theme', theme);
+  //   localStorage.setItem('tuktuk-theme', theme);
+  // };
 
   const handleSave = async () => {
     try {

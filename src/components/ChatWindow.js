@@ -51,7 +51,7 @@ const ChatWindow = ({ chat, onChatUpdate, onBackToChatList }) => {
         leaveChat(chat._id);
       }
     };
-  }, [chat?._id]); // Убираем socket и isConnected из зависимостей
+  }, [chat, isConnected, joinChat, leaveChat, loadMessages, socket]);
 
   // Подключаемся к чату при изменении состояния соединения
   useEffect(() => {
@@ -64,14 +64,14 @@ const ChatWindow = ({ chat, onChatUpdate, onBackToChatList }) => {
         leaveChat(chat._id);
       }
     };
-  }, [socket, isConnected, chat?._id]);
+  }, [chat, joinChat, leaveChat, socket, isConnected]);
 
   // Mark messages as read when chat is opened
   useEffect(() => {
     if (chat && messages.length > 0) {
       markMessagesAsRead();
     }
-  }, [chat?._id, messages.length]);
+  }, [chat, markMessagesAsRead, messages.length]);
 
   const markMessagesAsRead = async () => {
     if (!chat) return;
@@ -154,7 +154,7 @@ const ChatWindow = ({ chat, onChatUpdate, onBackToChatList }) => {
         socket.off('chat_updated', handleChatUpdated);
       };
     }
-  }, [socket, chat?._id, onChatUpdate]);
+  }, [socket, chat, onChatUpdate]);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {

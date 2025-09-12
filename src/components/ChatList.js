@@ -130,28 +130,28 @@ const ChatList = ({ chats, selectedChat, onChatSelect, isLoading, showAIChat, on
     });
   };
 
-  const getOnlineStatus = (chat) => {
-    if (chat.type === 'group') {
-      const onlineCount = chat.participants?.filter(p => p && p.isOnline).length || 0;
-      return onlineCount > 0 ? (
-        <span style={{ color: '#10B981', fontSize: '12px' }}>
-          {onlineCount} онлайн
-        </span>
-      ) : null;
-    } else {
-      const otherParticipant = chat.participants?.find(p => p && p._id !== user._id);
-      return otherParticipant?.isOnline ? (
-        <span style={{ color: '#10B981', fontSize: '12px' }}>
-          <FiCircle size={8} fill="currentColor" style={{ marginRight: '4px' }} />
-          Онлайн
-        </span>
-      ) : (
-        <span style={{ color: '#6B7280', fontSize: '12px' }}>
-          Был в сети {formatLastSeen(otherParticipant?.lastSeen)}
-        </span>
-      );
-    }
-  };
+  // const getOnlineStatus = (chat) => {
+  //   if (chat.type === 'group') {
+  //     const onlineCount = chat.participants?.filter(p => p && p.isOnline).length || 0;
+  //     return onlineCount > 0 ? (
+  //       <span style={{ color: '#10B981', fontSize: '12px' }}>
+  //         {onlineCount} онлайн
+  //       </span>
+  //     ) : null;
+  //   } else {
+  //     const otherParticipant = chat.participants?.find(p => p && p._id !== user._id);
+  //     return otherParticipant?.isOnline ? (
+  //       <span style={{ color: '#10B981', fontSize: '12px' }}>
+  //         <FiCircle size={8} fill="currentColor" style={{ marginRight: '4px' }} />
+  //         Онлайн
+  //       </span>
+  //     ) : (
+  //       <span style={{ color: '#6B7280', fontSize: '12px' }}>
+  //         Был в сети {formatLastSeen(otherParticipant?.lastSeen)}
+  //       </span>
+  //     );
+  //   }
+  // };
 
   return (
     <div className={styles.chatList}>

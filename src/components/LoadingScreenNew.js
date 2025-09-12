@@ -3,7 +3,7 @@ import { useAuth } from '../contexts/AuthContext';
 import useIsMobile from '../hooks/useIsMobile';
 
 const LoadingScreenNew = () => {
-  const { loading, logout } = useAuth();
+  const { loading } = useAuth();
   const isMobile = useIsMobile();
   const [loadingMessage, setLoadingMessage] = useState('Проверка аккаунта...');
   const [showResetButton, setShowResetButton] = useState(false);

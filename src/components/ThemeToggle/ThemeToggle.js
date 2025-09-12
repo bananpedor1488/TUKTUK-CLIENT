@@ -61,6 +61,9 @@ const ThemeToggle = ({ variant = 'buttons' }) => {
       case 'pickme':
         await switchToPickmeTheme();
         break;
+      default:
+        await switchToDefaultTheme();
+        break;
     }
   };
 
@@ -82,23 +85,23 @@ const ThemeToggle = ({ variant = 'buttons' }) => {
     }
   };
 
-  const getThemeName = (themeType) => {
-    switch (themeType) {
-      case 'default': return 'Классическая';
-      case 'blur': return 'Blur Glass';
-      case 'light': return 'Light';
-      case 'midnight': return 'Midnight';
-      case 'ocean': return 'Ocean';
-      case 'sunset': return 'Sunset';
-      case 'forest': return 'Forest';
-      case 'aurora': return 'Aurora';
-      case 'cosmic': return 'Cosmic';
-      case 'neon': return 'Neon';
-      case 'vintage': return 'Vintage';
-      case 'pickme': return 'Pickme';
-      default: return 'Классическая';
-    }
-  };
+  // const getThemeName = (themeType) => {
+  //   switch (themeType) {
+  //     case 'default': return 'Классическая';
+  //     case 'blur': return 'Blur Glass';
+  //     case 'light': return 'Light';
+  //     case 'midnight': return 'Midnight';
+  //     case 'ocean': return 'Ocean';
+  //     case 'sunset': return 'Sunset';
+  //     case 'forest': return 'Forest';
+  //     case 'aurora': return 'Aurora';
+  //     case 'cosmic': return 'Cosmic';
+  //     case 'neon': return 'Neon';
+  //     case 'vintage': return 'Vintage';
+  //     case 'pickme': return 'Pickme';
+  //     default: return 'Классическая';
+  //   }
+  // };
 
   const themes = [
     { type: 'default', name: 'Классическая', icon: '🌙' },

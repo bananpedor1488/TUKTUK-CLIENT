@@ -62,6 +62,7 @@ export const AuthProvider = ({ children }) => {
   // Configure axios defaults
   useEffect(() => {
     const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+    console.log('🔧 API URL configured:', apiUrl);
     axios.defaults.baseURL = apiUrl;
     
     // Синхронизируем время с сервером
@@ -125,7 +126,7 @@ export const AuthProvider = ({ children }) => {
       axios.interceptors.response.eject(responseInterceptor);
       clearInterval(syncInterval);
     };
-  }, []); // Remove dependencies to prevent infinite loop
+  }, [state.user]); // Add state.user dependency
 
   // Define updateOnlineStatus function before using it
   const updateOnlineStatus = React.useCallback(async (isOnline) => {

@@ -3,16 +3,14 @@ import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext';
 import { useSocket } from '../contexts/SocketContext';
 import { useTheme } from '../contexts/ThemeContext';
-import { FiPlus, FiSettings, FiMoon, FiSun, FiLogOut, FiCircle, FiUser } from 'react-icons/fi';
+import { FiCircle, FiUser } from 'react-icons/fi';
 import ChatList from '../components/ChatList';
 import ChatWindow from '../components/ChatWindow';
 import AIChatWindow from '../components/AIChatWindow';
 import UserProfileModal from '../components/UserProfileModal';
-import SettingsModal from '../components/SettingsModal';
 import SettingsModalTabs from '../components/SettingsModalTabs';
 import UserAvatarDropdown from '../components/UserAvatarDropdown';
 import MobileNavigation from '../components/MobileNavigation';
-import MobileSettingsPage from '../components/MobileSettingsPage';
 import MobileProfilePage from '../components/MobileProfilePage';
 import SearchButton from '../components/SearchButton';
 import useIsMobile from '../hooks/useIsMobile';
@@ -23,21 +21,21 @@ const Chat = () => {
   const [chats, setChats] = useState([]);
   const [users, setUsers] = useState([]);
   const [showUserProfile, setShowUserProfile] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [showChatList, setShowChatList] = useState(true);
-  const [animationType, setAnimationType] = useState('slideFromRight'); // 'slideFromRight', 'scaleIn', 'fadeIn'
+  const [animationType] = useState('slideFromRight'); // 'slideFromRight', 'scaleIn', 'fadeIn'
   const [isAnimating, setIsAnimating] = useState(false);
   const [showDesktopSettings, setShowDesktopSettings] = useState(false);
-  const [showMobileSettings, setShowMobileSettings] = useState(false);
-  const [currentPage, setCurrentPage] = useState('messages');
+  const [showMobileSettings] = useState(false);
+  const [currentPage] = useState('messages');
   const [showMobileNav, setShowMobileNav] = useState(true); // Состояние для показа/скрытия мобильной навигации
   const [showAIChat, setShowAIChat] = useState(false); // Состояние для показа чата с ИИ
   const [showMobileProfile, setShowMobileProfile] = useState(false); // Состояние для показа мобильной страницы профиля
 
   const { user, logout } = useAuth();
   const { socket, isConnected } = useSocket();
-  const { theme, toggleTheme, setTheme } = useTheme();
+  const { theme } = useTheme();
   const isMobile = useIsMobile();
 
   // Load chats on component mount
@@ -296,9 +294,9 @@ const Chat = () => {
     setShowDesktopSettings(true);
   };
 
-  const handleThemeToggle = () => {
-    toggleTheme();
-  };
+  // const handleThemeToggle = () => {
+  //   toggleTheme();
+  // };
 
   const handleMobileProfileClose = () => {
     setShowMobileProfile(false);
