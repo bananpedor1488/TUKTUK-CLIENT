@@ -61,7 +61,7 @@ export const AuthProvider = ({ children }) => {
 
   // Configure axios defaults
   useEffect(() => {
-    const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+    const apiUrl = process.env.REACT_APP_API_URL || 'https://tuktuk-server.onrender.com/api';
     axios.defaults.baseURL = apiUrl;
     
     // Добавляем обработку ошибок для production

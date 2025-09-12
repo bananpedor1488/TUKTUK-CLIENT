@@ -16,7 +16,7 @@ export const setServerTimeOffset = (offset) => {
 export const syncWithServer = async () => {
   try {
     const startTime = Date.now();
-    const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+    const apiUrl = process.env.REACT_APP_API_URL || 'https://tuktuk-server.onrender.com/api';
     const response = await fetch(`${apiUrl}/time`, {
       method: 'GET',
       headers: {

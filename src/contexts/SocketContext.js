@@ -18,7 +18,7 @@ export const SocketProvider = ({ children }) => {
           socket.close();
         }
 
-        const socketUrl = process.env.REACT_APP_SOCKET_URL || 'http://localhost:5000';
+        const socketUrl = process.env.REACT_APP_SOCKET_URL || 'https://tuktuk-server.onrender.com';
         const newSocket = io(socketUrl, {
           auth: {
             token: accessToken
