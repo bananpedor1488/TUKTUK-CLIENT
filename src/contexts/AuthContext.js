@@ -203,20 +203,22 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const checkAuth = async () => {
       console.log('🔍 Начинаем проверку аутентификации...');
+      console.log('🔍 Текущее состояние loading:', state.loading);
       
-      // Временное решение: очищаем localStorage при первой загрузке
-      // Это поможет избежать проблем с поврежденными токенами
-      // ВРЕМЕННО ОТКЛЮЧЕНО - вызывает проблемы с загрузкой данных
-      /*
-      const isFirstLoad = !localStorage.getItem('appLoaded');
-      if (isFirstLoad) {
-        console.log('🔄 Первая загрузка - очищаем localStorage');
-        localStorage.removeItem('accessToken');
-        localStorage.setItem('appLoaded', 'true');
-        dispatch({ type: 'LOGOUT' });
-        return;
+      // Очищаем localStorage при первой загрузке в production
+      // Это поможет избежать проблем с токенами от localhost
+      if (typeof window !== 'undefined' && window.localStorage) {
+        const isFirstLoad = !localStorage.getItem('appLoaded');
+        const isProduction = window.location.hostname !== 'localhost';
+        
+        if (isFirstLoad && isProduction) {
+          console.log('🔄 Первая загрузка в production - очищаем localStorage');
+          localStorage.removeItem('accessToken');
+          localStorage.setItem('appLoaded', 'true');
+          dispatch({ type: 'LOGOUT' });
+          return;
+        }
       }
-      */
       
       try {
         // Get stored access token
@@ -235,14 +237,21 @@ export const AuthProvider = ({ children }) => {
         // Есть токен - проверяем его валидность
         try {
           const response = await AuthService.checkAuth();
-          console.log('✅ Токен действителен, пользователь авторизован:', response.data.user?.email);
-          dispatch({
-            type: 'LOGIN_SUCCESS',
-            payload: {
-              user: response.data.user,
-              accessToken: storedToken
-            }
-          });
+          console.log('✅ Ответ от checkAuth:', response.data);
+          
+          if (response.data.isAuthenticated && response.data.user) {
+            console.log('✅ Токен действителен, пользователь авторизован:', response.data.user?.email);
+            dispatch({
+              type: 'LOGIN_SUCCESS',
+              payload: {
+                user: response.data.user,
+                accessToken: storedToken
+              }
+            });
+          } else {
+            console.log('⚠️ Токен недействителен, пытаемся обновить...');
+            throw new Error('Token invalid');
+          }
         } catch (error) {
           console.log('⚠️ Токен недействителен, пытаемся обновить...', error.response?.status);
           // If token is invalid, try to refresh
@@ -257,14 +266,20 @@ export const AuthProvider = ({ children }) => {
             
             // Try to get user info again with new token
             const userResponse = await AuthService.checkAuth();
-            console.log('✅ Пользователь авторизован с новым токеном:', userResponse.data.user?.email);
-            dispatch({
-              type: 'LOGIN_SUCCESS',
-              payload: {
-                user: userResponse.data.user,
-                accessToken
-              }
-            });
+            console.log('✅ Ответ после обновления токена:', userResponse.data);
+            
+            if (userResponse.data.isAuthenticated && userResponse.data.user) {
+              console.log('✅ Пользователь авторизован с новым токеном:', userResponse.data.user?.email);
+              dispatch({
+                type: 'LOGIN_SUCCESS',
+                payload: {
+                  user: userResponse.data.user,
+                  accessToken
+                }
+              });
+            } else {
+              throw new Error('Still not authenticated after refresh');
+            }
           } catch (refreshError) {
             console.log('❌ Обновление токена не удалось, выходим из системы:', refreshError.response?.status);
             if (typeof window !== 'undefined' && window.localStorage) {
