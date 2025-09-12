@@ -6,7 +6,7 @@ const ChatSearch = ({ messages, onClose, isOpen }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [currentResultIndex, setCurrentResultIndex] = useState(0);
-  // const [highlightedMessageId, setHighlightedMessageId] = useState(null);
+  const [highlightedMessageId, setHighlightedMessageId] = useState(null);
   const searchInputRef = useRef(null);
 
   // Фокус на поле ввода при открытии

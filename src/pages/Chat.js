@@ -21,14 +21,14 @@ const Chat = () => {
   const [chats, setChats] = useState([]);
   const [users, setUsers] = useState([]);
   const [showUserProfile, setShowUserProfile] = useState(false);
-  const [searchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [showChatList, setShowChatList] = useState(true);
   const [animationType] = useState('slideFromRight'); // 'slideFromRight', 'scaleIn', 'fadeIn'
   const [isAnimating, setIsAnimating] = useState(false);
   const [showDesktopSettings, setShowDesktopSettings] = useState(false);
-  const [showMobileSettings] = useState(false);
-  const [currentPage] = useState('messages');
+  const [showMobileSettings, setShowMobileSettings] = useState(false);
+  const [currentPage, setCurrentPage] = useState('messages');
   const [showMobileNav, setShowMobileNav] = useState(true); // Состояние для показа/скрытия мобильной навигации
   const [showAIChat, setShowAIChat] = useState(false); // Состояние для показа чата с ИИ
   const [showMobileProfile, setShowMobileProfile] = useState(false); // Состояние для показа мобильной страницы профиля
