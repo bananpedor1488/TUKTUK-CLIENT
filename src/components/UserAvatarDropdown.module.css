@@ -1,0 +1,248 @@
+/* User Avatar Dropdown - Glassmorphism стиль */
+.avatarContainer {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.avatarButton {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  padding: 6px 8px;
+  border-radius: 20px;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.avatarButton:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.avatarPlaceholder {
+  color: white;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.avatar:hover {
+  border-color: var(--theme-main-color, #d0bcff);
+  transform: scale(1.05);
+}
+
+.avatarImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatarIcon {
+  color: white;
+}
+
+.chevron {
+  color: var(--theme-text-secondary);
+  transition: transform 0.2s ease;
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
+}
+
+/* Выпадающее меню */
+.dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  min-width: 280px;
+  z-index: 1000;
+  animation: dropdownSlideIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+
+.dropdownHeader {
+  padding: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.userInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.userAvatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  position: relative;
+}
+
+.userAvatarPlaceholder {
+  color: white;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.userAvatarImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.userAvatarIcon {
+  color: white;
+}
+
+.userDetails {
+  flex: 1;
+}
+
+.userName {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--theme-text-primary);
+  margin-bottom: 4px;
+}
+
+.userStatus {
+  font-size: 12px;
+  color: var(--theme-text-secondary);
+}
+
+.dropdownMenu {
+  padding: 8px 0;
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 20px;
+  background: transparent;
+  border: none;
+  color: var(--theme-text-primary);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+
+.menuItem:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--theme-main-color, #d0bcff);
+}
+
+.menuItem svg {
+  color: var(--theme-text-secondary);
+  transition: color 0.2s ease;
+}
+
+.menuItem:hover svg {
+  color: var(--theme-main-color, #d0bcff);
+}
+
+.logoutItem {
+  color: #f44336;
+}
+
+.logoutItem:hover {
+  background: rgba(244, 67, 54, 0.1);
+  color: #f44336;
+}
+
+.logoutItem svg {
+  color: #f44336;
+}
+
+.divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 8px 0;
+}
+
+/* Анимации */
+@keyframes dropdownSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Светлая тема */
+[data-theme="light"] .avatarButton {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .avatarButton:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .dropdown {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(0, 0, 0, 0.1);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .dropdownHeader {
+  border-bottom-color: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .menuItem:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="light"] .divider {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+/* Blur тема */
+[data-theme="blur"] .dropdown {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .avatarContainer {
+    display: none;
+  }
+}

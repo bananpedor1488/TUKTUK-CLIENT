@@ -1,0 +1,841 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import './styles/auth.css';
+
+@font-face {
+  font-family: 'SF Pro Display';
+  src: url('./assets/fonts/sf-pro-display-medium.otf') format('opentype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Используем системные шрифты вместо кастомных */
+
+body {
+  /* Оптимизация скролла */
+  -webkit-overflow-scrolling: touch;
+  /* Предотвращение мерцания */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+:root {
+  --primary: #d0bcff;
+  --primary-light: #e9ddff;
+  --primary-dark: #9a7ace;
+  --background: #151515;
+  --background-secondary: #1c1c1c;
+  --surface: #1d1d1d;
+  --text-primary: #ffffff;
+  --text-secondary: #c2c2c2;
+  --error: #f28c9a;
+  --success: #6cd67d;
+  --border-color: rgba(255, 255, 255, 0.1);
+
+  /* Font weights */
+  --font-weight-medium: 500;
+  --font-weight-bold: 700;
+  --font-weight-heavy: 800;
+  --font-weight-black: 900;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  font-family:
+    'SF Pro Display',
+    'Inter',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    'Roboto',
+    'Oxygen',
+    'Ubuntu',
+    'Cantarell',
+    'Fira Sans',
+    'Droid Sans',
+    'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: var(--text-primary);
+  min-height: 100vh;
+  height: 100vh;
+  background: var(--theme-site-background, #0a0a0a);
+  transition: background 0.3s ease;
+}
+
+/* Для мобильных устройств - исправляем проблему с 100vh */
+@supports (-webkit-touch-callout: none) {
+  body {
+    height: -webkit-fill-available;
+  }
+}
+
+/* Дополнительные оптимизации для мобильных устройств */
+@media (max-width: 768px) {
+  /* Улучшаем производительность скролла на мобильных */
+  * {
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Оптимизируем анимации для мобильных */
+  .animated,
+  .transition,
+  .messageBubble,
+  .chatItem,
+  .actionButton {
+    will-change: transform;
+    transform: translateZ(0);
+  }
+  
+  /* Улучшаем читаемость текста на мобильных */
+  body {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+  
+  /* Оптимизируем интерактивные элементы */
+  button,
+  input,
+  textarea,
+  select {
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+    tap-highlight-color: rgba(0, 0, 0, 0.1);
+  }
+}
+
+/* Строгое скрытие мобильной навигации на ПК */
+@media (min-width: 769px) {
+  [class*="mobileNavigation"] {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    position: absolute !important;
+    left: -9999px !important;
+    top: -9999px !important;
+    width: 0 !important;
+    height: 0 !important;
+    overflow: hidden !important;
+    z-index: -1 !important;
+  }
+}
+
+#root {
+  height: 100vh;
+  min-height: 100vh;
+}
+
+/* Стили для фоновых изображений профиля */
+.profile-background-active {
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  background-attachment: fixed !important;
+  height: 100vh !important;
+  /* Оптимизация фоновых изображений */
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+  overflow: auto !important;
+}
+
+/* Для мобильных устройств с фоновыми изображениями */
+@supports (-webkit-touch-callout: none) {
+  .profile-background-active {
+    height: -webkit-fill-available !important;
+  }
+}
+
+code {
+  font-family:
+    source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+}
+
+a {
+  color: var(--primary);
+  text-decoration: none;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  outline: none;
+  /* Оптимизация кнопок */
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+input,
+textarea,
+select {
+  font-family: 'SF Pro Display', 'Inter', sans-serif;
+  /* Оптимизация инпутов */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  border-radius: 0;
+}
+
+.selectable {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+}
+
+.non-selectable {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+::-webkit-scrollbar {
+  width: 1px;
+  height: 1px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--primary-dark);
+  border-radius: 1px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--primary);
+}
+
+.PrivateSwipeArea-root {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  opacity: 0 !important;
+  position: absolute !important;
+  pointer-events: none !important;
+}
+
+.fullscreen-player-active #app-bottom-navigation {
+  display: none !important;
+}
+
+/* Оптимизации для анимаций */
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 0.7;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+/* Оптимизация для старых браузеров - только для анимированных элементов */
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+  /* Chrome/Safari оптимизации */
+  .animated,
+  .MuiCircularProgress-root,
+  .MuiSkeleton-root {
+    -webkit-transform: translate3d(0, 0, 0);
+  }
+}
+
+/* Оптимизация для Firefox */
+@-moz-document url-prefix() {
+  .animated,
+  .MuiCircularProgress-root,
+  .MuiSkeleton-root {
+    -moz-transform: translateZ(0);
+  }
+}
+
+/* Оптимизация для IE/Edge */
+@media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+  .animated,
+  .MuiCircularProgress-root,
+  .MuiSkeleton-root {
+    -ms-transform: translateZ(0);
+  }
+}
+
+/* App styles */
+.App {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--theme-site-background, #0a0a0a);
+  color: var(--theme-text-primary, #ffffff);
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+/* Utility classes */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.w-full {
+  width: 100%;
+}
+
+.h-full {
+  height: 100%;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-sm {
+  font-size: 0.875rem;
+}
+
+.text-lg {
+  font-size: 1.125rem;
+}
+
+.text-xl {
+  font-size: 1.25rem;
+}
+
+.font-medium {
+  font-weight: 500;
+}
+
+.font-semibold {
+  font-weight: 600;
+}
+
+.font-bold {
+  font-weight: 700;
+}
+
+.mb-2 {
+  margin-bottom: 0.5rem;
+}
+
+.mb-4 {
+  margin-bottom: 1rem;
+}
+
+.mb-6 {
+  margin-bottom: 1.5rem;
+}
+
+.mt-2 {
+  margin-top: 0.5rem;
+}
+
+.mt-4 {
+  margin-top: 1rem;
+}
+
+.p-2 {
+  padding: 0.5rem;
+}
+
+.p-4 {
+  padding: 1rem;
+}
+
+.p-6 {
+  padding: 1.5rem;
+}
+
+.px-4 {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.py-2 {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+.py-4 {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+.rounded {
+  border-radius: 8px;
+}
+
+.rounded-md {
+  border-radius: 12px;
+}
+
+.rounded-lg {
+  border-radius: 16px;
+}
+
+.rounded-xl {
+  border-radius: 20px;
+}
+
+.shadow {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.shadow-md {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.shadow-lg {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.border {
+  border: 1px solid var(--border-color);
+}
+
+.bg-primary {
+  background-color: var(--theme-background, #151515);
+}
+
+.bg-secondary {
+  background-color: var(--background-secondary);
+}
+
+.bg-accent {
+  background-color: var(--primary);
+}
+
+.text-primary {
+  color: var(--theme-text-primary, #ffffff);
+}
+
+.text-secondary {
+  color: var(--theme-text-secondary, #c2c2c2);
+}
+
+.text-accent {
+  color: var(--primary);
+}
+
+.hover\:bg-hover:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.transition {
+  transition: all 0.2s ease;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.opacity-50 {
+  opacity: 0.5;
+}
+
+.opacity-75 {
+  opacity: 0.75;
+}
+
+.hidden {
+  display: none;
+}
+
+.block {
+  display: block;
+}
+
+.inline-block {
+  display: inline-block;
+}
+
+.relative {
+  position: relative;
+}
+
+.absolute {
+  position: absolute;
+}
+
+.fixed {
+  position: fixed;
+}
+
+.top-0 {
+  top: 0;
+}
+
+.right-0 {
+  right: 0;
+}
+
+.bottom-0 {
+  bottom: 0;
+}
+
+.left-0 {
+  left: 0;
+}
+
+.z-10 {
+  z-index: 10;
+}
+
+.z-20 {
+  z-index: 20;
+}
+
+.z-50 {
+  z-index: 50;
+}
+
+/* УЛЬТРА-АГРЕССИВНОЕ скрытие мобильной навигации на ПК */
+@media (min-width: 769px) {
+  /* Скрываем по классу */
+  [class*="mobileNavigation"] {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    position: absolute !important;
+    left: -9999px !important;
+    top: -9999px !important;
+    width: 0 !important;
+    height: 0 !important;
+    overflow: hidden !important;
+    z-index: -1 !important;
+  }
+  
+  /* Скрываем по тегу nav */
+  nav[class*="mobileNavigation"] {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    position: absolute !important;
+    left: -9999px !important;
+    top: -9999px !important;
+    width: 0 !important;
+    height: 0 !important;
+    overflow: hidden !important;
+    z-index: -1 !important;
+  }
+  
+  /* Скрываем все дочерние элементы */
+  [class*="mobileNavigation"] * {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+  
+  /* ДОПОЛНИТЕЛЬНОЕ СКРЫТИЕ - скрываем любые элементы с fixed bottom */
+  [style*="position: fixed"][style*="bottom: 0"] {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+}
+
+/* АГРЕССИВНОЕ СКРЫТИЕ ДЛЯ BLUR ТЕМЫ - только для скрытых элементов */
+[data-theme="blur"] [class*="mobileNavigation"].hidden {
+  z-index: -1000 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  position: absolute !important;
+  left: -9999px !important;
+  top: -9999px !important;
+  width: 0 !important;
+  height: 0 !important;
+  overflow: hidden !important;
+}
+
+[data-theme="blur"] [class*="mobileNavigation"].hidden {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  position: absolute !important;
+  left: -9999px !important;
+  top: -9999px !important;
+  width: 0 !important;
+  height: 0 !important;
+  overflow: hidden !important;
+  z-index: -1 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* УЛЬТРА-АГРЕССИВНОЕ СКРЫТИЕ ДЛЯ BLUR ТЕМЫ - только для скрытых */
+[data-theme="blur"] nav[class*="mobileNavigation"].hidden {
+  z-index: -1000 !important;
+  position: absolute !important;
+  left: -9999px !important;
+  top: -9999px !important;
+  width: 0 !important;
+  height: 0 !important;
+  overflow: hidden !important;
+}
+
+[data-theme="blur"] nav[class*="mobileNavigation"].hidden {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  position: absolute !important;
+  left: -9999px !important;
+  top: -9999px !important;
+  width: 0 !important;
+  height: 0 !important;
+  overflow: hidden !important;
+  z-index: -1 !important;
+}
+
+/* Стили для компонентов регистрации */
+.password-input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: color 0.2s ease;
+}
+
+.password-toggle:hover {
+  color: var(--text-primary);
+}
+
+.password-toggle:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.checkbox-container {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  cursor: pointer;
+  margin-bottom: 16px;
+}
+
+.checkbox-container input[type="checkbox"] {
+  display: none;
+}
+
+.checkmark {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--border-color);
+  border-radius: 4px;
+  position: relative;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.checkbox-container input[type="checkbox"]:checked + .checkmark {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+
+.checkbox-container input[type="checkbox"]:checked + .checkmark::after {
+  content: '';
+  position: absolute;
+  left: 6px;
+  top: 2px;
+  width: 6px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.checkbox-label {
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--text-secondary);
+}
+
+.auth-link {
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.auth-link:hover {
+  text-decoration: underline;
+}
+
+.form-section-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+  margin-top: 24px;
+}
+
+.form-help {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: 4px;
+  line-height: 1.3;
+}
+
+.form-textarea {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text-primary);
+  font-size: 14px;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 100px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(208, 188, 255, 0.1);
+}
+
+.form-textarea:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.avatar-group {
+  margin-bottom: 24px;
+}
+
+.avatar-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.avatar-preview {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  border: 2px solid var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.avatar-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatar-preview svg {
+  color: var(--text-secondary);
+}
+
+.avatar-upload-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border: 1px solid var(--primary);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--primary);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.avatar-upload-btn:hover {
+  background: rgba(208, 188, 255, 0.1);
+  border-color: var(--primary-light);
+}
+
+.avatar-upload-btn input {
+  display: none;
+}
+
+.success-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  margin: 0 auto 24px;
+}
+
+/* Улучшения для мобильных устройств */
+@media (max-width: 768px) {
+  .avatar-preview {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .checkbox-container {
+    margin-bottom: 12px;
+  }
+  
+  .form-section-title {
+    margin-top: 20px;
+    margin-bottom: 8px;
+  }
+}

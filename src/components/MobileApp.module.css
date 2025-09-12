@@ -1,0 +1,59 @@
+/* MobileApp.module.css */
+
+.mobileApp {
+  width: 100%;
+  height: 100vh;
+  height: 100dvh; /* Dynamic viewport height for mobile */
+  background: var(--theme-background);
+  color: var(--theme-text-primary);
+  overflow: hidden;
+  position: relative;
+}
+
+.aiChatContainer {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 5;
+}
+
+/* Анимации переходов */
+.mobileApp > * {
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Поддержка различных размеров экранов */
+@media (max-width: 480px) {
+  .mobileApp {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 360px) {
+  .mobileApp {
+    font-size: 13px;
+  }
+}
+
+/* Поддержка темной темы */
+[data-theme="dark"] .mobileApp {
+  background: var(--theme-background);
+}
+
+[data-theme="light"] .mobileApp {
+  background: var(--theme-background);
+}
+

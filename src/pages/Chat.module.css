@@ -1,0 +1,556 @@
+.chatContainer {
+  display: flex;
+  height: 100vh;
+  background: var(--theme-site-background);
+  color: var(--theme-text-primary);
+  overflow: hidden;
+}
+
+/* Отступ снизу только на мобильных для навигации */
+@media (max-width: 768px) {
+  .chatContainer {
+    padding-bottom: 80px;
+  }
+}
+
+.sidebar {
+  width: 350px;
+  background: var(--theme-background);
+  border-right: 1px solid var(--theme-border-color, rgba(255, 255, 255, 0.12));
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.sidebarHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  border-bottom: 1px solid var(--theme-border-color, rgba(255, 255, 255, 0.12));
+  gap: 12px;
+}
+
+.sidebarTitle {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--theme-text-primary);
+  margin: 0;
+  flex: 1;
+  text-align: center;
+}
+
+.userInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: 500;
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatarPlaceholder {
+  color: white;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.userDetails {
+  flex: 1;
+  min-width: 0;
+}
+
+.userName {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.userStatus {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.headerActions {
+  display: flex;
+  gap: 8px;
+}
+
+.actionButton {
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.05);
+  color: var(--theme-text-primary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  transition: background-color 0.2s ease;
+}
+
+.actionButton:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.newChatSection {
+  padding: 0 8px;
+  position: relative;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--theme-border-color, rgba(255, 255, 255, 0.12));
+  background-color: rgba(255, 255, 255, 0.05);
+  color: var(--theme-text-primary);
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.searchInput:focus {
+  border-color: var(--theme-main-color, #d0bcff);
+}
+
+.searchInput::placeholder {
+  color: var(--theme-text-disabled);
+}
+
+.userList {
+  margin-top: 12px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.userItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.userItem:hover {
+  background-color: rgba(255, 255, 255, 0.04);
+}
+
+.userAvatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: 500;
+}
+
+.userAvatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.userAvatar .avatarPlaceholder {
+  color: white;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.userInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.userInfo .userName {
+  font-size: 14px;
+  font-weight: 500;
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.userUsername {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.chatListContainer {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.mainContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: var(--theme-site-background);
+  overflow: hidden;
+}
+
+.welcomeScreen {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--theme-background);
+}
+
+.welcomeContent {
+  text-align: center;
+  padding: 40px;
+}
+
+.welcomeContent h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+}
+
+.welcomeContent p {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  margin-bottom: 32px;
+}
+
+/* Responsive design - Mobile adaptation */
+@media (max-width: 768px) {
+  .chatContainer {
+    position: relative;
+    height: 100vh;
+    height: 100dvh; /* Dynamic viewport height for mobile */
+    overflow: hidden;
+    /* Отступ снизу для мобильной навигации */
+    padding-bottom: 80px;
+  }
+
+  /* Sidebar - адаптивная версия ПК-интерфейса */
+  .sidebar {
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 10;
+    transform: translateX(-100%);
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    height: 100vh;
+    height: 100dvh;
+    background: var(--theme-background);
+    border-right: none;
+    /* Сохраняем все оригинальные стили */
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    will-change: transform;
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  /* Main Content - адаптивная версия ПК-интерфейса */
+  .mainContent {
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 5;
+    transform: translateX(0);
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    height: 100vh;
+    height: 100dvh;
+    background: var(--theme-background);
+    will-change: transform;
+  }
+
+  .mainContent.hidden {
+    transform: translateX(100%);
+  }
+
+  /* Варианты анимации входа в чат */
+  
+  /* Вариант 1: Сдвиг справа (по умолчанию) */
+  .mainContent.slideFromRight {
+    transform: translateX(100%);
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .mainContent.slideFromRight.active {
+    transform: translateX(0);
+  }
+
+  /* Вариант 2: Мягкое увеличение */
+  .mainContent.scaleIn {
+    transform: scale(0.95) translateX(100%);
+    opacity: 0;
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), 
+                opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .mainContent.scaleIn.active {
+    transform: scale(1) translateX(0);
+    opacity: 1;
+  }
+
+  /* Вариант 3: Fade-эффект */
+  .mainContent.fadeIn {
+    transform: translateX(0);
+    opacity: 0;
+    transition: opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .mainContent.fadeIn.active {
+    opacity: 1;
+  }
+
+  /* Анимация возврата в список чатов */
+  .mainContent.slideOut {
+    transform: translateX(0);
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .mainContent.slideOut.hidden {
+    transform: translateX(100%);
+  }
+
+  /* Исправление микро-зазора */
+  .mainContent {
+    left: 0;
+    right: 0;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Кнопки переключения анимации (только для разработки) */
+  .animationControls {
+    display: flex;
+    gap: 4px;
+    margin-top: 8px;
+    padding: 0 16px;
+  }
+
+  .animationButton {
+    width: 28px;
+    height: 28px;
+    border: none;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--theme-text-primary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    transition: all 0.2s ease;
+    will-change: transform;
+    transform: translateZ(0);
+  }
+
+  .animationButton:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-1px);
+  }
+
+  .animationButton.active {
+    background: var(--theme-main-color, #d0bcff);
+    color: #000;
+    transform: scale(1.1);
+  }
+
+  /* Адаптивные размеры с сохранением пропорций */
+  .sidebarHeader {
+    padding: 12px 16px; /* Уменьшаем отступы пропорционально */
+    min-height: 60px; /* Фиксированная высота для мобильных */
+  }
+
+  .userInfo {
+    gap: 10px; /* Уменьшаем промежуток между элементами */
+  }
+
+  .avatar {
+    width: 40px; /* Уменьшаем аватар пропорционально */
+    height: 40px;
+    font-size: 14px; /* Уменьшаем размер шрифта */
+  }
+
+  .userName {
+    font-size: 16px; /* Уменьшаем размер шрифта */
+    font-weight: 600; /* Сохраняем жирность */
+  }
+
+  .userStatus {
+    font-size: 12px; /* Уменьшаем размер шрифта */
+  }
+
+  .headerActions {
+    gap: 8px; /* Уменьшаем промежуток между кнопками */
+  }
+
+  .actionButton {
+    width: 36px; /* Уменьшаем размер кнопок */
+    height: 36px;
+    font-size: 16px; /* Уменьшаем размер иконок */
+  }
+
+  .newChatSection {
+    padding: 12px 16px; /* Уменьшаем отступы */
+  }
+
+  .searchInput {
+    padding: 10px 12px; /* Уменьшаем отступы поиска */
+    font-size: 14px; /* Уменьшаем размер шрифта */
+  }
+
+  .userList {
+    max-height: 150px; /* Уменьшаем высоту списка пользователей */
+  }
+
+  .userItem {
+    padding: 10px 12px; /* Уменьшаем отступы элементов */
+  }
+
+  .userAvatar {
+    width: 28px; /* Уменьшаем аватарки в списке */
+    height: 28px;
+    font-size: 12px;
+  }
+
+  .userAvatar .avatarPlaceholder {
+    font-size: 12px;
+  }
+
+  .userInfo .userName {
+    font-size: 13px; /* Уменьшаем размер шрифта имени */
+  }
+
+  .userUsername {
+    font-size: 11px; /* Уменьшаем размер шрифта username */
+  }
+
+  /* Скрываем welcome screen на мобильных */
+  .welcomeScreen {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .sidebarHeader {
+    padding: 10px 12px;
+    min-height: 56px;
+  }
+
+  .avatar {
+    width: 36px;
+    height: 36px;
+    font-size: 12px;
+  }
+
+  .userName {
+    font-size: 15px;
+  }
+
+  .userStatus {
+    font-size: 11px;
+  }
+
+  .actionButton {
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
+  }
+
+  .newChatSection {
+    padding: 10px 12px;
+  }
+
+  .searchInput {
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+
+  .userItem {
+    padding: 8px 10px;
+  }
+
+  .userAvatar {
+    width: 24px;
+    height: 24px;
+    font-size: 10px;
+  }
+
+  .userAvatar .avatarPlaceholder {
+    font-size: 10px;
+  }
+
+  .userInfo .userName {
+    font-size: 12px;
+  }
+
+  .userUsername {
+    font-size: 10px;
+  }
+
+  .welcomeContent {
+    padding: 20px;
+  }
+
+  .welcomeContent h2 {
+    font-size: 1.5rem;
+  }
+
+  .welcomeContent p {
+    font-size: 1rem;
+  }
+
+  /* Скрываем кнопки анимации на очень маленьких экранах */
+  .animationControls {
+    display: none;
+  }
+}
+
+/* Стили для аватара в левом верхнем углу (Desktop) */
+.userAvatarContainer {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 1000;
+}
+
+/* Адаптивность для аватара */
+@media (max-width: 768px) {
+  .userAvatarContainer {
+    display: none;
+  }
+}
+

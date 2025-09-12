@@ -1,0 +1,290 @@
+/* Search Button - Glassmorphism стиль */
+.searchContainer {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.searchButton {
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  color: var(--theme-text-primary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.searchButton:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: var(--theme-main-color, #d0bcff);
+  transform: scale(1.05);
+}
+
+/* Полноэкранный поиск */
+.searchFullscreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--theme-background);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  z-index: 2000;
+  animation: searchFullscreenIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.searchHeader {
+  padding: 20px;
+  border-bottom: 1px solid var(--theme-border-color, rgba(255, 255, 255, 0.1));
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.searchInputContainer {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  padding: 16px 20px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.searchIcon {
+  color: var(--theme-text-secondary);
+  margin-right: 12px;
+  display: flex;
+  align-items: center;
+}
+
+.searchInput {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--theme-text-primary);
+  font-size: 18px;
+  font-weight: 400;
+  min-width: 0;
+}
+
+.searchInput::placeholder {
+  color: var(--theme-text-secondary);
+}
+
+.closeButton {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--theme-text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  margin-left: 12px;
+  transition: all 0.2s ease;
+}
+
+.closeButton:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: var(--theme-text-primary);
+}
+
+/* Результаты поиска */
+.searchResults {
+  padding: 20px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.resultsList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.resultItem {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.resultItem:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--theme-main-color, #d0bcff);
+  transform: translateY(-2px);
+}
+
+.userAvatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.userAvatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatarPlaceholder {
+  color: white;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.userInfo {
+  flex: 1;
+}
+
+.userName {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--theme-text-primary);
+  margin-bottom: 4px;
+}
+
+.userEmail {
+  font-size: 14px;
+  color: var(--theme-text-secondary);
+}
+
+.noResults {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--theme-text-secondary);
+}
+
+/* Анимации */
+@keyframes searchFullscreenIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Светлая тема */
+[data-theme="light"] .searchButton {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .searchButton:hover {
+  background: rgba(0, 0, 0, 0.1);
+  border-color: var(--theme-main-color, #d0bcff);
+}
+
+[data-theme="light"] .searchFullscreen {
+  background: var(--theme-background);
+}
+
+[data-theme="light"] .searchHeader {
+  background: rgba(0, 0, 0, 0.03);
+  border-bottom-color: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .searchInputContainer {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .resultItem {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .resultItem:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="light"] .closeButton {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="light"] .closeButton:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+/* Blur тема */
+[data-theme="blur"] .searchButton {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+[data-theme="blur"] .searchFullscreen {
+  background: rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+}
+
+[data-theme="blur"] .searchInputContainer {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .searchHeader {
+    padding: 16px;
+  }
+  
+  .searchInputContainer {
+    padding: 12px 16px;
+  }
+  
+  .searchInput {
+    font-size: 16px; /* Предотвращает зум на iOS */
+  }
+  
+  .searchResults {
+    padding: 16px;
+  }
+  
+  .resultItem {
+    padding: 12px;
+  }
+  
+  .userAvatar {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .userName {
+    font-size: 14px;
+  }
+  
+  .userEmail {
+    font-size: 12px;
+  }
+}

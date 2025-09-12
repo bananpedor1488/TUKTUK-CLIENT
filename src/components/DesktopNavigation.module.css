@@ -1,0 +1,267 @@
+/* Desktop Navigation - Glassmorphism стиль */
+.desktopNavigation {
+  display: none; /* Скрываем нижнюю панель на десктопе */
+}
+
+.navContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.navItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 16px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  min-width: 80px;
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+.navItem:hover {
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateY(-2px);
+}
+
+.navItem:active {
+  transform: translateY(0);
+}
+
+.navIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--theme-text-secondary);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  margin-bottom: 4px;
+  will-change: transform, background-color, color;
+}
+
+.navIcon.active {
+  background: var(--theme-main-color, #d0bcff);
+  color: #000;
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(208, 188, 255, 0.3);
+}
+
+.navLabel {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--theme-text-secondary);
+  transition: color 0.3s ease;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.navLabel.active {
+  color: var(--theme-text-primary);
+  font-weight: 600;
+}
+
+/* Боковая панель с кнопкой меню */
+.sidebarMenu {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 1100;
+}
+
+.menuButton {
+  width: 48px;
+  height: 48px;
+  border: none;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  color: var(--theme-text-primary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  will-change: transform, box-shadow;
+}
+
+.menuButton:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.menuButton:active {
+  transform: translateY(0) scale(0.95);
+}
+
+/* Выпадающее меню */
+.dropdownMenu {
+  position: absolute;
+  top: 60px;
+  left: 0;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  padding: 8px 0;
+  min-width: 160px;
+  animation: slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform, opacity;
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 16px;
+  border: none;
+  background: transparent;
+  color: var(--theme-text-primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: left;
+}
+
+.menuItem:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.menuItem:active {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* Анимация выпадающего меню */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Темная тема */
+[data-theme="dark"] .desktopNavigation {
+  background: rgba(0, 0, 0, 0.3);
+  border-top-color: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="dark"] .navItem:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="dark"] .navIcon {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+[data-theme="dark"] .navIcon.active {
+  background: var(--theme-main-color, #d0bcff);
+  color: #000;
+}
+
+[data-theme="dark"] .menuButton {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="dark"] .menuButton:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .dropdownMenu {
+  background: rgba(0, 0, 0, 0.4);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .menuItem:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* Светлая тема */
+[data-theme="light"] .desktopNavigation {
+  background: rgba(255, 255, 255, 0.8);
+  border-top-color: rgba(0, 0, 0, 0.1);
+  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="light"] .navItem:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="light"] .navIcon {
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--theme-text-secondary);
+}
+
+[data-theme="light"] .navIcon.active {
+  background: var(--theme-main-color, #d0bcff);
+  color: #000;
+}
+
+[data-theme="light"] .menuButton {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="light"] .menuButton:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .dropdownMenu {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .menuItem:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+/* Адаптивность для планшетов */
+@media (max-width: 1024px) {
+  .navContainer {
+    max-width: 500px;
+    padding: 0 16px;
+  }
+  
+  .navItem {
+    padding: 6px 12px;
+    min-width: 70px;
+  }
+  
+  .navIcon {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .navLabel {
+    font-size: 11px;
+  }
+}
+
+/* Скрытие на мобильных устройствах */
+@media (max-width: 768px) {
+  .desktopNavigation {
+    display: none;
+  }
+  
+  .sidebarMenu {
+    display: none;
+  }
+}

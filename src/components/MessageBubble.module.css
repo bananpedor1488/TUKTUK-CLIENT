@@ -1,0 +1,292 @@
+/* Контейнер сообщения */
+.messageContainer {
+  display: flex;
+  margin-bottom: 16px;
+  align-items: flex-start;
+}
+
+.messageContainer.own {
+  justify-content: flex-end;
+}
+
+.messageContainer.other {
+  justify-content: flex-start;
+}
+
+/* Блок сообщения */
+.messageBubble {
+  display: flex;
+  align-items: flex-start;
+  max-width: 70%;
+  gap: 12px;
+}
+
+.messageBubble.own {
+  flex-direction: row-reverse;
+}
+
+/* Аватарка */
+.messageAvatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: 500;
+  font-size: 16px;
+}
+
+.messageAvatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Контент сообщения */
+.messageContent {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Текст сообщения */
+.messageText {
+  font-size: 14px;
+  color: var(--theme-text-primary);
+  margin: 0;
+  line-height: 1.4;
+  word-wrap: break-word;
+  background: var(--theme-background);
+  padding: 8px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--theme-border-color, rgba(255, 255, 255, 0.1));
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Стили для собственных сообщений */
+.messageBubble.own .messageText {
+  background: linear-gradient(135deg, var(--theme-main-color, #d0bcff), #b69df8);
+  color: #000;
+  border-bottom-right-radius: 4px;
+  box-shadow: 0 4px 12px rgba(208, 188, 255, 0.3);
+}
+
+/* Время сообщения */
+.messageTime {
+  font-size: 11px;
+  color: var(--theme-text-disabled);
+  margin-top: 4px;
+  text-align: right;
+}
+
+.messageBubble.other .messageTime {
+  text-align: left;
+}
+
+
+.messageText {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.4;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.messageMedia {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mediaIcon {
+  font-size: 18px;
+}
+
+.messageMeta {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.messageTime {
+  font-size: 11px;
+}
+
+.messageStatus {
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+/* Message grouping */
+.messageContainer + .messageContainer.own .messageBubble {
+  border-top-right-radius: var(--radius-small);
+}
+
+.messageContainer + .messageContainer.other .messageBubble {
+  border-top-left-radius: var(--radius-small);
+}
+
+.messageContainer.own + .messageContainer.own .messageBubble {
+  border-top-right-radius: var(--radius-small);
+  margin-top: 2px;
+}
+
+.messageContainer.other + .messageContainer.other .messageBubble {
+  border-top-left-radius: var(--radius-small);
+  margin-top: 2px;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .messageContainer {
+    margin-bottom: 12px;
+  }
+
+  .messageBubble {
+    max-width: 80%;
+    gap: 10px;
+  }
+
+  .messageAvatar {
+    width: 36px;
+    height: 36px;
+    font-size: 14px;
+  }
+
+  .messageText {
+    font-size: 14px;
+    padding: 10px 14px;
+    border-radius: 10px;
+  }
+
+  .messageTime {
+    font-size: 10px;
+    margin-top: 3px;
+  }
+
+  .messageMeta {
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .messageContainer {
+    margin-bottom: 10px;
+  }
+
+  .messageBubble {
+    max-width: 85%;
+    gap: 8px;
+  }
+
+  .messageAvatar {
+    width: 32px;
+    height: 32px;
+    font-size: 12px;
+  }
+
+  .messageText {
+    font-size: 13px;
+    padding: 8px 12px;
+    border-radius: 8px;
+  }
+
+  .messageTime {
+    font-size: 9px;
+    margin-top: 2px;
+  }
+
+  .messageMeta {
+    font-size: 9px;
+  }
+}
+
+/* Animation for new messages */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px) translateZ(0);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) translateZ(0);
+  }
+}
+
+.messageBubble {
+  animation: slideIn 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform, opacity;
+  transform: translateZ(0);
+}
+
+.messageBubble.noAnimation {
+  animation: none;
+}
+
+/* Hover effects */
+.messageBubble:hover {
+  transform: translateY(-2px) translateZ(0);
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
+}
+
+.ownBubble:hover {
+  box-shadow: 0 8px 20px rgba(208, 188, 255, 0.4);
+  transform: translateY(-2px) scale(1.02) translateZ(0);
+}
+
+.otherBubble:hover {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px) scale(1.01) translateZ(0);
+}
+
+/* Message status indicators */
+.messageStatus {
+  margin-left: 4px;
+  display: inline-flex;
+  align-items: center;
+  position: relative;
+}
+
+.sentStatus {
+  color: white;
+}
+
+.sentStatus svg {
+  width: 14px;
+  height: 14px;
+}
+
+.readStatus {
+  color: white;
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.readStatus svg {
+  width: 14px;
+  height: 14px;
+}
+
+.readStatus svg:first-child {
+  position: absolute;
+  left: 0;
+  top: -1px;
+  opacity: 0.7;
+}
+
+.readStatus svg:last-child {
+  position: relative;
+  left: 2px;
+  top: 1px;
+}
+
+
+

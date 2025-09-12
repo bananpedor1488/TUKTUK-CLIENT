@@ -1,0 +1,7 @@
+<svg width="192" height="192" viewBox="0 0 192 192" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="192" height="192" rx="24" fill="#007bff"/>
+  <path d="M96 48C70.4 48 48 70.4 48 96C48 121.6 70.4 144 96 144C121.6 144 144 121.6 144 96C144 70.4 121.6 48 96 48ZM96 128C76.2 128 64 115.8 64 96C64 76.2 76.2 64 96 64C115.8 64 128 76.2 128 96C128 115.8 115.8 128 96 128Z" fill="white"/>
+  <path d="M96 80C88.8 80 80 88.8 80 96C80 103.2 88.8 112 96 112C103.2 112 112 103.2 112 96C112 88.8 103.2 80 96 80Z" fill="white"/>
+  <text x="96" y="160" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="16" font-weight="bold">Tuktuk</text>
+</svg>
+

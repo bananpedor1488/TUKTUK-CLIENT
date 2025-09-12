@@ -1,0 +1,360 @@
+/* UserProfileModal.module.css */
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.modal {
+  background: var(--theme-card-background, var(--theme-background, rgba(15, 15, 15, 1)));
+  backdrop-filter: var(--theme-backdrop-filter, none);
+  border-radius: 16px;
+  box-shadow: var(--theme-shadow-heavy, 0 25px 50px -12px rgba(0, 0, 0, 0.25));
+  border: 1px solid var(--theme-border-color, rgba(255, 255, 255, 0.1));
+  width: 100%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow: hidden;
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--theme-border-color, rgba(255, 255, 255, 0.1));
+  background: var(--theme-hover-background, rgba(255, 255, 255, 0.02));
+  backdrop-filter: blur(10px);
+}
+
+.title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--theme-text-primary, #ffffff);
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  color: var(--theme-text-secondary, #c2c2c2);
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.closeButton:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--theme-text-primary, #ffffff);
+}
+
+.content {
+  padding: 24px;
+  overflow-y: auto;
+  max-height: calc(90vh - 140px);
+}
+
+.avatarSection {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.avatarContainer {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 16px;
+}
+
+.avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid var(--border-color);
+}
+
+.avatarPlaceholder {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36px;
+  font-weight: 600;
+  color: white;
+  border: 4px solid var(--border-color);
+}
+
+.avatarEditButton {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  background: var(--text-secondary);
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 3px solid white;
+}
+
+.avatarEditButton:hover {
+  background: var(--text-muted);
+  transform: scale(1.05);
+}
+
+.displayName {
+  margin: 0 0 8px 0;
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--theme-text-primary, #ffffff);
+}
+
+.username {
+  margin: 0;
+  font-size: 16px;
+  color: var(--theme-text-secondary, #c2c2c2);
+}
+
+.profileInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.infoSection {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.sectionTitle {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--theme-text-primary, #ffffff);
+  padding-bottom: 8px;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.infoItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.infoIcon {
+  color: var(--theme-text-secondary, #c2c2c2);
+  margin-top: 4px;
+  flex-shrink: 0;
+}
+
+.infoContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.infoLabel {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--theme-text-secondary, #c2c2c2);
+}
+
+.infoValue {
+  font-size: 16px;
+  color: var(--theme-text-primary, #ffffff);
+  word-break: break-word;
+}
+
+.infoInput {
+  width: 100%;
+  padding: 8px 12px;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(20px);
+  color: var(--theme-text-primary, #ffffff);
+  font-size: 16px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.infoInput:focus {
+  border-color: var(--theme-text-accent, #d0bcff);
+}
+
+.bioContainer {
+  margin-top: 8px;
+}
+
+.bioText {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--theme-text-primary, #ffffff);
+  word-break: break-word;
+}
+
+.bioInput {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(20px);
+  color: var(--theme-text-primary, #ffffff);
+  font-size: 16px;
+  font-family: inherit;
+  outline: none;
+  resize: vertical;
+  min-height: 100px;
+  transition: border-color 0.2s;
+}
+
+.bioInput:focus {
+  border-color: var(--theme-text-accent, #d0bcff);
+}
+
+.themeSection {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.footer {
+  padding: 20px 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(10px);
+}
+
+.editButton {
+  width: 100%;
+  background: var(--theme-text-accent, #d0bcff);
+  color: #000;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s;
+}
+
+.editButton:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(208, 188, 255, 0.3);
+}
+
+.editButtons {
+  display: flex;
+  gap: 12px;
+}
+
+.cancelButton {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(20px);
+  color: var(--theme-text-primary, #ffffff);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cancelButton:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.saveButton {
+  flex: 1;
+  background: var(--theme-text-accent, #d0bcff);
+  color: #000;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.saveButton:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(208, 188, 255, 0.3);
+}
+
+/* Responsive design */
+
+/* Адаптивность */
+@media (max-width: 640px) {
+  .overlay {
+    padding: 10px;
+  }
+  
+  .modal {
+    max-height: 95vh;
+  }
+  
+  .content {
+    padding: 20px;
+    max-height: calc(95vh - 120px);
+  }
+  
+  .header {
+    padding: 16px 20px;
+  }
+  
+  .footer {
+    padding: 16px 20px;
+  }
+  
+  .editButtons {
+    flex-direction: column;
+  }
+}

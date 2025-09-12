@@ -1,0 +1,213 @@
+/* Overlay с блюром */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Модальное окно - обычное для ПК */
+.modal {
+  background: var(--theme-card-background, var(--theme-background));
+  border-radius: 16px;
+  border: 1px solid var(--theme-border-color, rgba(255, 255, 255, 0.1));
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  max-width: 400px;
+  width: 90%;
+  max-height: 80vh;
+  overflow: hidden;
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Индикатор перетаскивания - скрыт по умолчанию */
+.dragIndicator {
+  display: none;
+}
+
+/* Заголовок */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--theme-border-color, rgba(255, 255, 255, 0.1));
+}
+
+.title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--theme-text-primary);
+  font-family: 'SF Pro Display', 'Inter', sans-serif;
+}
+
+.closeButton {
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--theme-text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.closeButton:hover {
+  background: var(--theme-hover-background, rgba(255, 255, 255, 0.1));
+  color: var(--theme-text-primary);
+}
+
+/* Опции */
+.options {
+  padding: 16px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.option:hover {
+  background: var(--theme-hover-background, rgba(255, 255, 255, 0.05));
+  border-color: var(--theme-border-color, rgba(255, 255, 255, 0.1));
+  transform: translateY(-1px);
+}
+
+.optionIcon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  flex-shrink: 0;
+}
+
+.optionContent {
+  flex: 1;
+}
+
+.optionTitle {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--theme-text-primary);
+  margin-bottom: 4px;
+  font-family: 'SF Pro Display', 'Inter', sans-serif;
+}
+
+.optionDescription {
+  font-size: 14px;
+  color: var(--theme-text-secondary);
+  font-family: 'SF Pro Display', 'Inter', sans-serif;
+}
+
+/* Адаптивность - мобильные устройства */
+@media (max-width: 768px) {
+  .overlay {
+    align-items: flex-end;
+    justify-content: center;
+  }
+  
+  .modal {
+    width: 100%;
+    max-height: 60vh;
+    border-radius: 20px 20px 0 0;
+    border-bottom: none;
+    box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.3);
+    animation: slideUpFromBottom 0.3s ease-out;
+    margin-bottom: 0;
+  }
+  
+  @keyframes slideUpFromBottom {
+    from {
+      opacity: 0;
+      transform: translateY(100%);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .dragIndicator {
+    display: block;
+    width: 40px;
+    height: 4px;
+    background: var(--theme-text-disabled, rgba(255, 255, 255, 0.3));
+    border-radius: 2px;
+    margin: 12px auto 8px;
+  }
+  
+  .header {
+    padding: 8px 24px 16px;
+  }
+  
+  .title {
+    font-size: 16px;
+  }
+  
+  .options {
+    padding: 12px 24px 24px;
+  }
+  
+  .option {
+    padding: 12px;
+  }
+  
+  .optionIcon {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .optionTitle {
+    font-size: 15px;
+  }
+  
+  .optionDescription {
+    font-size: 13px;
+  }
+}

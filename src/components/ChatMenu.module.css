@@ -1,0 +1,135 @@
+/* ChatMenu.module.css */
+
+.menuDropdown {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  border: 1px solid #e5e7eb;
+  min-width: 200px;
+  z-index: 1000;
+  animation: slideDown 0.15s ease-out;
+  overflow: hidden;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.menuHeader {
+  padding: 12px 16px;
+  border-bottom: 1px solid #f3f4f6;
+  background-color: #f9fafb;
+}
+
+.menuTitle {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.menuItems {
+  padding: 8px 0;
+}
+
+.menuItem {
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-size: 14px;
+  color: #374151;
+  text-align: left;
+}
+
+.menuItem:hover {
+  background-color: #f9fafb;
+}
+
+.menuItem:active {
+  background-color: #f3f4f6;
+}
+
+.menuItem.dangerItem {
+  color: #dc2626;
+}
+
+.menuItem.dangerItem:hover {
+  background-color: #fef2f2;
+}
+
+.menuDivider {
+  height: 1px;
+  background-color: #f3f4f6;
+  margin: 8px 0;
+}
+
+/* Темная тема */
+@media (prefers-color-scheme: dark) {
+  .menuDropdown {
+    background: #1f2937;
+    border-color: #374151;
+  }
+  
+  .menuHeader {
+    border-bottom-color: #374151;
+    background-color: #111827;
+  }
+  
+  .menuTitle {
+    color: #d1d5db;
+  }
+  
+  .menuItem {
+    color: #d1d5db;
+  }
+  
+  .menuItem:hover {
+    background-color: #111827;
+  }
+  
+  .menuItem:active {
+    background-color: #374151;
+  }
+  
+  .menuItem.dangerItem {
+    color: #f87171;
+  }
+  
+  .menuItem.dangerItem:hover {
+    background-color: #7f1d1d;
+  }
+  
+  .menuDivider {
+    background-color: #374151;
+  }
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .menuDropdown {
+    right: -10px;
+    min-width: 180px;
+  }
+  
+  .menuItem {
+    padding: 14px 16px;
+    font-size: 15px;
+  }
+}

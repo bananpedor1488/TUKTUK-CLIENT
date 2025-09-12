@@ -1,0 +1,192 @@
+/* ChatContextMenu.module.css */
+
+.contextMenu {
+  background: var(--context-menu-bg, rgba(26, 26, 26, 0.95));
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  min-width: 200px;
+  overflow: hidden;
+  animation: slideIn 0.2s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.menuHeader {
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.chatInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.chatAvatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.chatAvatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatarPlaceholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.chatDetails {
+  flex: 1;
+  min-width: 0;
+}
+
+.chatName {
+  font-weight: 600;
+  color: var(--text-primary, #ffffff);
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.chatType {
+  font-size: 12px;
+  color: var(--text-secondary, #9ca3af);
+  margin-top: 2px;
+}
+
+.menuDivider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 8px 0;
+}
+
+.menuItems {
+  padding: 8px 0;
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 16px;
+  border: none;
+  background: none;
+  color: var(--text-primary, #ffffff);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+
+.menuItem:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.menuItem:active {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.menuItem span {
+  flex: 1;
+}
+
+/* Специальные стили для разных типов действий */
+.profileItem:hover {
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+}
+
+.settingsItem:hover {
+  background: rgba(156, 163, 175, 0.1);
+  color: #9ca3af;
+}
+
+.muteItem:hover {
+  background: rgba(245, 158, 11, 0.1);
+  color: #f59e0b;
+}
+
+.archiveItem:hover {
+  background: rgba(107, 114, 128, 0.1);
+  color: #6b7280;
+}
+
+.deleteItem:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .contextMenu {
+    min-width: 180px;
+  }
+  
+  .menuItem {
+    padding: 10px 14px;
+    font-size: 13px;
+  }
+  
+  .chatAvatar {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .chatName {
+    font-size: 13px;
+  }
+  
+  .chatType {
+    font-size: 11px;
+  }
+}
+
+/* Темная тема */
+[data-theme="dark"] .contextMenu {
+  background: rgba(15, 15, 15, 0.95);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] .menuHeader {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+/* Анимация появления */
+.contextMenu::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-bottom: 8px solid var(--context-menu-bg, rgba(26, 26, 26, 0.95));
+}

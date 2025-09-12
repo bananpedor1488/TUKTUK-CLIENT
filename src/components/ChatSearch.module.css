@@ -1,0 +1,314 @@
+/* ChatSearch.module.css */
+
+.searchOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 20px;
+}
+
+.searchContainer {
+  background: var(--theme-background);
+  backdrop-filter: var(--theme-backdrop-filter);
+  -webkit-backdrop-filter: var(--theme-backdrop-filter);
+  border-radius: 12px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  width: 90%;
+  max-width: 600px;
+  max-height: 80vh;
+  overflow: hidden;
+  animation: slideDown 0.2s ease-out;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.searchHeader {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  gap: 12px;
+}
+
+.searchInputContainer {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 12px;
+  color: var(--theme-text-secondary);
+  z-index: 1;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 12px 12px 12px 40px;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  font-size: 16px;
+  outline: none;
+  transition: border-color 0.2s;
+  background: var(--theme-background);
+  color: var(--theme-text-primary);
+}
+
+.searchInput:focus {
+  border-color: var(--theme-main-color);
+}
+
+.searchInput::placeholder {
+  color: var(--theme-text-secondary);
+}
+
+.clearButton {
+  position: absolute;
+  right: 8px;
+  background: none;
+  border: none;
+  color: var(--theme-text-secondary);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.clearButton:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  color: var(--theme-text-secondary);
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 6px;
+  transition: background-color 0.2s;
+}
+
+.closeButton:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.searchResults {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.resultsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.resultsCount {
+  font-size: 14px;
+  color: var(--theme-text-secondary);
+  font-weight: 500;
+}
+
+.navigationButtons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.navButton {
+  background: var(--theme-background);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  padding: 6px;
+  cursor: pointer;
+  color: var(--theme-text-primary);
+  transition: all 0.2s;
+}
+
+.navButton:hover:not(:disabled) {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: var(--theme-main-color);
+}
+
+.navButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.navCounter {
+  font-size: 12px;
+  color: var(--theme-text-secondary);
+  font-weight: 500;
+  min-width: 40px;
+  text-align: center;
+}
+
+.resultsList {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.resultItem {
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.resultItem:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.resultItem.active {
+  background-color: rgba(208, 188, 255, 0.1);
+  border-left: 3px solid var(--theme-main-color);
+}
+
+.resultContent {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.resultText {
+  flex: 1;
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--theme-text-primary);
+  word-break: break-word;
+}
+
+.resultTime {
+  font-size: 12px;
+  color: var(--theme-text-secondary);
+  white-space: nowrap;
+  margin-top: 2px;
+}
+
+.noResults {
+  padding: 40px 16px;
+  text-align: center;
+  color: var(--theme-text-secondary);
+}
+
+.noResults p {
+  margin: 0;
+  font-size: 14px;
+}
+
+/* Подсветка найденного сообщения */
+.highlighted {
+  background-color: rgba(208, 188, 255, 0.2) !important;
+  animation: highlight 2s ease-out;
+}
+
+@keyframes highlight {
+  0% {
+    background-color: rgba(208, 188, 255, 0.2);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+/* Специальные стили для светлой темы */
+[data-theme="light"] .searchContainer {
+  background: var(--theme-card-background);
+  border: 1px solid var(--theme-border-color);
+  box-shadow: var(--theme-shadow-medium);
+}
+
+[data-theme="light"] .searchHeader {
+  border-bottom-color: var(--theme-border-color);
+}
+
+[data-theme="light"] .searchInput {
+  background: var(--theme-input-background);
+  border-color: var(--theme-border-color);
+  color: var(--theme-text-primary);
+}
+
+[data-theme="light"] .searchInput:focus {
+  border-color: var(--theme-main-color);
+}
+
+[data-theme="light"] .searchIcon,
+[data-theme="light"] .clearButton,
+[data-theme="light"] .closeButton {
+  color: var(--theme-text-secondary);
+}
+
+[data-theme="light"] .clearButton:hover,
+[data-theme="light"] .closeButton:hover {
+  background-color: var(--theme-hover-background);
+}
+
+[data-theme="light"] .resultsHeader {
+  background-color: var(--theme-sidebar-background);
+  border-bottom-color: var(--theme-border-color);
+}
+
+[data-theme="light"] .resultsCount,
+[data-theme="light"] .navCounter {
+  color: var(--theme-text-secondary);
+}
+
+[data-theme="light"] .navButton {
+  background: var(--theme-card-background);
+  border-color: var(--theme-border-color);
+  color: var(--theme-text-primary);
+}
+
+[data-theme="light"] .navButton:hover:not(:disabled) {
+  background-color: var(--theme-hover-background);
+  border-color: var(--theme-main-color);
+}
+
+[data-theme="light"] .resultItem {
+  border-bottom-color: var(--theme-border-color);
+}
+
+[data-theme="light"] .resultItem:hover {
+  background-color: var(--theme-hover-background);
+}
+
+[data-theme="light"] .resultItem.active {
+  background-color: var(--theme-chat-item-selected);
+  border-left-color: var(--theme-main-color);
+}
+
+[data-theme="light"] .resultText {
+  color: var(--theme-text-primary);
+}
+
+[data-theme="light"] .resultTime {
+  color: var(--theme-text-secondary);
+}
+
+[data-theme="light"] .noResults {
+  color: var(--theme-text-secondary);
+}

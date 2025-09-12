@@ -1,0 +1,561 @@
+/* Mobile Settings Page - Неоморфизм стиль */
+.settingsPage {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1500; /* Больше чем у навигации, чтобы настройки были поверх */
+  background: var(--theme-background);
+  display: flex;
+  flex-direction: column;
+  animation: slideInFromRight 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
+  /* Убеждаемся, что страница поверх всего контента */
+  transform: translateZ(0);
+}
+
+.pageHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  padding-top: calc(16px + env(safe-area-inset-top));
+  background: var(--theme-background);
+  border-bottom: 1px solid var(--theme-border-color, rgba(255, 255, 255, 0.1));
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.backButton {
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 12px;
+  background: var(--theme-card-background, rgba(255, 255, 255, 0.05));
+  color: var(--theme-text-primary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 
+    2px 2px 4px rgba(0, 0, 0, 0.1),
+    -2px -2px 4px rgba(255, 255, 255, 0.05);
+  will-change: transform, box-shadow;
+}
+
+.backButton:hover {
+  transform: translateY(-1px);
+  box-shadow: 
+    4px 4px 8px rgba(0, 0, 0, 0.15),
+    -4px -4px 8px rgba(255, 255, 255, 0.1);
+}
+
+.backButton:active {
+  transform: translateY(0) scale(0.95);
+  box-shadow: 
+    inset 2px 2px 4px rgba(0, 0, 0, 0.1),
+    inset -2px -2px 4px rgba(255, 255, 255, 0.05);
+}
+
+.pageTitle {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--theme-text-primary);
+  margin: 0;
+  background: linear-gradient(135deg, var(--theme-main-color, #d0bcff), #b69df8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.saveButton {
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 12px;
+  background: var(--theme-main-color, #d0bcff);
+  color: #000;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 
+    2px 2px 4px rgba(0, 0, 0, 0.1),
+    -2px -2px 4px rgba(255, 255, 255, 0.1);
+  will-change: transform, box-shadow;
+}
+
+.saveButton:hover {
+  transform: translateY(-1px);
+  box-shadow: 
+    4px 4px 8px rgba(0, 0, 0, 0.15),
+    -4px -4px 8px rgba(255, 255, 255, 0.1);
+}
+
+.saveButton:active {
+  transform: translateY(0) scale(0.95);
+}
+
+.pageContent {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 20px;
+  padding-bottom: calc(80px + env(safe-area-inset-bottom)); /* Отступ для навигации */
+}
+
+.settingsSection {
+  margin-bottom: 32px;
+}
+
+.sectionTitle {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--theme-text-primary);
+  margin: 0 0 16px 0;
+  padding: 12px 16px;
+  background: var(--theme-card-background, rgba(255, 255, 255, 0.05));
+  border-radius: 12px;
+  box-shadow: 
+    inset 2px 2px 4px rgba(0, 0, 0, 0.1),
+    inset -2px -2px 4px rgba(255, 255, 255, 0.05);
+}
+
+.settingCard {
+  background: var(--theme-card-background, rgba(255, 255, 255, 0.05));
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 12px;
+  box-shadow: 
+    4px 4px 8px rgba(0, 0, 0, 0.1),
+    -4px -4px 8px rgba(255, 255, 255, 0.05);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform, box-shadow;
+}
+
+.settingCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    6px 6px 12px rgba(0, 0, 0, 0.15),
+    -6px -6px 12px rgba(255, 255, 255, 0.1);
+}
+
+.settingInfo {
+  margin-bottom: 16px;
+}
+
+.settingLabel {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--theme-text-primary);
+  margin: 0 0 4px 0;
+}
+
+.settingDescription {
+  font-size: 14px;
+  color: var(--theme-text-secondary);
+  line-height: 1.4;
+  margin: 0;
+}
+
+.settingControl {
+  width: 100%;
+}
+
+/* Кнопки темы */
+.themeButtons {
+  display: flex;
+  gap: 12px;
+}
+
+.themeButton {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 12px;
+  border: none;
+  border-radius: 12px;
+  background: var(--theme-card-background, rgba(255, 255, 255, 0.05));
+  color: var(--theme-text-secondary);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 
+    2px 2px 4px rgba(0, 0, 0, 0.1),
+    -2px -2px 4px rgba(255, 255, 255, 0.05);
+  will-change: transform, box-shadow, background-color;
+}
+
+.themeButton:hover {
+  transform: translateY(-1px);
+  box-shadow: 
+    4px 4px 8px rgba(0, 0, 0, 0.15),
+    -4px -4px 8px rgba(255, 255, 255, 0.1);
+}
+
+.themeButton.active {
+  background: var(--theme-main-color, #d0bcff);
+  color: #000;
+  transform: scale(1.02);
+  box-shadow: 
+    4px 4px 8px rgba(0, 0, 0, 0.1),
+    -4px -4px 8px rgba(255, 255, 255, 0.1),
+    0 0 0 2px rgba(208, 188, 255, 0.3);
+}
+
+.themeButton span {
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* Выпадающие списки */
+.select {
+  width: 100%;
+  padding: 16px;
+  border: none;
+  border-radius: 12px;
+  background: var(--theme-card-background, rgba(255, 255, 255, 0.05));
+  color: var(--theme-text-primary);
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 
+    inset 2px 2px 4px rgba(0, 0, 0, 0.1),
+    inset -2px -2px 4px rgba(255, 255, 255, 0.05);
+}
+
+.select:focus {
+  outline: none;
+  box-shadow: 
+    inset 2px 2px 4px rgba(0, 0, 0, 0.1),
+    inset -2px -2px 4px rgba(255, 255, 255, 0.05),
+    0 0 0 2px rgba(208, 188, 255, 0.3);
+}
+
+/* Переключатели */
+.toggleSwitch {
+  width: 60px;
+  height: 32px;
+  border: none;
+  border-radius: 16px;
+  background: var(--theme-card-background, rgba(255, 255, 255, 0.05));
+  cursor: pointer;
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 
+    inset 2px 2px 4px rgba(0, 0, 0, 0.1),
+    inset -2px -2px 4px rgba(255, 255, 255, 0.05);
+  will-change: transform, background-color;
+}
+
+.toggleSwitch:hover {
+  transform: scale(1.05);
+}
+
+.toggleSwitch.active {
+  background: var(--theme-main-color, #d0bcff);
+  box-shadow: 
+    inset 2px 2px 4px rgba(0, 0, 0, 0.1),
+    inset -2px -2px 4px rgba(255, 255, 255, 0.1),
+    0 0 0 2px rgba(208, 188, 255, 0.3);
+}
+
+.toggleThumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 28px;
+  height: 28px;
+  border-radius: 14px;
+  background: var(--theme-background);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 
+    2px 2px 4px rgba(0, 0, 0, 0.2),
+    -2px -2px 4px rgba(255, 255, 255, 0.1);
+  will-change: transform;
+}
+
+.toggleSwitch.active .toggleThumb {
+  transform: translateX(28px);
+}
+
+/* Информационная карточка */
+.infoCard {
+  background: var(--theme-card-background, rgba(255, 255, 255, 0.05));
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 
+    4px 4px 8px rgba(0, 0, 0, 0.1),
+    -4px -4px 8px rgba(255, 255, 255, 0.05);
+}
+
+.appInfo {
+  text-align: center;
+}
+
+.appName {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--theme-text-primary);
+  margin: 0 0 8px 0;
+  background: linear-gradient(135deg, var(--theme-main-color, #d0bcff), #b69df8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.appVersion {
+  font-size: 14px;
+  color: var(--theme-text-secondary);
+  margin: 0 0 12px 0;
+}
+
+.appDescription {
+  font-size: 14px;
+  color: var(--theme-text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Анимации */
+@keyframes slideInFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Темная тема */
+[data-theme="dark"] .settingsPage {
+  background: var(--theme-background);
+}
+
+[data-theme="dark"] .pageHeader {
+  border-bottom-color: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="dark"] .backButton {
+  background: rgba(255, 255, 255, 0.03);
+  box-shadow: 
+    2px 2px 4px rgba(0, 0, 0, 0.2),
+    -2px -2px 4px rgba(255, 255, 255, 0.02);
+}
+
+[data-theme="dark"] .sectionTitle {
+  background: rgba(255, 255, 255, 0.03);
+  box-shadow: 
+    inset 2px 2px 4px rgba(0, 0, 0, 0.2),
+    inset -2px -2px 4px rgba(255, 255, 255, 0.02);
+}
+
+[data-theme="dark"] .settingCard {
+  background: rgba(255, 255, 255, 0.03);
+  box-shadow: 
+    4px 4px 8px rgba(0, 0, 0, 0.2),
+    -4px -4px 8px rgba(255, 255, 255, 0.02);
+}
+
+[data-theme="dark"] .themeButton {
+  background: rgba(255, 255, 255, 0.03);
+  box-shadow: 
+    2px 2px 4px rgba(0, 0, 0, 0.2),
+    -2px -2px 4px rgba(255, 255, 255, 0.02);
+}
+
+[data-theme="dark"] .select {
+  background: rgba(255, 255, 255, 0.03);
+  box-shadow: 
+    inset 2px 2px 4px rgba(0, 0, 0, 0.2),
+    inset -2px -2px 4px rgba(255, 255, 255, 0.02);
+}
+
+[data-theme="dark"] .toggleSwitch {
+  background: rgba(255, 255, 255, 0.03);
+  box-shadow: 
+    inset 2px 2px 4px rgba(0, 0, 0, 0.2),
+    inset -2px -2px 4px rgba(255, 255, 255, 0.02);
+}
+
+[data-theme="dark"] .infoCard {
+  background: rgba(255, 255, 255, 0.03);
+  box-shadow: 
+    4px 4px 8px rgba(0, 0, 0, 0.2),
+    -4px -4px 8px rgba(255, 255, 255, 0.02);
+}
+
+/* Светлая тема */
+[data-theme="light"] .settingsPage {
+  background: var(--theme-background);
+}
+
+[data-theme="light"] .pageHeader {
+  border-bottom-color: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .backButton {
+  background: rgba(0, 0, 0, 0.03);
+  box-shadow: 
+    2px 2px 4px rgba(0, 0, 0, 0.1),
+    -2px -2px 4px rgba(255, 255, 255, 0.8);
+}
+
+[data-theme="light"] .sectionTitle {
+  background: rgba(0, 0, 0, 0.03);
+  box-shadow: 
+    inset 2px 2px 4px rgba(0, 0, 0, 0.1),
+    inset -2px -2px 4px rgba(255, 255, 255, 0.8);
+}
+
+[data-theme="light"] .settingCard {
+  background: rgba(0, 0, 0, 0.03);
+  box-shadow: 
+    4px 4px 8px rgba(0, 0, 0, 0.1),
+    -4px -4px 8px rgba(255, 255, 255, 0.8);
+}
+
+[data-theme="light"] .themeButton {
+  background: rgba(0, 0, 0, 0.03);
+  box-shadow: 
+    2px 2px 4px rgba(0, 0, 0, 0.1),
+    -2px -2px 4px rgba(255, 255, 255, 0.8);
+}
+
+[data-theme="light"] .select {
+  background: rgba(0, 0, 0, 0.03);
+  box-shadow: 
+    inset 2px 2px 4px rgba(0, 0, 0, 0.1),
+    inset -2px -2px 4px rgba(255, 255, 255, 0.8);
+}
+
+[data-theme="light"] .toggleSwitch {
+  background: rgba(0, 0, 0, 0.03);
+  box-shadow: 
+    inset 2px 2px 4px rgba(0, 0, 0, 0.1),
+    inset -2px -2px 4px rgba(255, 255, 255, 0.8);
+}
+
+[data-theme="light"] .infoCard {
+  background: rgba(0, 0, 0, 0.03);
+  box-shadow: 
+    4px 4px 8px rgba(0, 0, 0, 0.1),
+    -4px -4px 8px rgba(255, 255, 255, 0.8);
+}
+
+/* Скрытие на desktop */
+@media (min-width: 769px) {
+  .settingsPage {
+    display: none;
+  }
+}
+
+/* Адаптивность для очень маленьких экранов */
+@media (max-width: 480px) {
+  .pageHeader {
+    padding: 12px 16px;
+    padding-top: calc(12px + env(safe-area-inset-top));
+  }
+  
+  .pageTitle {
+    font-size: 18px;
+  }
+  
+  .pageContent {
+    padding: 16px;
+  }
+  
+  .settingCard {
+    padding: 16px;
+  }
+  
+  .themeButtons {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .themeButton {
+    padding: 12px;
+  }
+}
+
+/* Стили для кнопок анимации */
+.animationButtons {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.animationButton {
+  width: 44px;
+  height: 44px;
+  border: 2px solid rgba(128, 128, 128, 0.4);
+  border-radius: 12px;
+  background: transparent;
+  color: var(--theme-text-primary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0;
+  box-shadow: 
+    2px 2px 4px rgba(0, 0, 0, 0.1),
+    -2px -2px 4px rgba(255, 255, 255, 0.05);
+}
+
+.animationButton:hover {
+  background: rgba(128, 128, 128, 0.1);
+  border-color: var(--theme-main-color, #d0bcff);
+  color: var(--theme-main-color, #d0bcff);
+  transform: translateY(-2px);
+  box-shadow: 
+    4px 4px 8px rgba(0, 0, 0, 0.15),
+    -4px -4px 8px rgba(255, 255, 255, 0.1);
+}
+
+.animationButton.active {
+  background: var(--theme-main-color, #d0bcff);
+  border-color: var(--theme-main-color, #d0bcff);
+  color: white;
+  transform: scale(1.05);
+}
+
+.animationButton.active:hover {
+  background: #b69df8;
+  border-color: #b69df8;
+  transform: scale(1.05) translateY(-2px);
+}
+
+/* Светлая тема для кнопок анимации */
+[data-theme="light"] .animationButton {
+  background: rgba(0, 0, 0, 0.03);
+  box-shadow: 
+    2px 2px 4px rgba(0, 0, 0, 0.1),
+    -2px -2px 4px rgba(255, 255, 255, 0.8);
+}
+
+[data-theme="light"] .animationButton:hover {
+  background: rgba(0, 0, 0, 0.05);
+  box-shadow: 
+    4px 4px 8px rgba(0, 0, 0, 0.15),
+    -4px -4px 8px rgba(255, 255, 255, 0.8);
+}
+
+[data-theme="light"] .animationButton.active {
+  background: var(--theme-main-color, #d0bcff);
+  border-color: var(--theme-main-color, #d0bcff);
+  color: white;
+}

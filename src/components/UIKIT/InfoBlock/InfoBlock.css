@@ -1,0 +1,161 @@
+@import '../../uikit.module.css';
+@import '../../styles/theme.css';
+
+/* InfoBlock - Оптимизированные стили с поддержкой системы тем */
+
+.info-block {
+  box-sizing: border-box;
+  contain: layout style paint;
+  /* Используем CSS переменные для поддержки тем */
+  background: var(--theme-background, rgba(255,255,255,0.03));
+  backdrop-filter: var(--theme-backdrop-filter, blur(20px));
+  -webkit-backdrop-filter: var(--theme-backdrop-filter, blur(20px));
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  transition: background 0.3s ease, backdrop-filter 0.3s ease, border-color 0.3s ease;
+}
+
+.info-block__title {
+  font-family: inherit;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  color: var(--theme-text-primary, inherit);
+}
+
+.info-block__description {
+  font-family: inherit;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  color: var(--theme-text-secondary, rgba(0,0,0,0.7));
+}
+
+/* Варианты стилей */
+.info-block--default {
+  /* Стили по умолчанию уже определены в JS */
+}
+
+/* Класс для автоматического применения темы */
+.info-block.theme-aware {
+  background: var(--theme-background) !important;
+  backdrop-filter: var(--theme-backdrop-filter) !important;
+  -webkit-backdrop-filter: var(--theme-backdrop-filter) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+/* Принудительные классы тем */
+.info-block.theme-default {
+  background: rgba(15, 15, 15, 0.98) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.info-block.theme-blur {
+  background: rgba(255, 255, 255, 0.03) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+}
+
+.info-block.theme-midnight {
+  background: rgba(5, 8, 20, 0.95) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.info-block.theme-ocean {
+  background: rgba(8, 25, 40, 0.92) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.info-block.theme-sunset {
+  background: rgba(40, 15, 8, 0.94) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.info-block.theme-forest {
+  background: rgba(8, 30, 15, 0.93) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.info-block.theme-aurora {
+  background: rgba(12, 35, 25, 0.91) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.info-block.theme-cosmic {
+  background: rgba(30, 8, 35, 0.96) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+}
+
+.info-block.theme-neon {
+  background: rgba(8, 20, 45, 0.89) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+}
+
+.info-block.theme-vintage {
+  background: rgba(35, 20, 8, 0.95) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+}
+
+.info-block.theme-pickme {
+  background: rgba(131, 61, 96, 0.93) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Мобильные оптимизации */
+@media (max-width: 768px) {
+  .info-block {
+    padding: 12px;
+    margin-bottom: 6px;
+    /* На мобильных устройствах убираем border-radius для полноэкранных модалов */
+    border-radius: 0;
+  }
+
+  .info-block__title {
+    font-size: 1.25rem !important;
+  }
+
+  .info-block__description {
+    font-size: 0.8rem !important;
+  }
+}
+
+/* Поддержка темной темы */
+@media (prefers-color-scheme: dark) {
+  .info-block--default {
+    background: var(--theme-background, rgba(255, 255, 255, 0.02)) !important;
+    color: var(--theme-text-primary, rgba(255, 255, 255, 0.9)) !important;
+  }
+
+  .info-block--default .info-block__description {
+    color: var(--theme-text-secondary, rgba(255, 255, 255, 0.6)) !important;
+  }
+}
+
+/* Оптимизации для производительности */
+.info-block {
+  /* Базовые оптимизации без анимаций */
+}
+
+/* Поддержка высокого DPI */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .info-block {
+    /* Более четкие границы на retina дисплеях */
+    border-width: 0.5px;
+  }
+}
+
+/* Поддержка печати */
+@media print {
+  .info-block {
+    background: white !important;
+    color: black !important;
+    border: 1px solid #ccc !important;
+  }
+}

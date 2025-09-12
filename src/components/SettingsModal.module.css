@@ -1,0 +1,435 @@
+/* Settings Modal - Glassmorphism стиль */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.modalContent {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  max-width: 600px;
+  width: 100%;
+  max-height: 80vh;
+  overflow: hidden;
+  animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform, opacity;
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 24px;
+}
+
+.modalTitle {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--theme-text-primary);
+  margin: 0;
+  background: linear-gradient(135deg, var(--theme-main-color, #d0bcff), #b69df8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.closeButton {
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--theme-text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform, background-color;
+}
+
+.closeButton:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.1);
+}
+
+.modalBody {
+  padding: 0 24px;
+  max-height: 60vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.settingsSection {
+  margin-bottom: 32px;
+}
+
+.sectionTitle {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--theme-text-primary);
+  margin: 0 0 16px 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.settingItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.settingItem:last-child {
+  border-bottom: none;
+}
+
+.settingInfo {
+  flex: 1;
+  margin-right: 16px;
+}
+
+.settingLabel {
+  display: block;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--theme-text-primary);
+  margin-bottom: 4px;
+}
+
+.settingDescription {
+  font-size: 14px;
+  color: var(--theme-text-secondary);
+  line-height: 1.4;
+}
+
+.settingControl {
+  flex-shrink: 0;
+}
+
+/* Кнопки темы */
+.themeButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--theme-text-secondary);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 14px;
+  font-weight: 500;
+  will-change: transform, background-color, border-color;
+}
+
+.themeButton:first-child {
+  margin-right: 8px;
+}
+
+.themeButton:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-1px);
+}
+
+.themeButton.active {
+  background: var(--theme-main-color, #d0bcff);
+  color: #000;
+  border-color: var(--theme-main-color, #d0bcff);
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(208, 188, 255, 0.3);
+}
+
+/* Выпадающие списки */
+.select {
+  padding: 10px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--theme-text-primary);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 120px;
+}
+
+.select:focus {
+  outline: none;
+  border-color: var(--theme-main-color, #d0bcff);
+  box-shadow: 0 0 0 3px rgba(208, 188, 255, 0.1);
+}
+
+/* Переключатели */
+.toggleButton {
+  width: 48px;
+  height: 28px;
+  border: none;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--theme-text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  will-change: transform, background-color;
+}
+
+.toggleButton:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.1);
+}
+
+.toggleButton.active {
+  background: var(--theme-main-color, #d0bcff);
+  color: #000;
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(208, 188, 255, 0.3);
+}
+
+/* Кнопки действий */
+.modalFooter {
+  display: flex;
+  gap: 12px;
+  padding: 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin-top: 24px;
+}
+
+.cancelButton {
+  flex: 1;
+  padding: 12px 24px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--theme-text-secondary);
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 500;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform, background-color;
+}
+
+.cancelButton:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-1px);
+}
+
+.saveButton {
+  flex: 1;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 12px;
+  background: var(--theme-main-color, #d0bcff);
+  color: #000;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform, background-color;
+}
+
+.saveButton:hover {
+  background: #b69df8;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(208, 188, 255, 0.3);
+}
+
+/* Анимации */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Темная тема */
+[data-theme="dark"] .modalContent {
+  background: rgba(0, 0, 0, 0.3);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .modalHeader {
+  border-bottom-color: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="dark"] .sectionTitle {
+  border-bottom-color: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="dark"] .settingItem {
+  border-bottom-color: rgba(255, 255, 255, 0.03);
+}
+
+[data-theme="dark"] .modalFooter {
+  border-top-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Светлая тема */
+[data-theme="light"] .modalContent {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(0, 0, 0, 0.1);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .modalHeader {
+  border-bottom-color: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .sectionTitle {
+  border-bottom-color: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .settingItem {
+  border-bottom-color: rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="light"] .modalFooter {
+  border-top-color: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .themeButton {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .select {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .toggleButton {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .cancelButton {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .modalOverlay {
+    padding: 10px;
+  }
+  
+  .modalContent {
+    max-height: 90vh;
+  }
+  
+  .modalHeader {
+    padding: 16px 16px 0 16px;
+  }
+  
+  .modalTitle {
+    font-size: 20px;
+  }
+  
+  .modalBody {
+    padding: 0 16px;
+  }
+  
+  .settingItem {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  
+  .settingInfo {
+    margin-right: 0;
+  }
+  
+  .settingControl {
+    width: 100%;
+  }
+  
+  .themeButton {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .themeButton:first-child {
+    margin-right: 0;
+    margin-bottom: 8px;
+  }
+  
+  .modalFooter {
+    padding: 16px;
+    flex-direction: column;
+  }
+}
+
+/* Стили для кнопок анимации */
+.animationButtons {
+  display: flex;
+  gap: 8px;
+}
+
+.animationButton {
+  width: 40px;
+  height: 40px;
+  border: 2px solid rgba(128, 128, 128, 0.4);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--theme-text-primary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.animationButton:hover {
+  background: rgba(128, 128, 128, 0.1);
+  border-color: var(--theme-main-color, #d0bcff);
+  color: var(--theme-main-color, #d0bcff);
+  transform: translateY(-1px);
+}
+
+.animationButton.active {
+  background: var(--theme-main-color, #d0bcff);
+  border-color: var(--theme-main-color, #d0bcff);
+  color: white;
+}
+
+.animationButton.active:hover {
+  background: #b69df8;
+  border-color: #b69df8;
+  transform: translateY(-1px);
+}
