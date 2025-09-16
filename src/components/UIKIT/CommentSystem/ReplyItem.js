@@ -258,7 +258,7 @@ const ReplyItem = ({
               ? `/static/uploads/avatar/${reply.user.id}/${reply.user.photo}`
               : `/static/uploads/avatar/system/avatar.png`
           }
-          alt={reply.user.name}
+          alt={reply.user.displayName || reply.user.username}
           component={Link}
           to={`/profile/${reply.user.username}`}
           sx={{
@@ -302,7 +302,7 @@ const ReplyItem = ({
                   fontSize: '0.8rem',
                 }}
               >
-                {reply.user.name}
+                {reply.user.displayName || reply.user.username}
               </Typography>
               <Tooltip
                 title={new Date(reply.timestamp).toLocaleString()}

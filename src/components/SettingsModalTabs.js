@@ -79,6 +79,59 @@ const SettingsModalTabs = ({ isOpen, onClose, user }) => {
     }
   };
 
+  const handleAvatarUpload = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // Проверяем тип файла
+    if (!file.type.startsWith('image/')) {
+      alert('Пожалуйста, выберите изображение');
+      return;
+    }
+
+    // Проверяем размер файла (максимум 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Размер файла не должен превышать 5MB');
+      return;
+    }
+
+    try {
+      // Конвертируем файл в base64
+      const base64 = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+
+      // Отправляем на сервер
+      const response = await fetch('/api/user/avatar', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+        },
+        body: JSON.stringify({ avatar: base64 })
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        // Обновляем локальное состояние
+        setSettings(prev => ({
+          ...prev,
+          avatar: result.user.avatar
+        }));
+        console.log('Аватарка загружена успешно');
+      } else {
+        const error = await response.json();
+        alert(error.message || 'Ошибка при загрузке аватарки');
+      }
+    } catch (error) {
+      console.error('Ошибка при загрузке аватарки:', error);
+      alert('Ошибка при загрузке аватарки');
+    }
+  };
+
   const handleCancel = () => {
     onClose();
   };
@@ -136,7 +189,16 @@ const SettingsModalTabs = ({ isOpen, onClose, user }) => {
                       )}
                     </div>
                     <button className={styles.uploadButton}>
-                      Загрузить
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleAvatarUpload}
+                        style={{ display: 'none' }}
+                        id="desktop-avatar-upload"
+                      />
+                      <label htmlFor="desktop-avatar-upload" style={{ cursor: 'pointer', display: 'block' }}>
+                        Загрузить
+                      </label>
                     </button>
                   </div>
                 </div>

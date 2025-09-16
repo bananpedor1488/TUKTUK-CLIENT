@@ -343,7 +343,7 @@ const ReactionUsersDialog = ({ open, onClose, storyId }) => {
                 />
                 <Box>
                   <Typography sx={{ fontWeight: 500 }}>
-                    {user.name || user.username}
+                    {user.displayName || user.username}
                   </Typography>
                   <Typography variant='caption' color='text.secondary'>
                     @{user.username}

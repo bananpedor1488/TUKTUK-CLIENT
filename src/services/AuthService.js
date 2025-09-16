@@ -171,6 +171,24 @@ const AuthService = {
     }
   },
 
+  updateAvatar: async (avatarData) => {
+    try {
+      const response = await axios.put('/user/avatar', {
+        avatar: avatarData
+      }, {
+        withCredentials: true,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      return response.data;
+    } catch (error) {
+      console.error('Ошибка при обновлении аватарки:', error);
+      throw error;
+    }
+  },
+
   refreshToken: async () => {
     try {
       const response = await axios.post('/auth/refresh', {}, {

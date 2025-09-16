@@ -378,6 +378,20 @@ export const AuthProvider = ({ children }) => {
     dispatch({ type: 'UPDATE_USER', payload: userData });
   };
 
+  const updateAvatar = async (avatarData) => {
+    try {
+      const response = await AuthService.updateAvatar(avatarData);
+      if (response.user) {
+        dispatch({ type: 'UPDATE_USER', payload: response.user });
+        return { success: true, user: response.user };
+      }
+      return { success: false, error: 'Failed to update avatar' };
+    } catch (error) {
+      console.error('Avatar update error:', error);
+      return { success: false, error: error.message };
+    }
+  };
+
   const clearError = React.useCallback(() => {
     dispatch({ type: 'CLEAR_ERROR' });
   }, []);
@@ -389,6 +403,7 @@ export const AuthProvider = ({ children }) => {
     registerProfile,
     logout,
     updateUser,
+    updateAvatar,
     clearError,
     updateOnlineStatus
   };

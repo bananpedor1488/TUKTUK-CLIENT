@@ -740,7 +740,7 @@ const TransferMenu: React.FC<TransferMenuProps> = ({
                           variant='subtitle1'
                           sx={{ fontWeight: 'bold' }}
                         >
-                          {user.name}
+                          {user.displayName || user.username}
                         </Typography>
                         {user.verification_status === 'verified' && (
                           <VerifiedIcon

@@ -259,7 +259,7 @@ const UsernameCard = ({ username, onClose, open }) => {
               bgcolor: 'primary.main',
             }}
           >
-            {user.name?.charAt(0) || user.username?.charAt(0) || '?'}
+            {user.displayName?.charAt(0) || user.username?.charAt(0) || '?'}
           </Avatar>
         )}
         <Link
@@ -281,7 +281,7 @@ const UsernameCard = ({ username, onClose, open }) => {
               fontSize: isSmall ? '0.85rem' : '1rem',
             }}
           >
-            {truncateText(user.username || user.name, isSmall ? 10 : 15)}
+            {truncateText(user.displayName || user.username, isSmall ? 10 : 15)}
           </Typography>
           {user.is_verified && (
             <VerifiedIcon

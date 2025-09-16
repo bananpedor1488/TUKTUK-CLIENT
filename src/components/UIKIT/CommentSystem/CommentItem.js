@@ -161,7 +161,7 @@ const CommentItem = ({
               ? `/static/uploads/avatar/${comment.user.id}/${comment.user.photo}`
               : `/static/uploads/avatar/system/avatar.png`
           }
-          alt={comment.user.name}
+          alt={comment.user.displayName || comment.user.username}
           component={Link}
           to={`/profile/${comment.user.username}`}
           sx={{
@@ -210,7 +210,7 @@ const CommentItem = ({
                   fontSize: { xs: '0.9rem', sm: '1rem' },
                 }}
               >
-                {comment.user.name}
+                {comment.user.displayName || comment.user.username}
                 {(comment.user.verification?.status > 0 || 
                   comment.user.verification_status === 'verified' ||
                   comment.user.verification_status > 0 ||

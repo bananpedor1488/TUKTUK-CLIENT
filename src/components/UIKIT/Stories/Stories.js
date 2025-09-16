@@ -475,7 +475,7 @@ const Stories = ({ userIdentifier = null }) => {
                           ? `/static/uploads/avatar/${user.id}/${user.photo}`
                           : undefined
                       }
-                      alt={user?.name || 'You'}
+                      alt={user?.displayName || user?.username || 'You'}
                       sx={{
                         width: 32,
                         height: 32,
@@ -496,7 +496,7 @@ const Stories = ({ userIdentifier = null }) => {
                           overflow: 'hidden',
                         }}
                       >
-                        {user?.name || 'Ваша история'}
+                        {user?.displayName || user?.username || 'Ваша история'}
                       </Typography>
                     </Box>
                   </Box>
