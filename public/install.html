@@ -173,18 +173,38 @@
             </ol>
         </div>
         
-        <a href="project1.crx" download="project1.crx" class="install-button">
-            📥 Скачать расширение Project1
-        </a>
+        <button id="installButton" class="install-button">
+            🚀 Установить расширение Project1
+        </button>
+        
+        <div id="downloadFallback" style="display: none;">
+            <a href="project1.crx" download="project1.crx" class="install-button">
+                📥 Скачать расширение Project1
+            </a>
+        </div>
         
         <div class="instructions">
-            <h3>🔧 Альтернативный способ установки</h3>
-            <p>Если у вас возникли проблемы с установкой через режим разработчика, попробуйте:</p>
-            <ol>
-                <li>Переименуйте файл <code>project1.crx</code> в <code>project1.zip</code></li>
-                <li>Распакуйте архив в отдельную папку</li>
-                <li>Загрузите распакованную папку как расширение</li>
-            </ol>
+            <h3>🔧 Альтернативные способы установки</h3>
+            
+            <div style="margin: 20px 0;">
+                <h4 style="color: #FFD700;">Способ 1: Перетаскивание (Drag & Drop)</h4>
+                <p>Скачайте файл и перетащите его прямо в окно расширений браузера:</p>
+                <ol>
+                    <li>Откройте <code>chrome://extensions/</code> (Chrome) или <code>edge://extensions/</code> (Edge)</li>
+                    <li>Включите "Режим разработчика"</li>
+                    <li>Перетащите файл <code>project1.crx</code> в окно браузера</li>
+                </ol>
+            </div>
+            
+            <div style="margin: 20px 0;">
+                <h4 style="color: #FFD700;">Способ 2: Распаковка архива</h4>
+                <p>Если файл .crx не работает, попробуйте:</p>
+                <ol>
+                    <li>Переименуйте файл <code>project1.crx</code> в <code>project1.zip</code></li>
+                    <li>Распакуйте архив в отдельную папку</li>
+                    <li>Загрузите распакованную папку как расширение</li>
+                </ol>
+            </div>
         </div>
         
         <div class="footer">
@@ -194,32 +214,157 @@
     </div>
     
     <script>
-        // Добавляем интерактивность
-        document.addEventListener('DOMContentLoaded', function() {
-            const downloadButton = document.querySelector('.install-button');
+        // Функция для показа уведомлений
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            const bgColor = type === 'success' ? '#4CAF50' : type === 'error' ? '#f44336' : '#2196F3';
             
-            downloadButton.addEventListener('click', function(e) {
-                // Показываем уведомление о скачивании
-                const notification = document.createElement('div');
-                notification.style.cssText = `
-                    position: fixed;
-                    top: 20px;
-                    right: 20px;
-                    background: #4CAF50;
-                    color: white;
-                    padding: 15px 20px;
-                    border-radius: 10px;
-                    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-                    z-index: 1000;
-                    animation: slideIn 0.3s ease;
-                `;
-                notification.textContent = '📥 Начинается скачивание расширения...';
-                document.body.appendChild(notification);
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${bgColor};
+                color: white;
+                padding: 15px 20px;
+                border-radius: 10px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+                z-index: 1000;
+                animation: slideIn 0.3s ease;
+                max-width: 300px;
+                word-wrap: break-word;
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 5000);
+        }
+
+        // Функция для автоматической установки расширения
+        async function installExtension() {
+            const installButton = document.getElementById('installButton');
+            const downloadFallback = document.getElementById('downloadFallback');
+            
+            try {
+                // Проверяем поддержку Chrome Extensions API
+                if (typeof chrome !== 'undefined' && chrome.webstore) {
+                    showNotification('🔄 Попытка автоматической установки...', 'info');
+                    
+                    // Пытаемся установить через Chrome Web Store API
+                    chrome.webstore.install('project1.crx', function() {
+                        showNotification('✅ Расширение успешно установлено!', 'success');
+                        installButton.textContent = '✅ Установлено';
+                        installButton.disabled = true;
+                    }, function(error) {
+                        console.error('Ошибка установки:', error);
+                        showNotification('❌ Автоматическая установка не удалась. Используйте ручную установку.', 'error');
+                        downloadFallback.style.display = 'block';
+                        installButton.style.display = 'none';
+                    });
+                } else {
+                    // Fallback для других браузеров или если API недоступен
+                    throw new Error('Chrome Extensions API недоступен');
+                }
+            } catch (error) {
+                console.error('Ошибка:', error);
                 
-                setTimeout(() => {
-                    notification.remove();
-                }, 3000);
-            });
+                // Показываем инструкции для ручной установки
+                showNotification('🔧 Переходим к ручной установке...', 'info');
+                
+                // Скрываем кнопку установки и показываем скачивание
+                installButton.style.display = 'none';
+                downloadFallback.style.display = 'block';
+                
+                // Показываем подробные инструкции
+                showDetailedInstructions();
+            }
+        }
+
+        // Функция для показа подробных инструкций
+        function showDetailedInstructions() {
+            const instructionsDiv = document.createElement('div');
+            instructionsDiv.style.cssText = `
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: 15px;
+                padding: 25px;
+                margin: 20px 0;
+                border: 2px solid #FFC107;
+            `;
+            
+            instructionsDiv.innerHTML = `
+                <h3 style="color: #FFD700; margin-top: 0;">🔧 Ручная установка</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
+                    <div>
+                        <h4 style="color: #FFD700;">Chrome/Edge:</h4>
+                        <ol style="font-size: 0.9em; line-height: 1.6;">
+                            <li>Откройте <code>chrome://extensions/</code></li>
+                            <li>Включите "Режим разработчика"</li>
+                            <li>Перетащите файл .crx в окно</li>
+                        </ol>
+                    </div>
+                    <div>
+                        <h4 style="color: #FFD700;">Firefox:</h4>
+                        <ol style="font-size: 0.9em; line-height: 1.6;">
+                            <li>Откройте <code>about:debugging</code></li>
+                            <li>Нажмите "Загрузить временное дополнение"</li>
+                            <li>Выберите файл .crx</li>
+                        </ol>
+                    </div>
+                </div>
+            `;
+            
+            // Вставляем инструкции после кнопки скачивания
+            const downloadFallback = document.getElementById('downloadFallback');
+            downloadFallback.parentNode.insertBefore(instructionsDiv, downloadFallback.nextSibling);
+        }
+
+        // Функция для скачивания файла
+        function downloadFile() {
+            showNotification('📥 Начинается скачивание расширения...', 'info');
+            
+            // Создаем временную ссылку для скачивания
+            const link = document.createElement('a');
+            link.href = 'project1.crx';
+            link.download = 'project1.crx';
+            link.style.display = 'none';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            setTimeout(() => {
+                showNotification('✅ Файл скачан! Теперь установите его вручную.', 'success');
+            }, 1000);
+        }
+
+        // Инициализация при загрузке страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            const installButton = document.getElementById('installButton');
+            const downloadLink = document.querySelector('#downloadFallback a');
+            
+            // Обработчик для кнопки установки
+            installButton.addEventListener('click', installExtension);
+            
+            // Обработчик для ссылки скачивания
+            if (downloadLink) {
+                downloadLink.addEventListener('click', downloadFile);
+            }
+            
+            // Проверяем браузер и показываем соответствующую информацию
+            const userAgent = navigator.userAgent.toLowerCase();
+            let browserInfo = '';
+            
+            if (userAgent.includes('chrome')) {
+                browserInfo = '🌐 Обнаружен Chrome - автоматическая установка доступна';
+            } else if (userAgent.includes('firefox')) {
+                browserInfo = '🦊 Обнаружен Firefox - требуется ручная установка';
+            } else if (userAgent.includes('edge')) {
+                browserInfo = '🔷 Обнаружен Edge - автоматическая установка доступна';
+            } else {
+                browserInfo = '🔍 Неизвестный браузер - попробуйте ручную установку';
+            }
+            
+            showNotification(browserInfo, 'info');
         });
         
         // Добавляем CSS анимацию
@@ -228,6 +373,11 @@
             @keyframes slideIn {
                 from { transform: translateX(100%); opacity: 0; }
                 to { transform: translateX(0); opacity: 1; }
+            }
+            
+            button:disabled {
+                opacity: 0.6;
+                cursor: not-allowed;
             }
         `;
         document.head.appendChild(style);
