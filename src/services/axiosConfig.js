@@ -60,7 +60,15 @@ axios.interceptors.response.use(
       
       try {
         console.log('🔄 Пытаемся обновить токен для запроса:', originalRequest.url);
-        const response = await axios.post('/auth/refresh', {}, {
+        
+        // Получаем refresh token из localStorage как fallback
+        const refreshToken = typeof window !== 'undefined' && window.localStorage 
+          ? localStorage.getItem('refreshToken') 
+          : null;
+        
+        const refreshData = refreshToken ? { refreshToken } : {};
+        
+        const response = await axios.post('/auth/refresh', refreshData, {
           withCredentials: true
         });
         console.log('🔄 Ответ от refresh:', response);
@@ -79,6 +87,7 @@ axios.interceptors.response.use(
         console.log('❌ Refresh не удался для запроса:', originalRequest.url, 'Статус:', refreshError.response?.status);
         if (typeof window !== 'undefined' && window.localStorage) {
           localStorage.removeItem('accessToken');
+          localStorage.removeItem('refreshToken');
         }
         
         // Для AI запросов возвращаем более понятную ошибку

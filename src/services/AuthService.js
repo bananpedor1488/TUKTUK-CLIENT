@@ -31,6 +31,7 @@ const AuthService = {
           success: true,
           user: response.data.user || null,
           accessToken: response.data.accessToken || null,
+          refreshToken: response.data.refreshToken || null,
         };
       } else {
         return {

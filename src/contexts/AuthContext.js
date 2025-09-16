@@ -190,6 +190,10 @@ export const AuthProvider = ({ children }) => {
         
         if (!storedToken) {
           console.log('❌ Нет токена - пользователь не авторизован');
+          // Очищаем refresh token тоже
+          if (typeof window !== 'undefined' && window.localStorage) {
+            localStorage.removeItem('refreshToken');
+          }
           dispatch({ type: 'LOGOUT' });
           return;
         }
@@ -246,6 +250,7 @@ export const AuthProvider = ({ children }) => {
             console.log('❌ Обновление токена не удалось, выходим из системы:', refreshError.response?.status);
             if (typeof window !== 'undefined' && window.localStorage) {
               localStorage.removeItem('accessToken');
+              localStorage.removeItem('refreshToken');
             }
             dispatch({ type: 'LOGOUT' });
           }
@@ -255,6 +260,7 @@ export const AuthProvider = ({ children }) => {
         // В случае любой ошибки - выходим из системы
         if (typeof window !== 'undefined' && window.localStorage) {
           localStorage.removeItem('accessToken');
+          localStorage.removeItem('refreshToken');
         }
         dispatch({ type: 'LOGOUT' });
       }
@@ -273,11 +279,16 @@ export const AuthProvider = ({ children }) => {
       });
 
       if (response.success) {
-        const { user, accessToken } = response;
+        const { user, accessToken, refreshToken } = response;
         
         // Store access token in localStorage
         if (accessToken && typeof window !== 'undefined' && window.localStorage) {
           localStorage.setItem('accessToken', accessToken);
+        }
+        
+        // Store refresh token in localStorage as fallback
+        if (refreshToken && typeof window !== 'undefined' && window.localStorage) {
+          localStorage.setItem('refreshToken', refreshToken);
         }
         
         dispatch({
@@ -369,6 +380,7 @@ export const AuthProvider = ({ children }) => {
     } finally {
       if (typeof window !== 'undefined' && window.localStorage) {
         localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
       }
       dispatch({ type: 'LOGOUT' });
     }
