@@ -12,6 +12,14 @@
       }
     },
     {
+      "src": "/install.html",
+      "dest": "/install.html"
+    },
+    {
+      "src": "/telegram-auth.html",
+      "dest": "/telegram-auth.html"
+    },
+    {
       "src": "/(.*)",
       "dest": "/index.html"
     }
