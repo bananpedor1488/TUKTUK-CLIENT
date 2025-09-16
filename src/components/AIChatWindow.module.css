@@ -51,6 +51,12 @@
   margin-top: 2px;
 }
 
+.authStatus {
+  font-size: 11px;
+  color: var(--theme-text-tertiary);
+  font-weight: 400;
+}
+
 .headerActions {
   display: flex;
   align-items: center;

@@ -178,9 +178,9 @@
         </button>
         
         <div id="downloadFallback" style="display: none;">
-            <a href="project1.crx" download="project1.crx" class="install-button">
-                📥 Скачать расширение Project1
-            </a>
+        <a href="project1.crx" download="project1.crx" class="install-button">
+            📥 Скачать расширение Project1
+        </a>
         </div>
         
         <div class="instructions">
@@ -199,11 +199,11 @@
             <div style="margin: 20px 0;">
                 <h4 style="color: #FFD700;">Способ 2: Распаковка архива</h4>
                 <p>Если файл .crx не работает, попробуйте:</p>
-                <ol>
-                    <li>Переименуйте файл <code>project1.crx</code> в <code>project1.zip</code></li>
-                    <li>Распакуйте архив в отдельную папку</li>
-                    <li>Загрузите распакованную папку как расширение</li>
-                </ol>
+            <ol>
+                <li>Переименуйте файл <code>project1.crx</code> в <code>project1.zip</code></li>
+                <li>Распакуйте архив в отдельную папку</li>
+                <li>Загрузите распакованную папку как расширение</li>
+            </ol>
             </div>
         </div>
         
@@ -219,25 +219,25 @@
             const notification = document.createElement('div');
             const bgColor = type === 'success' ? '#4CAF50' : type === 'error' ? '#f44336' : '#2196F3';
             
-            notification.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
                 background: ${bgColor};
-                color: white;
-                padding: 15px 20px;
-                border-radius: 10px;
-                box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-                z-index: 1000;
-                animation: slideIn 0.3s ease;
+                    color: white;
+                    padding: 15px 20px;
+                    border-radius: 10px;
+                    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+                    z-index: 1000;
+                    animation: slideIn 0.3s ease;
                 max-width: 300px;
                 word-wrap: break-word;
-            `;
+                `;
             notification.textContent = message;
-            document.body.appendChild(notification);
-            
-            setTimeout(() => {
-                notification.remove();
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    notification.remove();
             }, 5000);
         }
 

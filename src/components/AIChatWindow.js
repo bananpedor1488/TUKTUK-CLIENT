@@ -3,6 +3,7 @@ import { FiSend, FiZap, FiUser, FiRefreshCw, FiPlus } from 'react-icons/fi';
 import AttachModal from './AttachModal';
 import styles from './AIChatWindow.module.css';
 import axios from 'axios';
+import { useAuth } from '../contexts/AuthContext';
 
 const AIChatWindow = ({ onClose }) => {
   const [messages, setMessages] = useState([]);
@@ -11,6 +12,7 @@ const AIChatWindow = ({ onClose }) => {
   const [showAttachModal, setShowAttachModal] = useState(false);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
+  const { logout, isAuthenticated, user } = useAuth();
 
 
   // Автоскролл к последнему сообщению
@@ -31,6 +33,19 @@ const AIChatWindow = ({ onClose }) => {
 
   const sendMessage = async () => {
     if (!inputMessage.trim() || isLoading) return;
+
+    // Проверяем авторизацию перед отправкой
+    if (!isAuthenticated) {
+      const errorMessage = {
+        id: Date.now(),
+        type: 'ai',
+        content: 'Вы не авторизованы. Пожалуйста, войдите в систему.',
+        timestamp: new Date(),
+        isError: true
+      };
+      setMessages(prev => [...prev, errorMessage]);
+      return;
+    }
 
     const userMessage = {
       id: Date.now(),
@@ -60,13 +75,15 @@ const AIChatWindow = ({ onClose }) => {
       console.error('Ошибка при отправке сообщения:', error);
       
       let errorContent = 'Извините, произошла ошибка при обработке вашего запроса. Попробуйте еще раз.';
+      let shouldLogout = false;
       
       if (error.response?.data?.error) {
         errorContent = error.response.data.error;
       } else if (error.response?.status === 429) {
         errorContent = 'Слишком много запросов. Подождите минуту и попробуйте снова.';
       } else if (error.response?.status === 401) {
-        errorContent = 'Ошибка авторизации. Войдите в систему заново.';
+        errorContent = 'Ошибка авторизации. Попробуйте войти в систему заново.';
+        shouldLogout = true;
       } else if (error.response?.status === 400) {
         errorContent = 'Неверный запрос к API. Попробуйте переформулировать вопрос.';
       } else if (error.response?.status === 500) {
@@ -83,6 +100,18 @@ const AIChatWindow = ({ onClose }) => {
         isError: true
       };
       setMessages(prev => [...prev, errorMessage]);
+      
+      // Если ошибка авторизации, предлагаем перелогиниться
+      if (shouldLogout) {
+        setTimeout(() => {
+          const confirmLogout = window.confirm(
+            'Ваша сессия истекла. Хотите войти в систему заново?'
+          );
+          if (confirmLogout) {
+            logout();
+          }
+        }, 2000);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -118,7 +147,14 @@ const AIChatWindow = ({ onClose }) => {
           </div>
           <div>
             <h2 className={styles.title}>AI Ассистент</h2>
-            <p className={styles.subtitle}>Google Gemini 2.0 Flash</p>
+            <p className={styles.subtitle}>
+              Google Gemini 2.0 Flash
+              {isAuthenticated && user ? (
+                <span className={styles.authStatus}> • Авторизован как {user.displayName || user.username}</span>
+              ) : (
+                <span className={styles.authStatus}> • Не авторизован</span>
+              )}
+            </p>
           </div>
         </div>
         <div className={styles.headerActions}>

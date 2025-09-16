@@ -59,7 +59,7 @@ axios.interceptors.response.use(
       originalRequest._retry = true;
       
       try {
-        console.log('🔄 Пытаемся обновить токен...');
+        console.log('🔄 Пытаемся обновить токен для запроса:', originalRequest.url);
         const response = await axios.post('/auth/refresh', {}, {
           withCredentials: true
         });
@@ -73,14 +73,24 @@ axios.interceptors.response.use(
         
         // Retry original request
         originalRequest.headers.Authorization = `Bearer ${accessToken}`;
-        console.log('🔄 Повторяем оригинальный запрос с новым токеном');
+        console.log('🔄 Повторяем оригинальный запрос с новым токеном:', originalRequest.url);
         return axios(originalRequest);
       } catch (refreshError) {
-        console.log('❌ Refresh не удался, перенаправляем на логин:', refreshError.response?.status);
+        console.log('❌ Refresh не удался для запроса:', originalRequest.url, 'Статус:', refreshError.response?.status);
         if (typeof window !== 'undefined' && window.localStorage) {
           localStorage.removeItem('accessToken');
         }
-        // Можно добавить перенаправление на страницу логина здесь
+        
+        // Для AI запросов возвращаем более понятную ошибку
+        if (originalRequest.url?.includes('/ai/')) {
+          const aiError = new Error('Ошибка авторизации. Войдите в систему заново.');
+          aiError.response = {
+            status: 401,
+            data: { error: 'Ошибка авторизации. Войдите в систему заново.' }
+          };
+          return Promise.reject(aiError);
+        }
+        
         return Promise.reject(refreshError);
       }
     }
