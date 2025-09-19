@@ -66,8 +66,8 @@ const AIChatWindow = ({ onClose }) => {
       const aiMessage = {
         id: Date.now() + 1,
         type: 'ai',
-        content: response.data.content,
-        timestamp: new Date(response.data.timestamp)
+        content: response.data.content || 'Извините, не удалось получить ответ от AI.',
+        timestamp: response.data.timestamp ? new Date(response.data.timestamp) : new Date()
       };
 
       setMessages(prev => [...prev, aiMessage]);
@@ -131,10 +131,19 @@ const AIChatWindow = ({ onClose }) => {
   };
 
   const formatTime = (timestamp) => {
-    return timestamp.toLocaleTimeString('ru-RU', { 
-      hour: '2-digit', 
-      minute: '2-digit' 
-    });
+    try {
+      const date = new Date(timestamp);
+      if (isNaN(date.getTime())) {
+        return '--:--';
+      }
+      return date.toLocaleTimeString('ru-RU', { 
+        hour: '2-digit', 
+        minute: '2-digit' 
+      });
+    } catch (error) {
+      console.error('Ошибка форматирования времени:', error);
+      return '--:--';
+    }
   };
 
   return (
