@@ -331,26 +331,6 @@ const ChatWindow = ({ chat, onChatUpdate, onBackToChatList }) => {
                 {getChatName()?.charAt(0)?.toUpperCase()}
               </div>
             )}
-            {chat.type === 'private' && (() => {
-              const otherParticipant = chat.participants.find(p => p._id !== user._id);
-              const userStatus = getUserStatus(otherParticipant?._id);
-              return (
-                <div style={{
-                  position: 'absolute',
-                  bottom: '2px',
-                  right: '2px',
-                  zIndex: 1
-                }}>
-                  <OnlineStatusIndicator
-                    userId={otherParticipant?._id}
-                    isOnline={userStatus.isOnline}
-                    lastSeen={userStatus.lastSeen}
-                    showText={false}
-                    size="small"
-                  />
-                </div>
-              );
-            })()}
           </div>
           <div className={styles.chatDetails}>
             <h2 className={styles.chatName}>{getChatName()}</h2>

@@ -190,11 +190,13 @@ const useOnlineStatus = (socket) => {
 
     const handleUserOnline = (data) => {
       console.log('🟢 User came online:', data.userId, data.username);
+      console.log('🟢 Current online users before update:', Array.from(onlineUsers.keys()));
       updateUserStatus(data.userId, {
         username: data.username,
         isOnline: true,
         lastSeen: new Date(data.lastSeen || data.timestamp)
       });
+      console.log('🟢 Current online users after update:', Array.from(onlineUsers.keys()));
     };
 
     const handleUserOffline = (data) => {
