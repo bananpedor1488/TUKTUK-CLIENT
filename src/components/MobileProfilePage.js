@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { FiArrowLeft, FiUser, FiBell, FiShield, FiLogOut, FiEdit3, FiSave, FiSettings, FiEye, FiVolume2, FiVolumeX, FiBellOff, FiEyeOff } from 'react-icons/fi';
 import ThemeToggle from './ThemeToggle/ThemeToggle';
 import axios from '../services/axiosConfig';
+import { useToast } from '../contexts/ToastContext';
 import styles from './MobileProfilePage.module.css';
 
 const MobileProfilePage = ({ isOpen, onClose, user }) => {
@@ -33,6 +34,8 @@ const MobileProfilePage = ({ isOpen, onClose, user }) => {
     autoDownload: false,
     language: 'ru'
   });
+
+  const { success, error, warning } = useToast();
 
   // Обновляем настройки при изменении пользователя
   useEffect(() => {
@@ -89,13 +92,13 @@ const MobileProfilePage = ({ isOpen, onClose, user }) => {
     // Проверяем тип файла
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
     if (!allowedTypes.includes(file.type)) {
-      alert('Неподдерживаемый формат файла. Разрешены: JPEG, PNG, GIF, WebP');
+      error('Неподдерживаемый формат файла. Разрешены: JPEG, PNG, GIF, WebP', 'Неподдерживаемый формат');
       return;
     }
 
     // Проверяем размер файла (максимум 5MB)
     if (file.size > 5 * 1024 * 1024) {
-      alert('Размер файла не должен превышать 5MB');
+      error('Размер файла не должен превышать 5MB', 'Файл слишком большой');
       return;
     }
 
@@ -125,13 +128,13 @@ const MobileProfilePage = ({ isOpen, onClose, user }) => {
           avatar: response.data.avatar
         }));
         
-        alert('Аватарка загружена успешно!');
+        success('Аватарка загружена успешно!', 'Загрузка завершена');
       } else {
         throw new Error(response.data.message || 'Upload failed');
       }
     } catch (error) {
       console.error('❌ Avatar upload error:', error);
-      alert(error.response?.data?.message || error.message || 'Ошибка при загрузке аватарки');
+      error(error.response?.data?.message || error.message || 'Ошибка при загрузке аватарки', 'Ошибка загрузки');
     }
   };
 

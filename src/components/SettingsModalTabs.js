@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { FiX, FiUser, FiEye, FiBell, FiShield, FiSave } from 'react-icons/fi';
 import ThemeToggle from './ThemeToggle/ThemeToggle';
 import axios from '../services/axiosConfig';
+import { useToast } from '../contexts/ToastContext';
 import styles from './SettingsModalTabs.module.css';
 
 const SettingsModalTabs = ({ isOpen, onClose, user }) => {
@@ -26,6 +27,8 @@ const SettingsModalTabs = ({ isOpen, onClose, user }) => {
     twoFactorEnabled: false,
     sessionTimeout: 30
   });
+
+  const { success, error, warning } = useToast();
 
   const tabs = [
     { id: 'profile', label: 'Профиль', icon: FiUser },
@@ -87,13 +90,13 @@ const SettingsModalTabs = ({ isOpen, onClose, user }) => {
     // Проверяем тип файла
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
     if (!allowedTypes.includes(file.type)) {
-      alert('Неподдерживаемый формат файла. Разрешены: JPEG, PNG, GIF, WebP');
+      error('Неподдерживаемый формат файла. Разрешены: JPEG, PNG, GIF, WebP', 'Неподдерживаемый формат');
       return;
     }
 
     // Проверяем размер файла (максимум 5MB)
     if (file.size > 5 * 1024 * 1024) {
-      alert('Размер файла не должен превышать 5MB');
+      error('Размер файла не должен превышать 5MB', 'Файл слишком большой');
       return;
     }
 
@@ -123,13 +126,13 @@ const SettingsModalTabs = ({ isOpen, onClose, user }) => {
           avatar: response.data.avatar
         }));
         
-        alert('Аватарка загружена успешно!');
+        success('Аватарка загружена успешно!', 'Загрузка завершена');
       } else {
         throw new Error(response.data.message || 'Upload failed');
       }
     } catch (error) {
       console.error('❌ Avatar upload error:', error);
-      alert(error.response?.data?.message || error.message || 'Ошибка при загрузке аватарки');
+      error(error.response?.data?.message || error.message || 'Ошибка при загрузке аватарки', 'Ошибка загрузки');
     }
   };
 

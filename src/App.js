@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { SocketProvider } from './contexts/SocketContext';
+import { ToastProvider } from './contexts/ToastContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import ConnectionGuard from './components/ConnectionGuard';
 import LoadingScreenNew from './components/LoadingScreenNew';
@@ -22,7 +23,8 @@ function App() {
     <ThemeProvider>
       <AuthProvider>
         <SocketProvider>
-          <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+          <ToastProvider>
+            <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
             <div className="App">
               <LoadingScreenNew />
               <Routes>
@@ -51,7 +53,8 @@ function App() {
                 <Route path="/" element={<Navigate to="/login" replace />} />
               </Routes>
             </div>
-          </Router>
+            </Router>
+          </ToastProvider>
         </SocketProvider>
       </AuthProvider>
     </ThemeProvider>
