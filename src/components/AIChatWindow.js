@@ -157,7 +157,7 @@ const AIChatWindow = ({ onClose }) => {
           <div>
             <h2 className={styles.title}>AI Ассистент</h2>
             <p className={styles.subtitle}>
-              Google Gemini 2.0 Flash
+              Google Gemini 2.0 Flash (Прямая интеграция)
               {isAuthenticated && user ? (
                 <span className={styles.authStatus}> • Авторизован как {user.displayName || user.username}</span>
               ) : (
