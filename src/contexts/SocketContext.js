@@ -7,6 +7,7 @@ const SocketContext = createContext();
 export const SocketProvider = ({ children }) => {
   const [socket, setSocket] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
+  const [onlineUsers, setOnlineUsers] = useState(new Map());
   const { isAuthenticated, accessToken } = useAuth();
 
   useEffect(() => {
@@ -43,6 +44,59 @@ export const SocketProvider = ({ children }) => {
           setIsConnected(false);
         });
 
+        // Online status handlers
+        newSocket.on('online_users', (users) => {
+          const usersMap = new Map();
+          users.forEach(user => {
+            usersMap.set(user.userId, {
+              status: user.status,
+              lastSeen: new Date(user.lastSeen)
+            });
+          });
+          setOnlineUsers(usersMap);
+        });
+
+        newSocket.on('user_online', (data) => {
+          setOnlineUsers(prev => {
+            const newMap = new Map(prev);
+            newMap.set(data.userId, {
+              status: data.status,
+              lastSeen: new Date(data.lastSeen)
+            });
+            return newMap;
+          });
+        });
+
+        newSocket.on('user_offline', (data) => {
+          setOnlineUsers(prev => {
+            const newMap = new Map(prev);
+            newMap.delete(data.userId);
+            return newMap;
+          });
+        });
+
+        newSocket.on('user_status_update', (data) => {
+          setOnlineUsers(prev => {
+            const newMap = new Map(prev);
+            newMap.set(data.userId, {
+              status: data.status,
+              lastSeen: new Date(data.lastSeen)
+            });
+            return newMap;
+          });
+        });
+
+        // Heartbeat to keep connection alive
+        const heartbeatInterval = setInterval(() => {
+          if (newSocket && newSocket.connected) {
+            newSocket.emit('ping');
+          }
+        }, 30000); // Ping every 30 seconds
+
+        newSocket.on('pong', () => {
+          // Connection is alive
+        });
+
         setSocket(newSocket);
       }
     } else {
@@ -50,6 +104,7 @@ export const SocketProvider = ({ children }) => {
         socket.close();
         setSocket(null);
         setIsConnected(false);
+        setOnlineUsers(new Map());
       }
     }
 
@@ -95,14 +150,37 @@ export const SocketProvider = ({ children }) => {
     }
   };
 
+  const updateStatus = (status) => {
+    if (socket && isConnected) {
+      socket.emit('update_status', { status });
+    }
+  };
+
+  const isUserOnline = (userId) => {
+    return onlineUsers.has(userId);
+  };
+
+  const getUserStatus = (userId) => {
+    return onlineUsers.get(userId) || { status: 'offline', lastSeen: null };
+  };
+
+  const getOnlineUsersCount = () => {
+    return onlineUsers.size;
+  };
+
   const value = {
     socket,
     isConnected,
+    onlineUsers,
     joinChat,
     leaveChat,
     sendMessage,
     startTyping,
-    stopTyping
+    stopTyping,
+    updateStatus,
+    isUserOnline,
+    getUserStatus,
+    getOnlineUsersCount
   };
 
   return (
