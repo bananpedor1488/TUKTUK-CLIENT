@@ -263,7 +263,8 @@ export const SocketProvider = ({ children }) => {
     isUserOnline,
     getUserStatus,
     getOnlineUsersCount,
-    fetchOnlineStatus
+    fetchOnlineStatus,
+    refreshAllUsersStatus
   };
 
   return (

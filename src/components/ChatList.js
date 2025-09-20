@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FiUsers, FiCircle, FiZap } from 'react-icons/fi';
 import { formatLastSeen, formatChatTime } from '../utils/timeUtils';
 import { useAuth } from '../contexts/AuthContext';
@@ -10,7 +10,7 @@ import styles from './ChatList.module.css';
 
 const ChatList = ({ chats, selectedChat, onChatSelect, isLoading, showAIChat, onAIChatSelect }) => {
   const { user } = useAuth();
-  const { isUserOnline, getUserStatus } = useSocket();
+  const { isUserOnline, getUserStatus, refreshAllUsersStatus } = useSocket();
   const isMobile = useIsMobile();
   
   // Состояние для контекстного меню
@@ -19,6 +19,14 @@ const ChatList = ({ chats, selectedChat, onChatSelect, isLoading, showAIChat, on
     position: { x: 0, y: 0 },
     chat: null
   });
+
+  // Обновляем статусы пользователей при загрузке чатов
+  useEffect(() => {
+    if (chats && chats.length > 0) {
+      console.log('🔄 ChatList: Refreshing user statuses for', chats.length, 'chats');
+      refreshAllUsersStatus(chats);
+    }
+  }, [chats, refreshAllUsersStatus]);
   
   if (isLoading) {
     return (

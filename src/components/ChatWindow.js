@@ -53,6 +53,20 @@ const ChatWindow = ({ chat, onChatUpdate, onBackToChatList }) => {
     };
   }, [chat?._id]); // Убираем socket и isConnected из зависимостей
 
+  // Обновляем статус пользователя в чате при загрузке
+  useEffect(() => {
+    if (chat && chat.participants) {
+      const userIds = chat.participants
+        .filter(p => p && p._id && p._id !== user._id)
+        .map(p => p._id);
+      
+      if (userIds.length > 0) {
+        console.log('🔄 ChatWindow: Refreshing status for participants:', userIds);
+        // Здесь можно добавить вызов fetchOnlineStatus если нужно
+      }
+    }
+  }, [chat, user._id]);
+
   // Подключаемся к чату при изменении состояния соединения
   useEffect(() => {
     if (chat && socket && isConnected) {

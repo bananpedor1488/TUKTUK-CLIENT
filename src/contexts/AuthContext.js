@@ -6,8 +6,6 @@ import authManager from '../utils/authManager';
 
 const AuthContext = createContext();
 
-const AuthContext = createContext();
-
 const authReducer = (state, action) => {
   switch (action.type) {
     case 'LOGIN_START':
