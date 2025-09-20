@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import axios from 'axios';
+import axios from '../services/axiosConfig';
 
 /**
  * Professional Online Status Management Hook
@@ -46,16 +46,10 @@ const useOnlineStatus = (socket) => {
     if (!userIds || userIds.length === 0) return {};
     
     try {
-      const token = localStorage.getItem('accessToken');
-      const baseURL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
-      
       console.log(`🔄 Fetching online status for ${userIds.length} users`);
       
-      const response = await axios.get(`${baseURL}/api/users/online-status`, {
+      const response = await axios.get('/users/online-status', {
         params: { userIds: userIds.join(',') },
-        headers: {
-          'Authorization': `Bearer ${token}`
-        },
         timeout: config.syncTimeout
       });
 
