@@ -2,6 +2,9 @@ import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import axios from '../services/axiosConfig';
 import { syncWithServer } from '../utils/timeUtils';
 import AuthService from '../services/AuthService';
+import authManager from '../utils/authManager';
+
+const AuthContext = createContext();
 
 const AuthContext = createContext();
 
@@ -59,11 +62,11 @@ const initialState = {
 export const AuthProvider = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
 
-  // Configure axios defaults
+  // Configure axios defaults and token monitoring
   useEffect(() => {
-    console.log('🔧 Настраиваем axios interceptors...');
+    console.log('🔧 Setting up axios interceptors and token monitoring...');
     
-    // Синхронизируем время с сервером (только если API доступен)
+    // Синхронизируем время с сервером
     try {
       syncWithServer();
       
@@ -78,7 +81,21 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       console.warn('Не удалось синхронизировать время с сервером:', error);
     }
-  }, []); // Remove dependencies to prevent infinite loop
+  }, []);
+
+  // Token monitoring
+  useEffect(() => {
+    if (!state.isAuthenticated) return;
+
+    console.log('🔍 Starting token monitoring...');
+    
+    const stopMonitoring = authManager.startTokenMonitoring(() => {
+      console.log('⏰ Tokens expired, logging out...');
+      dispatch({ type: 'LOGOUT' });
+    });
+
+    return stopMonitoring;
+  }, [state.isAuthenticated]);
 
   // Online status is now handled by WebSocket (peer-to-peer)
   const updateOnlineStatus = React.useCallback(async (isOnline) => {
@@ -141,101 +158,52 @@ export const AuthProvider = ({ children }) => {
   // Check if user is already authenticated on app load
   useEffect(() => {
     const checkAuth = async () => {
-      console.log('🔍 Начинаем проверку аутентификации...');
-      console.log('🔍 Текущее состояние loading:', state.loading);
-      
-      // Проверяем localStorage сразу
-      if (typeof window !== 'undefined' && window.localStorage) {
-        const allKeys = Object.keys(localStorage);
-        console.log('🔍 Все ключи в localStorage:', allKeys);
-        const token = localStorage.getItem('accessToken');
-        console.log('🔍 Токен в localStorage:', token ? 'есть' : 'нет');
-        if (token) {
-          console.log('🔍 Токен preview:', token.substring(0, 20) + '...');
-        }
-      }
+      console.log('🔍 Starting authentication check...');
       
       try {
-        // Get stored access token
-        const storedToken = typeof window !== 'undefined' && window.localStorage 
-          ? localStorage.getItem('accessToken') 
-          : null;
-        console.log('📱 Токен в localStorage:', storedToken ? 'есть' : 'нет');
-        
-        if (!storedToken) {
-          console.log('❌ Нет токена - пользователь не авторизован');
-          // Очищаем refresh token тоже
-          if (typeof window !== 'undefined' && window.localStorage) {
-            localStorage.removeItem('refreshToken');
-          }
+        // Проверяем, есть ли токены
+        if (!authManager.isAuthenticated()) {
+          console.log('❌ No tokens found - user not authenticated');
           dispatch({ type: 'LOGOUT' });
           return;
         }
 
-        console.log('✅ Есть токен - проверяем его валидность...');
-        console.log('🔍 Токен для проверки:', storedToken.substring(0, 20) + '...');
-        // Есть токен - проверяем его валидность
+        // Проверяем валидность access token
+        const { accessToken } = authManager.getTokens();
+        if (!accessToken || authManager.isTokenExpired(accessToken)) {
+          console.log('⚠️ Access token expired, trying to refresh...');
+          try {
+            await authManager.refreshAccessToken();
+            console.log('✅ Token refreshed successfully');
+          } catch (error) {
+            console.log('❌ Token refresh failed, logging out:', error.message);
+            dispatch({ type: 'LOGOUT' });
+            return;
+          }
+        }
+
+        // Получаем данные пользователя
         try {
           const response = await AuthService.checkAuth();
-          console.log('✅ Ответ от checkAuth:', response.data);
-          
           if (response.data.isAuthenticated && response.data.user) {
-            console.log('✅ Токен действителен, пользователь авторизован:', response.data.user?.email);
+            console.log('✅ User authenticated:', response.data.user?.email);
+            authManager.setUser(response.data.user);
             dispatch({
               type: 'LOGIN_SUCCESS',
               payload: {
                 user: response.data.user,
-                accessToken: storedToken
+                accessToken: authManager.getTokens().accessToken
               }
             });
           } else {
-            console.log('⚠️ Токен недействителен, пытаемся обновить...');
-            throw new Error('Token invalid');
+            throw new Error('Not authenticated');
           }
         } catch (error) {
-          console.log('⚠️ Токен недействителен, пытаемся обновить...', error.response?.status);
-          // If token is invalid, try to refresh
-          try {
-            const refreshResponse = await AuthService.refreshToken();
-            
-            const { accessToken } = refreshResponse;
-            if (typeof window !== 'undefined' && window.localStorage) {
-              localStorage.setItem('accessToken', accessToken);
-            }
-            console.log('🔄 Токен обновлен, получаем данные пользователя...');
-            
-            // Try to get user info again with new token
-            const userResponse = await AuthService.checkAuth();
-            console.log('✅ Ответ после обновления токена:', userResponse.data);
-            
-            if (userResponse.data.isAuthenticated && userResponse.data.user) {
-              console.log('✅ Пользователь авторизован с новым токеном:', userResponse.data.user?.email);
-              dispatch({
-                type: 'LOGIN_SUCCESS',
-                payload: {
-                  user: userResponse.data.user,
-                  accessToken
-                }
-              });
-            } else {
-              throw new Error('Still not authenticated after refresh');
-            }
-          } catch (refreshError) {
-            console.log('❌ Обновление токена не удалось, выходим из системы:', refreshError.response?.status);
-            if (typeof window !== 'undefined' && window.localStorage) {
-              localStorage.removeItem('accessToken');
-              localStorage.removeItem('refreshToken');
-            }
-            dispatch({ type: 'LOGOUT' });
-          }
+          console.log('❌ Auth check failed:', error.message);
+          dispatch({ type: 'LOGOUT' });
         }
       } catch (error) {
-        console.error('💥 Ошибка при проверке аутентификации:', error);
-        // В случае любой ошибки - выходим из системы
-        if (typeof window !== 'undefined' && window.localStorage) {
-          localStorage.removeItem('accessToken');
-          localStorage.removeItem('refreshToken');
-        }
+        console.error('💥 Authentication check error:', error);
         dispatch({ type: 'LOGOUT' });
       }
     };
@@ -255,15 +223,9 @@ export const AuthProvider = ({ children }) => {
       if (response.success) {
         const { user, accessToken, refreshToken } = response;
         
-        // Store access token in localStorage
-        if (accessToken && typeof window !== 'undefined' && window.localStorage) {
-          localStorage.setItem('accessToken', accessToken);
-        }
-        
-        // Store refresh token in localStorage as fallback
-        if (refreshToken && typeof window !== 'undefined' && window.localStorage) {
-          localStorage.setItem('refreshToken', refreshToken);
-        }
+        // Сохраняем токены через authManager
+        authManager.setTokens(accessToken, refreshToken);
+        authManager.setUser(user);
         
         dispatch({
           type: 'LOGIN_SUCCESS',
@@ -348,14 +310,10 @@ export const AuthProvider = ({ children }) => {
     try {
       // Set offline status before logout
       await updateOnlineStatus(false);
-      await AuthService.logout();
+      await authManager.logout();
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
-      if (typeof window !== 'undefined' && window.localStorage) {
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
-      }
       dispatch({ type: 'LOGOUT' });
     }
   };
