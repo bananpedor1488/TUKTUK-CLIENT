@@ -82,7 +82,7 @@ export const SocketProvider = ({ children }) => {
             newMap.set(data.userId, {
               username: data.username,
               isOnline: true,
-              lastSeen: new Date(data.lastSeen || data.timestamp) // Используем lastSeen если есть
+              lastSeen: new Date(data.lastSeen || data.timestamp) // Используем lastSeen или timestamp
             });
             console.log('🟢 Updated online users:', newMap);
             return newMap;
@@ -96,7 +96,7 @@ export const SocketProvider = ({ children }) => {
             newMap.set(data.userId, {
               username: data.username,
               isOnline: false,
-              lastSeen: new Date(data.lastSeen)
+              lastSeen: new Date(data.lastSeen) // Используем lastSeen от сервера
             });
             console.log('🔴 Updated online users:', newMap);
             return newMap;
