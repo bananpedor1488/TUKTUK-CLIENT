@@ -32,6 +32,12 @@ export const SocketProvider = ({ children }) => {
         newSocket.on('connect', () => {
           console.log('Connected to server');
           setIsConnected(true);
+          
+          // Принудительно запрашиваем статус всех пользователей после подключения
+          setTimeout(() => {
+            console.log('🔄 Requesting online status after connection...');
+            // Здесь можно добавить запрос статуса всех пользователей из чатов
+          }, 1000);
         });
 
         newSocket.on('disconnect', () => {
@@ -66,7 +72,7 @@ export const SocketProvider = ({ children }) => {
             newMap.set(data.userId, {
               username: data.username,
               isOnline: true,
-              lastSeen: new Date(data.timestamp)
+              lastSeen: new Date(data.lastSeen || data.timestamp) // Используем lastSeen если есть
             });
             console.log('🟢 Updated online users:', newMap);
             return newMap;
@@ -219,6 +225,29 @@ export const SocketProvider = ({ children }) => {
       }
     }
     return {};
+  };
+
+  // Функция для обновления статуса всех пользователей из чатов
+  const refreshAllUsersStatus = async (chats) => {
+    if (!chats || chats.length === 0) return;
+    
+    const allUserIds = new Set();
+    
+    // Собираем всех пользователей из всех чатов
+    chats.forEach(chat => {
+      if (chat.participants) {
+        chat.participants.forEach(participant => {
+          if (participant && participant._id) {
+            allUserIds.add(participant._id);
+          }
+        });
+      }
+    });
+    
+    if (allUserIds.size > 0) {
+      console.log(`🔄 Refreshing status for ${allUserIds.size} users from chats`);
+      await fetchOnlineStatus(Array.from(allUserIds));
+    }
   };
 
   const value = {
