@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { FiUsers, FiCircle, FiZap } from 'react-icons/fi';
 import { formatLastSeen, formatChatTime } from '../utils/timeUtils';
 import { useAuth } from '../contexts/AuthContext';
+import { useSocket } from '../contexts/SocketContext';
 import SwipeableChatItem from './SwipeableChatItem';
 import ChatContextMenu from './ChatContextMenu';
 import useIsMobile from '../hooks/useIsMobile';
@@ -9,6 +10,7 @@ import styles from './ChatList.module.css';
 
 const ChatList = ({ chats, selectedChat, onChatSelect, isLoading, showAIChat, onAIChatSelect }) => {
   const { user } = useAuth();
+  const { isUserOnline, getUserStatus } = useSocket();
   const isMobile = useIsMobile();
   
   // Состояние для контекстного меню
@@ -132,7 +134,7 @@ const ChatList = ({ chats, selectedChat, onChatSelect, isLoading, showAIChat, on
 
   const getOnlineStatus = (chat) => {
     if (chat.type === 'group') {
-      const onlineCount = chat.participants?.filter(p => p && p.isOnline).length || 0;
+      const onlineCount = chat.participants?.filter(p => p && isUserOnline(p._id)).length || 0;
       return onlineCount > 0 ? (
         <span style={{ color: '#10B981', fontSize: '12px' }}>
           {onlineCount} онлайн
@@ -140,14 +142,15 @@ const ChatList = ({ chats, selectedChat, onChatSelect, isLoading, showAIChat, on
       ) : null;
     } else {
       const otherParticipant = chat.participants?.find(p => p && p._id !== user._id);
-      return otherParticipant?.isOnline ? (
+      const userStatus = getUserStatus(otherParticipant?._id);
+      return userStatus.status === 'online' ? (
         <span style={{ color: '#10B981', fontSize: '12px' }}>
           <FiCircle size={8} fill="currentColor" style={{ marginRight: '4px' }} />
           Онлайн
         </span>
       ) : (
         <span style={{ color: '#6B7280', fontSize: '12px' }}>
-          Был в сети {formatLastSeen(otherParticipant?.lastSeen)}
+          Был в сети {formatLastSeen(userStatus.lastSeen)}
         </span>
       );
     }

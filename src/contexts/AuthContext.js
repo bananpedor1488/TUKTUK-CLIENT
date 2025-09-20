@@ -80,37 +80,11 @@ export const AuthProvider = ({ children }) => {
     }
   }, []); // Remove dependencies to prevent infinite loop
 
-  // Define updateOnlineStatus function before using it
+  // Online status is now handled by WebSocket (peer-to-peer)
   const updateOnlineStatus = React.useCallback(async (isOnline) => {
-    console.log('📡 updateOnlineStatus вызвана:', isOnline, 'isAuthenticated:', state.isAuthenticated);
-    
-    // Проверяем, есть ли токен в localStorage
-    const token = typeof window !== 'undefined' && window.localStorage && localStorage.getItem('accessToken');
-    console.log('📡 Токен в localStorage:', token ? 'есть' : 'нет');
-    if (token) {
-      console.log('📡 Токен preview:', token.substring(0, 20) + '...');
-    }
-    
-    if (!state.isAuthenticated || !token) {
-      console.log('📡 Пользователь не авторизован или нет токена, пропускаем обновление статуса');
-      return;
-    }
-    
-    try {
-      console.log('📡 Отправляем запрос на обновление статуса');
-      console.log('📡 Axios defaults:', {
-        baseURL: axios.defaults.baseURL,
-        withCredentials: axios.defaults.withCredentials,
-        timeout: axios.defaults.timeout
-      });
-      
-      await axios.put('/user/status', { isOnline });
-      dispatch({ type: 'UPDATE_USER', payload: { isOnline, lastSeen: new Date() } });
-      console.log('📡 Статус обновлен успешно');
-    } catch (error) {
-      console.error('Failed to update online status:', error);
-    }
-  }, [state.isAuthenticated]);
+    console.log('📡 Online status is now handled by WebSocket peer-to-peer system');
+    // No need to update database - status is managed in memory via WebSocket
+  }, []);
 
   // Handle online status based on page visibility and connection
   useEffect(() => {

@@ -24,7 +24,7 @@ const ChatWindow = ({ chat, onChatUpdate, onBackToChatList }) => {
   const messagesEndRef = useRef(null);
   const typingTimeoutRef = useRef(null);
 
-  const { socket, isConnected, joinChat, leaveChat, sendMessage, startTyping, stopTyping } = useSocket();
+  const { socket, isConnected, joinChat, leaveChat, sendMessage, startTyping, stopTyping, isUserOnline, getUserStatus } = useSocket();
   const { user } = useAuth();
 
   // Отладка данных пользователя
@@ -263,7 +263,7 @@ const ChatWindow = ({ chat, onChatUpdate, onBackToChatList }) => {
 
   const getOnlineStatus = () => {
     if (chat.type === 'group') {
-      const onlineCount = chat.participants.filter(p => p.isOnline).length;
+      const onlineCount = chat.participants.filter(p => isUserOnline(p._id)).length;
       return (
         <span style={{ color: '#10B981' }}>
           {onlineCount} онлайн
@@ -271,11 +271,12 @@ const ChatWindow = ({ chat, onChatUpdate, onBackToChatList }) => {
       );
     } else {
       const otherParticipant = chat.participants.find(p => p._id !== user._id);
-      return otherParticipant?.isOnline ? (
+      const userStatus = getUserStatus(otherParticipant?._id);
+      return userStatus.status === 'online' ? (
         <span style={{ color: '#10B981' }}>Онлайн</span>
       ) : (
         <span style={{ color: '#6B7280' }}>
-          Был в сети {formatLastSeen(otherParticipant?.lastSeen)}
+          Был в сети {formatLastSeen(userStatus.lastSeen)}
         </span>
       );
     }
