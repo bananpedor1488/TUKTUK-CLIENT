@@ -46,7 +46,7 @@ export const SocketProvider = ({ children }) => {
 
         // Online status handlers (SocialSpace approach)
         newSocket.on('onlineUsersSync', (data) => {
-          console.log('Syncing online users:', data);
+          console.log('🟢 Syncing online users:', data);
           const usersMap = new Map();
           Object.entries(data.users).forEach(([userId, status]) => {
             usersMap.set(userId, {
@@ -56,10 +56,11 @@ export const SocketProvider = ({ children }) => {
             });
           });
           setOnlineUsers(usersMap);
+          console.log('🟢 Online users map updated:', usersMap);
         });
 
         newSocket.on('userOnline', (data) => {
-          console.log('User came online:', data.userId, data.username);
+          console.log('🟢 User came online:', data.userId, data.username);
           setOnlineUsers(prev => {
             const newMap = new Map(prev);
             newMap.set(data.userId, {
@@ -67,12 +68,13 @@ export const SocketProvider = ({ children }) => {
               isOnline: true,
               lastSeen: new Date(data.timestamp)
             });
+            console.log('🟢 Updated online users:', newMap);
             return newMap;
           });
         });
 
         newSocket.on('userOffline', (data) => {
-          console.log('User went offline:', data.userId, data.username);
+          console.log('🔴 User went offline:', data.userId, data.username);
           setOnlineUsers(prev => {
             const newMap = new Map(prev);
             newMap.set(data.userId, {
@@ -80,6 +82,7 @@ export const SocketProvider = ({ children }) => {
               isOnline: false,
               lastSeen: new Date(data.lastSeen)
             });
+            console.log('🔴 Updated online users:', newMap);
             return newMap;
           });
         });

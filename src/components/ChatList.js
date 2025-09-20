@@ -137,6 +137,7 @@ const ChatList = ({ chats, selectedChat, onChatSelect, isLoading, showAIChat, on
       const onlineCount = chat.participants?.filter(p => {
         if (!p) return false;
         const userStatus = getUserStatus(p._id);
+        console.log('🔍 ChatList Group participant status:', p._id, userStatus);
         return userStatus.isOnline;
       }).length || 0;
       return onlineCount > 0 ? (
@@ -147,6 +148,7 @@ const ChatList = ({ chats, selectedChat, onChatSelect, isLoading, showAIChat, on
     } else {
       const otherParticipant = chat.participants?.find(p => p && p._id !== user._id);
       const userStatus = getUserStatus(otherParticipant?._id);
+      console.log('🔍 ChatList Private participant status:', otherParticipant?._id, userStatus);
       return userStatus.isOnline ? (
         <span style={{ color: '#10B981', fontSize: '12px' }}>
           <FiCircle size={8} fill="currentColor" style={{ marginRight: '4px' }} />
@@ -154,7 +156,7 @@ const ChatList = ({ chats, selectedChat, onChatSelect, isLoading, showAIChat, on
         </span>
       ) : (
         <span style={{ color: '#6B7280', fontSize: '12px' }}>
-          Был в сети {formatLastSeen(userStatus.lastSeen)}
+          Был в сети {formatLastSeen(userStatus.lastSeen?.toISOString ? userStatus.lastSeen.toISOString() : userStatus.lastSeen)}
         </span>
       );
     }
@@ -216,7 +218,8 @@ const ChatList = ({ chats, selectedChat, onChatSelect, isLoading, showAIChat, on
               {/* Индикатор онлайн статуса */}
               {chat.type === 'private' && (() => {
                 const otherParticipant = chat.participants?.find(p => p && p._id !== user._id);
-                return otherParticipant?.isOnline && (
+                const userStatus = getUserStatus(otherParticipant?._id);
+                return userStatus.isOnline && (
                   <div className={styles.onlineIndicator}></div>
                 );
               })()}

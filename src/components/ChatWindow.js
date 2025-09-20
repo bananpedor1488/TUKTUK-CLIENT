@@ -265,6 +265,7 @@ const ChatWindow = ({ chat, onChatUpdate, onBackToChatList }) => {
     if (chat.type === 'group') {
       const onlineCount = chat.participants.filter(p => {
         const userStatus = getUserStatus(p._id);
+        console.log('🔍 Group participant status:', p._id, userStatus);
         return userStatus.isOnline;
       }).length;
       return (
@@ -275,11 +276,12 @@ const ChatWindow = ({ chat, onChatUpdate, onBackToChatList }) => {
     } else {
       const otherParticipant = chat.participants.find(p => p._id !== user._id);
       const userStatus = getUserStatus(otherParticipant?._id);
+      console.log('🔍 Private chat participant status:', otherParticipant?._id, userStatus);
       return userStatus.isOnline ? (
         <span style={{ color: '#10B981' }}>Онлайн</span>
       ) : (
         <span style={{ color: '#6B7280' }}>
-          Был в сети {formatLastSeen(userStatus.lastSeen)}
+          Был в сети {formatLastSeen(userStatus.lastSeen?.toISOString ? userStatus.lastSeen.toISOString() : userStatus.lastSeen)}
         </span>
       );
     }
@@ -315,7 +317,8 @@ const ChatWindow = ({ chat, onChatUpdate, onBackToChatList }) => {
             )}
             {chat.type === 'private' && (() => {
               const otherParticipant = chat.participants.find(p => p._id !== user._id);
-              return otherParticipant?.isOnline && (
+              const userStatus = getUserStatus(otherParticipant?._id);
+              return userStatus.isOnline && (
                 <div style={{
                   position: 'absolute',
                   bottom: '2px',
