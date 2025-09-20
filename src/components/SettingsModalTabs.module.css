@@ -287,6 +287,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  max-width: 200px; /* Ограничиваем ширину */
 }
 
 .avatarPreview {
@@ -298,6 +299,15 @@
   align-items: center;
   justify-content: center;
   color: white;
+  flex-shrink: 0; /* Не сжимаем аватарку */
+  overflow: hidden;
+}
+
+.avatarImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
 }
 
 .uploadButton {
@@ -309,6 +319,8 @@
   font-size: 14px;
   cursor: pointer;
   transition: all 0.2s ease;
+  white-space: nowrap; /* Не переносим текст */
+  flex-shrink: 0; /* Не сжимаем кнопку */
 }
 
 .uploadButton:hover {
@@ -491,6 +503,10 @@
   
   .settingControl {
     width: 100%;
+  }
+  
+  .avatarUpload {
+    max-width: 100%; /* На мобилке можно использовать всю ширину */
   }
   
   .textInput,
