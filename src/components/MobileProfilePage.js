@@ -3,6 +3,7 @@ import { FiArrowLeft, FiUser, FiBell, FiShield, FiLogOut, FiEdit3, FiSave, FiSet
 import ThemeToggle from './ThemeToggle/ThemeToggle';
 import axios from '../services/axiosConfig';
 import { useToast } from '../contexts/ToastContext';
+import { useAuth } from '../contexts/AuthContext';
 import styles from './MobileProfilePage.module.css';
 
 const MobileProfilePage = ({ isOpen, onClose, user }) => {
@@ -10,7 +11,9 @@ const MobileProfilePage = ({ isOpen, onClose, user }) => {
   const [settings, setSettings] = useState({
     // Профиль
     name: user?.displayName || user?.username || 'Пользователь',
+    username: user?.username || '',
     email: user?.email || 'user@example.com',
+    bio: user?.bio || '',
     avatar: user?.avatar || null,
     
     // Внешний вид
@@ -36,6 +39,7 @@ const MobileProfilePage = ({ isOpen, onClose, user }) => {
   });
 
   const { success, error, warning } = useToast();
+  const { updateUser } = useAuth();
 
   // Обновляем настройки при изменении пользователя
   useEffect(() => {
@@ -43,7 +47,9 @@ const MobileProfilePage = ({ isOpen, onClose, user }) => {
       setSettings(prev => ({
         ...prev,
         name: user.displayName || user.username || 'Пользователь',
+        username: user.username || '',
         email: user.email || 'user@example.com',
+        bio: user.bio || '',
         avatar: user.avatar || null
       }));
     }
@@ -72,11 +78,49 @@ const MobileProfilePage = ({ isOpen, onClose, user }) => {
     localStorage.setItem('tuktuk-theme', theme);
   };
 
-  const handleSave = () => {
-    // Сохраняем настройки
-    localStorage.setItem('userSettings', JSON.stringify(settings));
-    console.log('Settings saved:', settings);
-    onClose();
+  const handleSave = async () => {
+    try {
+      // Обновляем данные пользователя через API
+      const hasChanges = settings.name !== user?.displayName || 
+                        settings.username !== user?.username ||
+                        settings.bio !== user?.bio;
+
+      if (hasChanges) {
+        console.log('📤 Updating user profile...');
+        
+        const response = await axios.put('/user/profile', {
+          displayName: settings.name,
+          username: settings.username,
+          bio: settings.bio
+        });
+
+        if (response.data.success) {
+          console.log('✅ Profile updated successfully');
+          success('Профиль обновлен успешно!', 'Сохранение завершено');
+          
+          // Обновляем пользователя в AuthContext
+          if (updateUser) {
+            updateUser(response.data.user);
+          }
+          
+          // Закрываем модалку
+          if (onClose) {
+            onClose();
+          }
+        } else {
+          throw new Error(response.data.message || 'Update failed');
+        }
+      } else {
+        // Сохраняем только настройки приложения
+        localStorage.setItem('userSettings', JSON.stringify(settings));
+        console.log('Settings saved:', settings);
+        success('Настройки сохранены!', 'Готово');
+        onClose();
+      }
+    } catch (error) {
+      console.error('❌ Error saving settings:', error);
+      error(error.response?.data?.message || error.message || 'Ошибка при сохранении', 'Ошибка сохранения');
+    }
   };
 
   const handleLogout = () => {
@@ -127,6 +171,11 @@ const MobileProfilePage = ({ isOpen, onClose, user }) => {
           ...prev,
           avatar: response.data.avatar
         }));
+        
+        // Обновляем пользователя в AuthContext
+        if (updateUser) {
+          updateUser(response.data.user);
+        }
         
         success('Аватарка загружена успешно!', 'Загрузка завершена');
       } else {
@@ -221,6 +270,23 @@ const MobileProfilePage = ({ isOpen, onClose, user }) => {
 
                       <div className={styles.settingCard}>
                         <div className={styles.settingInfo}>
+                          <h3 className={styles.settingLabel}>Username</h3>
+                          <p className={styles.settingDescription}>Ваш уникальный никнейм</p>
+                        </div>
+                        <div className={styles.settingControl}>
+                          <input
+                            type="text"
+                            className={styles.textInput}
+                            value={settings.username}
+                            onChange={(e) => handleSettingChange('username', e.target.value)}
+                            maxLength={20}
+                            placeholder="username"
+                          />
+                        </div>
+                      </div>
+
+                      <div className={styles.settingCard}>
+                        <div className={styles.settingInfo}>
                           <h3 className={styles.settingLabel}>Имя</h3>
                           <p className={styles.settingDescription}>Ваше отображаемое имя</p>
                         </div>
@@ -230,6 +296,24 @@ const MobileProfilePage = ({ isOpen, onClose, user }) => {
                             className={styles.textInput}
                             value={settings.name}
                             onChange={(e) => handleSettingChange('name', e.target.value)}
+                            maxLength={50}
+                          />
+                        </div>
+                      </div>
+
+                      <div className={styles.settingCard}>
+                        <div className={styles.settingInfo}>
+                          <h3 className={styles.settingLabel}>Bio</h3>
+                          <p className={styles.settingDescription}>Краткое описание о себе</p>
+                        </div>
+                        <div className={styles.settingControl}>
+                          <textarea
+                            className={styles.textInput}
+                            value={settings.bio}
+                            onChange={(e) => handleSettingChange('bio', e.target.value)}
+                            maxLength={160}
+                            rows={3}
+                            placeholder="Расскажите о себе..."
                           />
                         </div>
                       </div>

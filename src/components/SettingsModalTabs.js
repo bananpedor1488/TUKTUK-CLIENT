@@ -3,6 +3,7 @@ import { FiX, FiUser, FiEye, FiBell, FiShield, FiSave } from 'react-icons/fi';
 import ThemeToggle from './ThemeToggle/ThemeToggle';
 import axios from '../services/axiosConfig';
 import { useToast } from '../contexts/ToastContext';
+import { useAuth } from '../contexts/AuthContext';
 import styles from './SettingsModalTabs.module.css';
 
 const SettingsModalTabs = ({ isOpen, onClose, user }) => {
@@ -10,7 +11,9 @@ const SettingsModalTabs = ({ isOpen, onClose, user }) => {
   const [settings, setSettings] = useState({
     // Профиль
     name: user?.displayName || 'Пользователь',
+    username: user?.username || '',
     email: user?.email || 'user@example.com',
+    bio: user?.bio || '',
     avatar: user?.avatar || null,
     
     // Внешний вид
@@ -29,6 +32,7 @@ const SettingsModalTabs = ({ isOpen, onClose, user }) => {
   });
 
   const { success, error, warning } = useToast();
+  const { updateUser } = useAuth();
 
   const tabs = [
     { id: 'profile', label: 'Профиль', icon: FiUser },
@@ -50,7 +54,9 @@ const SettingsModalTabs = ({ isOpen, onClose, user }) => {
       setSettings(prev => ({
         ...prev,
         name: user.displayName || 'Пользователь',
+        username: user.username || '',
         email: user.email || 'user@example.com',
+        bio: user.bio || '',
         avatar: user.avatar || null
       }));
     }
@@ -65,21 +71,46 @@ const SettingsModalTabs = ({ isOpen, onClose, user }) => {
 
   const handleSave = async () => {
     try {
-      // Обновляем данные пользователя
-      if (settings.name !== user?.displayName || settings.email !== user?.email) {
-        // Здесь будет API вызов для обновления профиля
-        console.log('Updating user profile:', {
+      // Обновляем данные пользователя через API
+      const hasChanges = settings.name !== user?.displayName || 
+                        settings.username !== user?.username ||
+                        settings.bio !== user?.bio;
+
+      if (hasChanges) {
+        console.log('📤 Updating user profile...');
+        
+        const response = await axios.put('/user/profile', {
           displayName: settings.name,
-          email: settings.email
+          username: settings.username,
+          bio: settings.bio
         });
+
+        if (response.data.success) {
+          console.log('✅ Profile updated successfully');
+          success('Профиль обновлен успешно!', 'Сохранение завершено');
+          
+          // Обновляем пользователя в AuthContext
+          if (updateUser) {
+            updateUser(response.data.user);
+          }
+          
+          // Закрываем модалку
+          if (onClose) {
+            onClose();
+          }
+        } else {
+          throw new Error(response.data.message || 'Update failed');
+        }
+      } else {
+        // Сохраняем только настройки приложения
+        localStorage.setItem('userSettings', JSON.stringify(settings));
+        console.log('Settings saved:', settings);
+        success('Настройки сохранены!', 'Готово');
+        onClose();
       }
-      
-      // Сохраняем настройки
-      localStorage.setItem('userSettings', JSON.stringify(settings));
-      console.log('Settings saved:', settings);
-      onClose();
     } catch (error) {
-      console.error('Error saving settings:', error);
+      console.error('❌ Error saving settings:', error);
+      error(error.response?.data?.message || error.message || 'Ошибка при сохранении', 'Ошибка сохранения');
     }
   };
 
@@ -125,6 +156,11 @@ const SettingsModalTabs = ({ isOpen, onClose, user }) => {
           ...prev,
           avatar: response.data.avatar
         }));
+        
+        // Обновляем пользователя в AuthContext
+        if (updateUser) {
+          updateUser(response.data.user);
+        }
         
         success('Аватарка загружена успешно!', 'Загрузка завершена');
       } else {
@@ -210,6 +246,23 @@ const SettingsModalTabs = ({ isOpen, onClose, user }) => {
 
               <div className={styles.settingItem}>
                 <div className={styles.settingInfo}>
+                  <label className={styles.settingLabel}>Username</label>
+                  <span className={styles.settingDescription}>Ваш уникальный никнейм</span>
+                </div>
+                <div className={styles.settingControl}>
+                  <input
+                    type="text"
+                    className={styles.textInput}
+                    value={settings.username}
+                    onChange={(e) => handleSettingChange('username', e.target.value)}
+                    maxLength={20}
+                    placeholder="username"
+                  />
+                </div>
+              </div>
+
+              <div className={styles.settingItem}>
+                <div className={styles.settingInfo}>
                   <label className={styles.settingLabel}>Имя</label>
                   <span className={styles.settingDescription}>Ваше отображаемое имя</span>
                 </div>
@@ -219,6 +272,24 @@ const SettingsModalTabs = ({ isOpen, onClose, user }) => {
                     className={styles.textInput}
                     value={settings.name}
                     onChange={(e) => handleSettingChange('name', e.target.value)}
+                    maxLength={50}
+                  />
+                </div>
+              </div>
+
+              <div className={styles.settingItem}>
+                <div className={styles.settingInfo}>
+                  <label className={styles.settingLabel}>Bio</label>
+                  <span className={styles.settingDescription}>Краткое описание о себе</span>
+                </div>
+                <div className={styles.settingControl}>
+                  <textarea
+                    className={styles.textInput}
+                    value={settings.bio}
+                    onChange={(e) => handleSettingChange('bio', e.target.value)}
+                    maxLength={160}
+                    rows={3}
+                    placeholder="Расскажите о себе..."
                   />
                 </div>
               </div>
