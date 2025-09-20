@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FiArrowLeft, FiUser, FiBell, FiShield, FiLogOut, FiEdit3, FiSave, FiSettings, FiEye, FiVolume2, FiVolumeX, FiBellOff, FiEyeOff } from 'react-icons/fi';
 import ThemeToggle from './ThemeToggle/ThemeToggle';
+import axios from '../services/axiosConfig';
 import styles from './MobileProfilePage.module.css';
 
 const MobileProfilePage = ({ isOpen, onClose, user }) => {
@@ -86,8 +87,9 @@ const MobileProfilePage = ({ isOpen, onClose, user }) => {
     if (!file) return;
 
     // Проверяем тип файла
-    if (!file.type.startsWith('image/')) {
-      alert('Пожалуйста, выберите изображение');
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      alert('Неподдерживаемый формат файла. Разрешены: JPEG, PNG, GIF, WebP');
       return;
     }
 
@@ -98,6 +100,8 @@ const MobileProfilePage = ({ isOpen, onClose, user }) => {
     }
 
     try {
+      console.log('📤 Uploading avatar...');
+
       // Конвертируем файл в base64
       const base64 = await new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -106,31 +110,28 @@ const MobileProfilePage = ({ isOpen, onClose, user }) => {
         reader.readAsDataURL(file);
       });
 
-      // Отправляем на сервер
-      const response = await fetch('/api/user/avatar', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-        },
-        body: JSON.stringify({ avatar: base64 })
+      // Отправляем на сервер через новый API
+      const response = await axios.post('/user/upload-avatar', {
+        base64Data: base64,
+        fileName: `avatar_${user?._id}_${Date.now()}.png`
       });
 
-      if (response.ok) {
-        const result = await response.json();
+      if (response.data.success) {
+        console.log('✅ Avatar uploaded successfully');
+        
         // Обновляем локальное состояние
         setSettings(prev => ({
           ...prev,
-          avatar: result.user.avatar
+          avatar: response.data.avatar
         }));
-        console.log('Аватарка загружена успешно');
+        
+        alert('Аватарка загружена успешно!');
       } else {
-        const error = await response.json();
-        alert(error.message || 'Ошибка при загрузке аватарки');
+        throw new Error(response.data.message || 'Upload failed');
       }
     } catch (error) {
-      console.error('Ошибка при загрузке аватарки:', error);
-      alert('Ошибка при загрузке аватарки');
+      console.error('❌ Avatar upload error:', error);
+      alert(error.response?.data?.message || error.message || 'Ошибка при загрузке аватарки');
     }
   };
 
