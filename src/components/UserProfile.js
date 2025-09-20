@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext';
+import AvatarUpload from './AvatarUpload';
 import styles from './UserProfile.module.css';
 
 const UserProfile = ({ user, onClose }) => {
@@ -14,6 +15,12 @@ const UserProfile = ({ user, onClose }) => {
   const [error, setError] = useState('');
 
   const { updateUser } = useAuth();
+
+  const handleAvatarChange = (newAvatarUrl) => {
+    // Update user object with new avatar
+    const updatedUser = { ...user, avatar: newAvatarUrl };
+    updateUser(updatedUser);
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -61,18 +68,13 @@ const UserProfile = ({ user, onClose }) => {
 
         <div className={styles.profileContent}>
           <div className={styles.avatarSection}>
-            <div className={styles.avatar}>
-              {user?.avatar ? (
-                <img src={user.avatar} alt={user.displayName} />
-              ) : (
-                <div className={styles.avatarPlaceholder}>
-                  {user?.displayName?.charAt(0)?.toUpperCase()}
-                </div>
-              )}
-            </div>
-            <button className={styles.changeAvatarButton}>
-              Change Avatar
-            </button>
+            <AvatarUpload
+              currentAvatar={user?.avatar}
+              onAvatarChange={handleAvatarChange}
+              userId={user?._id}
+              size="large"
+              className={styles.avatarUpload}
+            />
           </div>
 
           {error && (
