@@ -44,52 +44,51 @@ export const SocketProvider = ({ children }) => {
           setIsConnected(false);
         });
 
-        // Online status handlers
-        newSocket.on('online_users', (users) => {
+        // Online status handlers (SocialSpace approach)
+        newSocket.on('onlineUsersSync', (data) => {
+          console.log('Syncing online users:', data);
           const usersMap = new Map();
-          users.forEach(user => {
-            usersMap.set(user.userId, {
-              status: user.status,
-              lastSeen: new Date(user.lastSeen)
+          Object.entries(data.users).forEach(([userId, status]) => {
+            usersMap.set(userId, {
+              username: status.username,
+              isOnline: status.isOnline,
+              lastSeen: new Date(status.lastSeen)
             });
           });
           setOnlineUsers(usersMap);
         });
 
-        newSocket.on('user_online', (data) => {
+        newSocket.on('userOnline', (data) => {
+          console.log('User came online:', data.userId, data.username);
           setOnlineUsers(prev => {
             const newMap = new Map(prev);
             newMap.set(data.userId, {
-              status: data.status,
+              username: data.username,
+              isOnline: true,
+              lastSeen: new Date(data.timestamp)
+            });
+            return newMap;
+          });
+        });
+
+        newSocket.on('userOffline', (data) => {
+          console.log('User went offline:', data.userId, data.username);
+          setOnlineUsers(prev => {
+            const newMap = new Map(prev);
+            newMap.set(data.userId, {
+              username: data.username,
+              isOnline: false,
               lastSeen: new Date(data.lastSeen)
             });
             return newMap;
           });
         });
 
-        newSocket.on('user_offline', (data) => {
-          setOnlineUsers(prev => {
-            const newMap = new Map(prev);
-            newMap.delete(data.userId);
-            return newMap;
-          });
-        });
-
-        newSocket.on('user_status_update', (data) => {
-          setOnlineUsers(prev => {
-            const newMap = new Map(prev);
-            newMap.set(data.userId, {
-              status: data.status,
-              lastSeen: new Date(data.lastSeen)
-            });
-            return newMap;
-          });
-        });
-
-        // Heartbeat to keep connection alive
+        // Heartbeat to keep connection alive (SocialSpace approach)
         const heartbeatInterval = setInterval(() => {
           if (newSocket && newSocket.connected) {
-            newSocket.emit('ping');
+            newSocket.emit('user-activity'); // SocialSpace heartbeat
+            newSocket.emit('ping'); // TUKTUK heartbeat
           }
         }, 30000); // Ping every 30 seconds
 
@@ -161,11 +160,62 @@ export const SocketProvider = ({ children }) => {
   };
 
   const getUserStatus = (userId) => {
-    return onlineUsers.get(userId) || { status: 'offline', lastSeen: null };
+    return onlineUsers.get(userId) || { isOnline: false, lastSeen: null };
   };
 
   const getOnlineUsersCount = () => {
     return onlineUsers.size;
+  };
+
+  // Fetch online status via API (SocialSpace approach)
+  const fetchOnlineStatus = async (userIds, retryCount = 0) => {
+    if (!userIds || userIds.length === 0) return {};
+    
+    try {
+      const token = localStorage.getItem('accessToken');
+      const baseURL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+      
+      console.log(`Fetching online status for users: ${userIds.join(',')}`);
+      
+      const response = await fetch(`${baseURL}/api/users/online-status?userIds=${userIds.join(',')}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        const statusMap = await response.json();
+        console.log('Online status received:', statusMap);
+        
+        // Update local state
+        Object.entries(statusMap).forEach(([userId, status]) => {
+          setOnlineUsers(prev => {
+            const newMap = new Map(prev);
+            newMap.set(userId, {
+              username: status.username,
+              isOnline: status.isOnline,
+              lastSeen: new Date(status.lastSeen)
+            });
+            return newMap;
+          });
+        });
+        
+        return statusMap;
+      } else {
+        throw new Error(`HTTP ${response.status}`);
+      }
+    } catch (error) {
+      console.error('Error fetching online status:', error);
+      
+      // Retry mechanism (max 2 attempts)
+      if (retryCount < 2) {
+        console.log(`Retrying online status fetch, attempt ${retryCount + 1}`);
+        setTimeout(() => {
+          fetchOnlineStatus(userIds, retryCount + 1);
+        }, 1000 * (retryCount + 1)); // Exponential delay
+      }
+    }
+    return {};
   };
 
   const value = {
@@ -180,7 +230,8 @@ export const SocketProvider = ({ children }) => {
     updateStatus,
     isUserOnline,
     getUserStatus,
-    getOnlineUsersCount
+    getOnlineUsersCount,
+    fetchOnlineStatus
   };
 
   return (
@@ -197,4 +248,5 @@ export const useSocket = () => {
   }
   return context;
 };
+
 

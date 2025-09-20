@@ -263,7 +263,10 @@ const ChatWindow = ({ chat, onChatUpdate, onBackToChatList }) => {
 
   const getOnlineStatus = () => {
     if (chat.type === 'group') {
-      const onlineCount = chat.participants.filter(p => isUserOnline(p._id)).length;
+      const onlineCount = chat.participants.filter(p => {
+        const userStatus = getUserStatus(p._id);
+        return userStatus.isOnline;
+      }).length;
       return (
         <span style={{ color: '#10B981' }}>
           {onlineCount} онлайн
@@ -272,7 +275,7 @@ const ChatWindow = ({ chat, onChatUpdate, onBackToChatList }) => {
     } else {
       const otherParticipant = chat.participants.find(p => p._id !== user._id);
       const userStatus = getUserStatus(otherParticipant?._id);
-      return userStatus.status === 'online' ? (
+      return userStatus.isOnline ? (
         <span style={{ color: '#10B981' }}>Онлайн</span>
       ) : (
         <span style={{ color: '#6B7280' }}>
