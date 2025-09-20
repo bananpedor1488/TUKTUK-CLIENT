@@ -9,6 +9,7 @@ import ChatSearch from './ChatSearch';
 import ChatMenu from './ChatMenu';
 import UserProfileModal from './UserProfileModal';
 import AttachModal from './AttachModal';
+import OnlineStatusIndicator from './OnlineStatusIndicator';
 import styles from './ChatWindow.module.css';
 
 const ChatWindow = ({ chat, onChatUpdate, onBackToChatList }) => {
@@ -290,19 +291,15 @@ const ChatWindow = ({ chat, onChatUpdate, onBackToChatList }) => {
       const otherParticipant = chat.participants.find(p => p._id !== user._id);
       const userStatus = getUserStatus(otherParticipant?._id);
       
-      if (userStatus.isOnline) {
-        return <span style={{ color: '#10B981' }}>Онлайн</span>;
-      } else if (userStatus.lastSeen) {
-        // Правильно форматируем lastSeen
-        const lastSeenDate = userStatus.lastSeen instanceof Date ? userStatus.lastSeen : new Date(userStatus.lastSeen);
-        return (
-          <span style={{ color: '#6B7280' }}>
-            Был в сети {formatLastSeen(lastSeenDate.toISOString())}
-          </span>
-        );
-      } else {
-        return <span style={{ color: '#6B7280' }}>Никогда не был в сети</span>;
-      }
+      return (
+        <OnlineStatusIndicator
+          userId={otherParticipant?._id}
+          isOnline={userStatus.isOnline}
+          lastSeen={userStatus.lastSeen}
+          showText={true}
+          size="small"
+        />
+      );
     }
   };
 
@@ -337,18 +334,21 @@ const ChatWindow = ({ chat, onChatUpdate, onBackToChatList }) => {
             {chat.type === 'private' && (() => {
               const otherParticipant = chat.participants.find(p => p._id !== user._id);
               const userStatus = getUserStatus(otherParticipant?._id);
-              return userStatus.isOnline && (
+              return (
                 <div style={{
                   position: 'absolute',
                   bottom: '2px',
                   right: '2px',
-                  width: '12px',
-                  height: '12px',
-                  backgroundColor: '#10B981',
-                  borderRadius: '50%',
-                  border: '2px solid var(--theme-background, #1a1a1a)',
                   zIndex: 1
-                }} />
+                }}>
+                  <OnlineStatusIndicator
+                    userId={otherParticipant?._id}
+                    isOnline={userStatus.isOnline}
+                    lastSeen={userStatus.lastSeen}
+                    showText={false}
+                    size="small"
+                  />
+                </div>
               );
             })()}
           </div>

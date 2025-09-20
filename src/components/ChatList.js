@@ -5,6 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useSocket } from '../contexts/SocketContext';
 import SwipeableChatItem from './SwipeableChatItem';
 import ChatContextMenu from './ChatContextMenu';
+import OnlineStatusIndicator from './OnlineStatusIndicator';
 import useIsMobile from '../hooks/useIsMobile';
 import styles from './ChatList.module.css';
 
@@ -156,28 +157,15 @@ const ChatList = ({ chats, selectedChat, onChatSelect, isLoading, showAIChat, on
       const otherParticipant = chat.participants?.find(p => p && p._id !== user._id);
       const userStatus = getUserStatus(otherParticipant?._id);
       
-      if (userStatus.isOnline) {
-        return (
-          <span style={{ color: '#10B981', fontSize: '12px' }}>
-            <FiCircle size={8} fill="currentColor" style={{ marginRight: '4px' }} />
-            Онлайн
-          </span>
-        );
-      } else if (userStatus.lastSeen) {
-        // Правильно форматируем lastSeen
-        const lastSeenDate = userStatus.lastSeen instanceof Date ? userStatus.lastSeen : new Date(userStatus.lastSeen);
-        return (
-          <span style={{ color: '#6B7280', fontSize: '12px' }}>
-            Был в сети {formatLastSeen(lastSeenDate.toISOString())}
-          </span>
-        );
-      } else {
-        return (
-          <span style={{ color: '#6B7280', fontSize: '12px' }}>
-            Никогда не был в сети
-          </span>
-        );
-      }
+      return (
+        <OnlineStatusIndicator
+          userId={otherParticipant?._id}
+          isOnline={userStatus.isOnline}
+          lastSeen={userStatus.lastSeen}
+          showText={true}
+          size="small"
+        />
+      );
     }
   };
 
@@ -238,8 +226,21 @@ const ChatList = ({ chats, selectedChat, onChatSelect, isLoading, showAIChat, on
               {chat.type === 'private' && (() => {
                 const otherParticipant = chat.participants?.find(p => p && p._id !== user._id);
                 const userStatus = getUserStatus(otherParticipant?._id);
-                return userStatus.isOnline && (
-                  <div className={styles.onlineIndicator}></div>
+                return (
+                  <div style={{
+                    position: 'absolute',
+                    bottom: '2px',
+                    right: '2px',
+                    zIndex: 1
+                  }}>
+                    <OnlineStatusIndicator
+                      userId={otherParticipant?._id}
+                      isOnline={userStatus.isOnline}
+                      lastSeen={userStatus.lastSeen}
+                      showText={false}
+                      size="small"
+                    />
+                  </div>
                 );
               })()}
               {/* Групповой индикатор */}
