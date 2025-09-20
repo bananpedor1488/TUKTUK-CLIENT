@@ -291,6 +291,12 @@ const ChatWindow = ({ chat, onChatUpdate, onBackToChatList }) => {
       const otherParticipant = chat.participants.find(p => p._id !== user._id);
       const userStatus = getUserStatus(otherParticipant?._id);
       console.log('🔍 Private chat participant status:', otherParticipant?._id, userStatus);
+      console.log('🔍 LastSeen debug:', {
+        lastSeen: userStatus.lastSeen,
+        lastSeenType: typeof userStatus.lastSeen,
+        lastSeenString: userStatus.lastSeen?.toString(),
+        isOnline: userStatus.isOnline
+      });
       return userStatus.isOnline ? (
         <span style={{ color: '#10B981' }}>Онлайн</span>
       ) : (

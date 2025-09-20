@@ -53,6 +53,16 @@ export const SocketProvider = ({ children }) => {
         // Online status handlers (SocialSpace approach)
         newSocket.on('onlineUsersSync', (data) => {
           console.log('🟢 Syncing online users:', data);
+          console.log('🟢 OnlineUsersSync debug:', {
+            usersCount: Object.keys(data.users).length,
+            users: Object.entries(data.users).map(([userId, status]) => ({
+              userId,
+              username: status.username,
+              isOnline: status.isOnline,
+              lastSeen: status.lastSeen,
+              lastSeenType: typeof status.lastSeen
+            }))
+          });
           const usersMap = new Map();
           Object.entries(data.users).forEach(([userId, status]) => {
             usersMap.set(userId, {
