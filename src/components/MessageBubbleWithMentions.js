@@ -4,7 +4,7 @@ import { formatMessageTime } from '../utils/timeUtils';
 import { renderMentions } from '../utils/mentionParser';
 import styles from './MessageBubble.module.css';
 
-const MessageBubble = ({ 
+const MessageBubbleWithMentions = ({ 
   message, 
   isOwn, 
   senderName, 
@@ -68,7 +68,7 @@ const MessageBubble = ({
           {/* Текст сообщения */}
           <div className={styles.messageText}>
             {message.type === 'text' ? (
-              renderMentions(message.content, handleMentionClick, currentUsername)
+              renderMentions(message.content, handleMentionClick, currentUsername, styles)
             ) : (
               <span>{getMessageContent()}</span>
             )}
@@ -98,4 +98,4 @@ const MessageBubble = ({
   );
 };
 
-export default MessageBubble;
+export default MessageBubbleWithMentions;

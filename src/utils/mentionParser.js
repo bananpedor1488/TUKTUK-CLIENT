@@ -33,9 +33,10 @@ export const parseMentions = (text) => {
  * @param {string} text - The text to convert
  * @param {Function} onMentionClick - Callback for mention clicks
  * @param {string} currentUsername - Current user's username
+ * @param {Object} styles - CSS modules styles object
  * @returns {Array} Array of JSX elements
  */
-export const renderMentions = (text, onMentionClick, currentUsername) => {
+export const renderMentions = (text, onMentionClick, currentUsername, styles) => {
   if (!text) return text;
   
   const mentions = parseMentions(text);
@@ -59,7 +60,7 @@ export const renderMentions = (text, onMentionClick, currentUsername) => {
     elements.push(
       <span
         key={`mention-${index}`}
-        className={`mention ${isOwnMention ? 'own-mention' : 'other-mention'}`}
+        className={`${styles.mention} ${isOwnMention ? styles['own-mention'] : styles['other-mention']}`}
         onClick={() => onMentionClick(mention.username, isOwnMention)}
         title={isOwnMention ? 'Перейти в избранные' : `Перейти к @${mention.username}`}
       >
