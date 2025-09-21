@@ -172,11 +172,15 @@ const MobileProfilePage = ({ isOpen, onClose, user }) => {
     try {
       console.log('📤 Updating user profile...');
       
-      const response = await axios.put('/user/profile', {
+      const requestData = {
         displayName: settings.name,
         username: settings.username,
         bio: settings.bio
-      });
+      };
+      
+      console.log('📤 Request data:', requestData);
+      
+      const response = await axios.put('/user/profile', requestData);
 
       if (response.data.success) {
         console.log('✅ Profile updated successfully');
@@ -231,8 +235,12 @@ const MobileProfilePage = ({ isOpen, onClose, user }) => {
       }
     } catch (err) {
       console.error('❌ Error saving settings:', err);
+      console.error('❌ Error response:', err.response?.data);
+      console.error('❌ Error status:', err.response?.status);
+      
       if (error) {
-        error(err.response?.data?.message || err.message || 'Ошибка при сохранении', 'Ошибка сохранения');
+        const errorMessage = err.response?.data?.message || err.message || 'Ошибка при сохранении';
+        error(errorMessage, 'Ошибка сохранения');
       } else {
         console.error('Toast error function not available');
       }
