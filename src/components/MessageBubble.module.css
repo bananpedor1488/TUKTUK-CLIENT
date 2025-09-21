@@ -231,7 +231,7 @@
 .imageCaption {
   font-size: 14px;
   line-height: 1.4;
-  color: var(--theme-text-primary, #ffffff);
+  color: var(--theme-text-primary);
   word-wrap: break-word;
   padding: 8px 12px;
   background: var(--theme-background-secondary, rgba(255, 255, 255, 0.05));
@@ -242,7 +242,7 @@
 
 /* Light theme adjustments for images */
 [data-theme="light"] .imageCaption {
-  color: var(--theme-text-primary, #000000);
+  color: var(--theme-text-primary);
   background: var(--theme-background-secondary, rgba(0, 0, 0, 0.05));
   border: 1px solid rgba(0, 0, 0, 0.1);
   border-top: none;
