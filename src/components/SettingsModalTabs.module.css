@@ -42,6 +42,13 @@
   margin-bottom: 0;
 }
 
+.modalTitleContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  flex: 1;
+}
+
 .modalTitle {
   font-size: 24px;
   font-weight: 700;
@@ -51,6 +58,26 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+}
+
+.unsavedIndicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  padding: 4px 8px;
+  background: rgba(255, 193, 7, 0.1);
+  border: 1px solid rgba(255, 193, 7, 0.3);
+  border-radius: 8px;
+  font-size: 12px;
+  color: #ffc107;
+  animation: pulse 2s infinite;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .closeButton {
@@ -71,6 +98,64 @@
   background: rgba(255, 255, 255, 0.2);
   color: var(--theme-text-primary);
   transform: scale(1.05);
+}
+
+.saveButton {
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: var(--theme-main-color, #d0bcff);
+  border-radius: 12px;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.saveButton:hover {
+  background: #b69df8;
+  transform: translateY(-2px);
+}
+
+.saveButtonActive {
+  background: #4caf50 !important;
+  animation: glow 1.5s ease-in-out infinite alternate;
+}
+
+.saveButtonSaving {
+  background: #ff9800 !important;
+  cursor: not-allowed;
+}
+
+.cancelButton {
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: rgba(244, 67, 54, 0.1);
+  border-radius: 12px;
+  color: #f44336;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid rgba(244, 67, 54, 0.2);
+}
+
+.cancelButton:hover {
+  background: rgba(244, 67, 54, 0.2);
+  transform: translateY(-2px);
+}
+
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top: 2px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
 }
 
 /* Табы */
@@ -136,10 +221,17 @@
   justify-content: space-between;
   padding: 16px 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  transition: all 0.3s ease;
 }
 
 .settingItem:last-child {
   border-bottom: none;
+}
+
+.settingItemChanged {
+  background: rgba(76, 175, 80, 0.05);
+  border-color: rgba(76, 175, 80, 0.3);
+  box-shadow: 0 0 0 1px rgba(76, 175, 80, 0.2);
 }
 
 .settingInfo {
@@ -148,11 +240,26 @@
 }
 
 .settingLabel {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-size: 14px;
   font-weight: 500;
   color: var(--theme-text-primary);
   margin-bottom: 4px;
+}
+
+.changedIndicator {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+  background: rgba(76, 175, 80, 0.1);
+  border: 1px solid rgba(76, 175, 80, 0.3);
+  border-radius: 6px;
+  font-size: 11px;
+  color: #4caf50;
+  font-weight: 500;
 }
 
 .settingDescription {
@@ -166,8 +273,13 @@
 }
 
 /* Элементы управления */
-.textInput {
+.inputContainer {
+  position: relative;
   width: 200px;
+}
+
+.textInput {
+  width: 100%;
   padding: 12px 16px;
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -181,6 +293,25 @@
   outline: none;
   border-color: var(--theme-main-color, #d0bcff);
   background: rgba(255, 255, 255, 0.15);
+}
+
+.textInputChanged {
+  border-color: rgba(76, 175, 80, 0.5);
+  background: rgba(76, 175, 80, 0.05);
+}
+
+.textInputChanged:focus {
+  border-color: rgba(76, 175, 80, 0.8);
+  box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+}
+
+.inputStatus {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #4caf50;
+  pointer-events: none;
 }
 
 .select {
@@ -527,5 +658,45 @@
   .modalFooter {
     padding: 16px;
     flex-direction: column;
+  }
+}
+
+/* Анимации */
+@keyframes pulse {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.05);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes glow {
+  from {
+    box-shadow: 
+      2px 2px 4px rgba(0, 0, 0, 0.1),
+      -2px -2px 4px rgba(255, 255, 255, 0.05),
+      0 0 0 0 rgba(76, 175, 80, 0.7);
+  }
+  to {
+    box-shadow: 
+      2px 2px 4px rgba(0, 0, 0, 0.1),
+      -2px -2px 4px rgba(255, 255, 255, 0.05),
+      0 0 20px rgba(76, 175, 80, 0.7);
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
   }
 }

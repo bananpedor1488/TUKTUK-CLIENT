@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FiX, FiUser, FiEye, FiBell, FiShield, FiSave } from 'react-icons/fi';
+import { FiX, FiUser, FiEye, FiBell, FiShield, FiSave, FiCheck, FiAlertCircle, FiEdit3 } from 'react-icons/fi';
 import ThemeToggle from './ThemeToggle/ThemeToggle';
 import axios from '../services/axiosConfig';
 import { useToast } from '../contexts/ToastContext';
@@ -8,6 +8,9 @@ import styles from './SettingsModalTabs.module.css';
 
 const SettingsModalTabs = ({ isOpen, onClose, user }) => {
   const [activeTab, setActiveTab] = useState('profile');
+  const [originalSettings, setOriginalSettings] = useState({});
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [settings, setSettings] = useState({
     // Профиль
     name: user?.displayName || 'Пользователь',
@@ -31,7 +34,8 @@ const SettingsModalTabs = ({ isOpen, onClose, user }) => {
     sessionTimeout: 30
   });
 
-  const { success, error, warning } = useToast();
+  const toast = useToast();
+  const { success, error, warning } = toast || {};
   const { updateUser } = useAuth();
 
   const tabs = [
@@ -51,16 +55,38 @@ const SettingsModalTabs = ({ isOpen, onClose, user }) => {
   // Обновляем данные пользователя при изменении user
   useEffect(() => {
     if (user) {
-      setSettings(prev => ({
-        ...prev,
+      const newSettings = {
         name: user.displayName || 'Пользователь',
         username: user.username || '',
         email: user.email || 'user@example.com',
         bio: user.bio || '',
-        avatar: user.avatar || null
-      }));
+        avatar: user.avatar || null,
+        theme: 'dark',
+        fontSize: 'medium',
+        animationType: 'slideFromRight',
+        soundEnabled: true,
+        notificationsEnabled: true,
+        showOnlineStatus: true,
+        twoFactorEnabled: false,
+        sessionTimeout: 30
+      };
+      
+      setSettings(newSettings);
+      setOriginalSettings(newSettings);
+      setHasUnsavedChanges(false);
     }
   }, [user]);
+
+  // Проверяем изменения при каждом обновлении settings
+  useEffect(() => {
+    const hasChanges = settings.name !== originalSettings.name ||
+                      settings.username !== originalSettings.username ||
+                      settings.bio !== originalSettings.bio ||
+                      settings.email !== originalSettings.email ||
+                      settings.avatar !== originalSettings.avatar;
+    
+    setHasUnsavedChanges(hasChanges);
+  }, [settings, originalSettings]);
 
   const handleThemeChange = (theme) => {
     handleSettingChange('theme', theme);
@@ -70,48 +96,75 @@ const SettingsModalTabs = ({ isOpen, onClose, user }) => {
   };
 
   const handleSave = async () => {
+    if (!hasUnsavedChanges) {
+      if (success) {
+        success('Нет изменений для сохранения', 'Все актуально');
+      }
+      return;
+    }
+
+    setIsSaving(true);
     try {
-      // Обновляем данные пользователя через API
-      const hasChanges = settings.name !== user?.displayName || 
-                        settings.username !== user?.username ||
-                        settings.bio !== user?.bio;
+      console.log('📤 Updating user profile...');
+      
+      const response = await axios.put('/user/profile', {
+        displayName: settings.name,
+        username: settings.username,
+        bio: settings.bio
+      });
 
-      if (hasChanges) {
-        console.log('📤 Updating user profile...');
+      if (response.data.success) {
+        console.log('✅ Profile updated successfully');
         
-        const response = await axios.put('/user/profile', {
-          displayName: settings.name,
+        // Обновляем оригинальные настройки
+        setOriginalSettings({
+          ...originalSettings,
+          name: settings.name,
           username: settings.username,
-          bio: settings.bio
+          bio: settings.bio,
+          avatar: settings.avatar
         });
-
-        if (response.data.success) {
-          console.log('✅ Profile updated successfully');
+        
+        setHasUnsavedChanges(false);
+        
+        if (success) {
           success('Профиль обновлен успешно!', 'Сохранение завершено');
-          
-          // Обновляем пользователя в AuthContext
-          if (updateUser) {
-            updateUser(response.data.user);
-          }
-          
-          // Закрываем модалку
+        }
+        
+        // Обновляем пользователя в AuthContext
+        if (updateUser) {
+          updateUser(response.data.user);
+        }
+        
+        // Закрываем модалку через небольшую задержку
+        setTimeout(() => {
           if (onClose) {
             onClose();
           }
-        } else {
-          throw new Error(response.data.message || 'Update failed');
-        }
+        }, 1000);
       } else {
-        // Сохраняем только настройки приложения
-        localStorage.setItem('userSettings', JSON.stringify(settings));
-        console.log('Settings saved:', settings);
-        success('Настройки сохранены!', 'Готово');
-        onClose();
+        throw new Error(response.data.message || 'Update failed');
       }
-    } catch (error) {
-      console.error('❌ Error saving settings:', error);
-      error(error.response?.data?.message || error.message || 'Ошибка при сохранении', 'Ошибка сохранения');
+    } catch (err) {
+      console.error('❌ Error saving settings:', err);
+      if (error) {
+        error(err.response?.data?.message || err.message || 'Ошибка при сохранении', 'Ошибка сохранения');
+      }
+    } finally {
+      setIsSaving(false);
     }
+  };
+
+  const handleCancel = () => {
+    if (hasUnsavedChanges) {
+      if (warning) {
+        warning('У вас есть несохраненные изменения. Вы уверены, что хотите отменить?', 'Несохраненные изменения');
+      }
+    }
+    
+    // Возвращаем к оригинальным настройкам
+    setSettings(originalSettings);
+    setHasUnsavedChanges(false);
   };
 
   const handleAvatarUpload = async (event) => {
@@ -162,19 +215,20 @@ const SettingsModalTabs = ({ isOpen, onClose, user }) => {
           updateUser(response.data.user);
         }
         
-        success('Аватарка загружена успешно!', 'Загрузка завершена');
+        if (success) {
+          success('Аватарка загружена успешно!', 'Загрузка завершена');
+        }
       } else {
         throw new Error(response.data.message || 'Upload failed');
       }
-    } catch (error) {
-      console.error('❌ Avatar upload error:', error);
-      error(error.response?.data?.message || error.message || 'Ошибка при загрузке аватарки', 'Ошибка загрузки');
+    } catch (err) {
+      console.error('❌ Avatar upload error:', err);
+      if (error) {
+        error(err.response?.data?.message || err.message || 'Ошибка при загрузке аватарки', 'Ошибка загрузки');
+      }
     }
   };
 
-  const handleCancel = () => {
-    onClose();
-  };
 
   if (!isOpen) return null;
 
@@ -183,10 +237,35 @@ const SettingsModalTabs = ({ isOpen, onClose, user }) => {
       <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
         {/* Заголовок */}
         <div className={styles.modalHeader}>
-          <h2 className={styles.modalTitle}>Настройки</h2>
-          <button className={styles.closeButton} onClick={onClose}>
-            <FiX size={20} />
-          </button>
+          <div className={styles.modalTitleContainer}>
+            <h2 className={styles.modalTitle}>Настройки</h2>
+            {hasUnsavedChanges && (
+              <div className={styles.unsavedIndicator}>
+                <FiAlertCircle size={16} />
+                <span>Несохраненные изменения</span>
+              </div>
+            )}
+          </div>
+          <div className={styles.headerActions}>
+            {hasUnsavedChanges && (
+              <button className={styles.cancelButton} onClick={handleCancel}>
+                <FiX size={20} />
+              </button>
+            )}
+            <button 
+              className={`${styles.saveButton} ${hasUnsavedChanges ? styles.saveButtonActive : ''} ${isSaving ? styles.saveButtonSaving : ''}`} 
+              onClick={handleSave}
+              disabled={isSaving}
+            >
+              {isSaving ? (
+                <div className={styles.spinner}></div>
+              ) : hasUnsavedChanges ? (
+                <FiCheck size={20} />
+              ) : (
+                <FiSave size={20} />
+              )}
+            </button>
+          </div>
         </div>
 
         {/* Табы */}
@@ -244,53 +323,98 @@ const SettingsModalTabs = ({ isOpen, onClose, user }) => {
                 </div>
               </div>
 
-              <div className={styles.settingItem}>
+              <div className={`${styles.settingItem} ${settings.username !== originalSettings.username ? styles.settingItemChanged : ''}`}>
                 <div className={styles.settingInfo}>
-                  <label className={styles.settingLabel}>Username</label>
+                  <label className={styles.settingLabel}>
+                    Username
+                    {settings.username !== originalSettings.username && (
+                      <span className={styles.changedIndicator}>
+                        <FiEdit3 size={12} />
+                        Изменено
+                      </span>
+                    )}
+                  </label>
                   <span className={styles.settingDescription}>Ваш уникальный никнейм</span>
                 </div>
                 <div className={styles.settingControl}>
-                  <input
-                    type="text"
-                    className={styles.textInput}
-                    value={settings.username}
-                    onChange={(e) => handleSettingChange('username', e.target.value)}
-                    maxLength={20}
-                    placeholder="username"
-                  />
+                  <div className={styles.inputContainer}>
+                    <input
+                      type="text"
+                      className={`${styles.textInput} ${settings.username !== originalSettings.username ? styles.textInputChanged : ''}`}
+                      value={settings.username}
+                      onChange={(e) => handleSettingChange('username', e.target.value)}
+                      maxLength={20}
+                      placeholder="username"
+                    />
+                    {settings.username !== originalSettings.username && (
+                      <div className={styles.inputStatus}>
+                        <FiCheck size={14} />
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
 
-              <div className={styles.settingItem}>
+              <div className={`${styles.settingItem} ${settings.name !== originalSettings.name ? styles.settingItemChanged : ''}`}>
                 <div className={styles.settingInfo}>
-                  <label className={styles.settingLabel}>Имя</label>
+                  <label className={styles.settingLabel}>
+                    Имя
+                    {settings.name !== originalSettings.name && (
+                      <span className={styles.changedIndicator}>
+                        <FiEdit3 size={12} />
+                        Изменено
+                      </span>
+                    )}
+                  </label>
                   <span className={styles.settingDescription}>Ваше отображаемое имя</span>
                 </div>
                 <div className={styles.settingControl}>
-                  <input
-                    type="text"
-                    className={styles.textInput}
-                    value={settings.name}
-                    onChange={(e) => handleSettingChange('name', e.target.value)}
-                    maxLength={50}
-                  />
+                  <div className={styles.inputContainer}>
+                    <input
+                      type="text"
+                      className={`${styles.textInput} ${settings.name !== originalSettings.name ? styles.textInputChanged : ''}`}
+                      value={settings.name}
+                      onChange={(e) => handleSettingChange('name', e.target.value)}
+                      maxLength={50}
+                    />
+                    {settings.name !== originalSettings.name && (
+                      <div className={styles.inputStatus}>
+                        <FiCheck size={14} />
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
 
-              <div className={styles.settingItem}>
+              <div className={`${styles.settingItem} ${settings.bio !== originalSettings.bio ? styles.settingItemChanged : ''}`}>
                 <div className={styles.settingInfo}>
-                  <label className={styles.settingLabel}>Bio</label>
+                  <label className={styles.settingLabel}>
+                    Bio
+                    {settings.bio !== originalSettings.bio && (
+                      <span className={styles.changedIndicator}>
+                        <FiEdit3 size={12} />
+                        Изменено
+                      </span>
+                    )}
+                  </label>
                   <span className={styles.settingDescription}>Краткое описание о себе</span>
                 </div>
                 <div className={styles.settingControl}>
-                  <textarea
-                    className={styles.textInput}
-                    value={settings.bio}
-                    onChange={(e) => handleSettingChange('bio', e.target.value)}
-                    maxLength={160}
-                    rows={3}
-                    placeholder="Расскажите о себе..."
-                  />
+                  <div className={styles.inputContainer}>
+                    <textarea
+                      className={`${styles.textInput} ${settings.bio !== originalSettings.bio ? styles.textInputChanged : ''}`}
+                      value={settings.bio}
+                      onChange={(e) => handleSettingChange('bio', e.target.value)}
+                      maxLength={160}
+                      rows={3}
+                      placeholder="Расскажите о себе..."
+                    />
+                    {settings.bio !== originalSettings.bio && (
+                      <div className={styles.inputStatus}>
+                        <FiCheck size={14} />
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
 

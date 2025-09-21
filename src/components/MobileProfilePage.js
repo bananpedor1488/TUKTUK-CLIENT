@@ -41,7 +41,8 @@ const MobileProfilePage = ({ isOpen, onClose, user }) => {
     language: 'ru'
   });
 
-  const { success, error, warning } = useToast();
+  const toast = useToast();
+  const { success, error, warning } = toast || {};
   const { updateUser } = useAuth();
 
   // Обновляем настройки при изменении пользователя
@@ -110,7 +111,9 @@ const MobileProfilePage = ({ isOpen, onClose, user }) => {
 
   const handleSave = async () => {
     if (!hasUnsavedChanges) {
-      success('Нет изменений для сохранения', 'Все актуально');
+      if (success) {
+        success('Нет изменений для сохранения', 'Все актуально');
+      }
       return;
     }
 
@@ -137,7 +140,10 @@ const MobileProfilePage = ({ isOpen, onClose, user }) => {
         });
         
         setHasUnsavedChanges(false);
-        success('Профиль обновлен успешно!', 'Сохранение завершено');
+        
+        if (success) {
+          success('Профиль обновлен успешно!', 'Сохранение завершено');
+        }
         
         // Обновляем пользователя в AuthContext
         if (updateUser) {
@@ -153,9 +159,13 @@ const MobileProfilePage = ({ isOpen, onClose, user }) => {
       } else {
         throw new Error(response.data.message || 'Update failed');
       }
-    } catch (error) {
-      console.error('❌ Error saving settings:', error);
-      error(error.response?.data?.message || error.message || 'Ошибка при сохранении', 'Ошибка сохранения');
+    } catch (err) {
+      console.error('❌ Error saving settings:', err);
+      if (error) {
+        error(err.response?.data?.message || err.message || 'Ошибка при сохранении', 'Ошибка сохранения');
+      } else {
+        console.error('Toast error function not available');
+      }
     } finally {
       setIsSaving(false);
     }
@@ -163,7 +173,9 @@ const MobileProfilePage = ({ isOpen, onClose, user }) => {
 
   const handleCancel = () => {
     if (hasUnsavedChanges) {
-      warning('У вас есть несохраненные изменения. Вы уверены, что хотите отменить?', 'Несохраненные изменения');
+      if (warning) {
+        warning('У вас есть несохраненные изменения. Вы уверены, что хотите отменить?', 'Несохраненные изменения');
+      }
       // Здесь можно добавить подтверждение
     }
     
@@ -185,13 +197,17 @@ const MobileProfilePage = ({ isOpen, onClose, user }) => {
     // Проверяем тип файла
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
     if (!allowedTypes.includes(file.type)) {
-      error('Неподдерживаемый формат файла. Разрешены: JPEG, PNG, GIF, WebP', 'Неподдерживаемый формат');
+      if (error) {
+        error('Неподдерживаемый формат файла. Разрешены: JPEG, PNG, GIF, WebP', 'Неподдерживаемый формат');
+      }
       return;
     }
 
     // Проверяем размер файла (максимум 5MB)
     if (file.size > 5 * 1024 * 1024) {
-      error('Размер файла не должен превышать 5MB', 'Файл слишком большой');
+      if (error) {
+        error('Размер файла не должен превышать 5MB', 'Файл слишком большой');
+      }
       return;
     }
 
@@ -226,13 +242,17 @@ const MobileProfilePage = ({ isOpen, onClose, user }) => {
           updateUser(response.data.user);
         }
         
-        success('Аватарка загружена успешно!', 'Загрузка завершена');
+        if (success) {
+          success('Аватарка загружена успешно!', 'Загрузка завершена');
+        }
       } else {
         throw new Error(response.data.message || 'Upload failed');
       }
-    } catch (error) {
-      console.error('❌ Avatar upload error:', error);
-      error(error.response?.data?.message || error.message || 'Ошибка при загрузке аватарки', 'Ошибка загрузки');
+    } catch (err) {
+      console.error('❌ Avatar upload error:', err);
+      if (error) {
+        error(err.response?.data?.message || err.message || 'Ошибка при загрузке аватарки', 'Ошибка загрузки');
+      }
     }
   };
 
