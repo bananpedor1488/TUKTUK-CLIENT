@@ -21,11 +21,16 @@ const ChatList = ({ chats, selectedChat, onChatSelect, isLoading, showAIChat, on
     chat: null
   });
 
-  // Обновляем статусы пользователей при загрузке чатов
+  // Обновляем статусы пользователей при загрузке чатов (с дебаунсингом)
   useEffect(() => {
     if (chats && chats.length > 0) {
       console.log('🔄 ChatList: Refreshing user statuses for', chats.length, 'chats');
-      refreshAllUsersStatus(chats);
+      // Используем setTimeout для дебаунсинга
+      const timeoutId = setTimeout(() => {
+        refreshAllUsersStatus(chats);
+      }, 1000); // 1 секунда задержки
+      
+      return () => clearTimeout(timeoutId);
     }
   }, [chats, refreshAllUsersStatus]);
   

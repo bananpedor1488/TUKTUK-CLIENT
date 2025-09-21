@@ -15,13 +15,16 @@ const useOnlineStatus = (socket) => {
   const heartbeatIntervalRef = useRef(null);
   const retryTimeoutRef = useRef(null);
   const isInitializedRef = useRef(false);
+  const debounceTimeoutRef = useRef(null);
+  const pendingUserIdsRef = useRef(new Set());
   
   // Configuration
   const config = {
     heartbeatInterval: 30000, // 30 seconds
     retryDelay: 1000,
     maxRetries: 3,
-    syncTimeout: 5000
+    syncTimeout: 5000,
+    debounceDelay: 2000 // 2 seconds debounce for API calls
   };
 
   /**
@@ -37,6 +40,30 @@ const useOnlineStatus = (socket) => {
       });
       return newMap;
     });
+  }, []);
+
+  /**
+   * Debounced version of fetchOnlineStatus to prevent spam
+   */
+  const debouncedFetchOnlineStatus = useCallback((userIds) => {
+    // Add userIds to pending set
+    userIds.forEach(id => pendingUserIdsRef.current.add(id));
+    
+    // Clear existing timeout
+    if (debounceTimeoutRef.current) {
+      clearTimeout(debounceTimeoutRef.current);
+    }
+    
+    // Set new timeout
+    debounceTimeoutRef.current = setTimeout(() => {
+      const userIdsToFetch = Array.from(pendingUserIdsRef.current);
+      pendingUserIdsRef.current.clear();
+      
+      if (userIdsToFetch.length > 0) {
+        console.log(`🔄 Debounced fetch for ${userIdsToFetch.length} users`);
+        fetchOnlineStatus(userIdsToFetch);
+      }
+    }, config.debounceDelay);
   }, []);
 
   /**
@@ -102,9 +129,9 @@ const useOnlineStatus = (socket) => {
     
     if (allUserIds.size > 0) {
       console.log(`🔄 Refreshing status for ${allUserIds.size} users from chats`);
-      await fetchOnlineStatus(Array.from(allUserIds));
+      debouncedFetchOnlineStatus(Array.from(allUserIds));
     }
-  }, [fetchOnlineStatus]);
+  }, [debouncedFetchOnlineStatus]);
 
   /**
    * Send heartbeat to server
@@ -237,6 +264,9 @@ const useOnlineStatus = (socket) => {
       if (retryTimeoutRef.current) {
         clearTimeout(retryTimeoutRef.current);
       }
+      if (debounceTimeoutRef.current) {
+        clearTimeout(debounceTimeoutRef.current);
+      }
     };
   }, [socket, updateUserStatus, sendHeartbeat, config.heartbeatInterval]);
 
@@ -248,6 +278,9 @@ const useOnlineStatus = (socket) => {
       }
       if (retryTimeoutRef.current) {
         clearTimeout(retryTimeoutRef.current);
+      }
+      if (debounceTimeoutRef.current) {
+        clearTimeout(debounceTimeoutRef.current);
       }
     };
   }, []);
