@@ -217,9 +217,9 @@
 .messageImage {
   max-width: 100%;
   max-height: 300px;
-  border-radius: 12px;
+  border-radius: 8px;
   object-fit: contain;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   cursor: pointer;
   transition: transform 0.2s ease;
 }
@@ -231,17 +231,17 @@
 .imageCaption {
   font-size: 14px;
   line-height: 1.4;
-  color: var(--theme-text-primary, #ffffff);
+  color: var(--theme-text-secondary, #888888);
   word-wrap: break-word;
 }
 
 /* Light theme adjustments for images */
 [data-theme="light"] .imageCaption {
-  color: var(--theme-text-primary, #000000);
+  color: var(--theme-text-secondary, #666666);
 }
 
 [data-theme="light"] .messageImage {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 /* Animation for new messages */
