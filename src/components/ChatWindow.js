@@ -9,6 +9,7 @@ import ChatSearch from './ChatSearch';
 import ChatMenu from './ChatMenu';
 import UserProfileModal from './UserProfileModal';
 import AttachModal from './AttachModal';
+import PhotoPreviewModal from './PhotoPreviewModal';
 import OnlineStatusIndicator from './OnlineStatusIndicator';
 import styles from './ChatWindow.module.css';
 
@@ -22,6 +23,8 @@ const ChatWindow = ({ chat, onChatUpdate, onBackToChatList }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [showAttachModal, setShowAttachModal] = useState(false);
+  const [showPhotoPreview, setShowPhotoPreview] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
   const messagesEndRef = useRef(null);
   const typingTimeoutRef = useRef(null);
 
@@ -70,6 +73,53 @@ const ChatWindow = ({ chat, onChatUpdate, onBackToChatList }) => {
         console.error('❌ Error handling mention click:', error);
         alert('Ошибка при переходе к пользователю');
       }
+    }
+  };
+
+  // Handle file selection from AttachModal
+  const handleFileSelect = (file) => {
+    if (file.type.startsWith('image/')) {
+      setSelectedFile(file);
+      setShowPhotoPreview(true);
+    } else {
+      console.log('Unsupported file type:', file.type);
+      // TODO: Handle other file types
+    }
+  };
+
+  // Handle photo send
+  const handlePhotoSend = async (file, caption) => {
+    try {
+      // Upload photo to ImgBB
+      const formData = new FormData();
+      formData.append('image', file);
+      
+      const uploadResponse = await axios.post('/user/upload-avatar', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      if (uploadResponse.data.success && uploadResponse.data.imageUrl) {
+        // Send message with photo
+        const messageData = {
+          content: caption || '',
+          type: 'image',
+          imageUrl: uploadResponse.data.imageUrl,
+          chatId: chat._id
+        };
+
+        await sendMessage(messageData);
+        
+        // Clear states
+        setSelectedFile(null);
+        setShowPhotoPreview(false);
+      } else {
+        throw new Error('Failed to upload image');
+      }
+    } catch (error) {
+      console.error('Error sending photo:', error);
+      throw error;
     }
   };
 
@@ -518,6 +568,18 @@ const ChatWindow = ({ chat, onChatUpdate, onBackToChatList }) => {
       <AttachModal
         isOpen={showAttachModal}
         onClose={() => setShowAttachModal(false)}
+        onFileSelect={handleFileSelect}
+      />
+
+      {/* Photo Preview Modal */}
+      <PhotoPreviewModal
+        isOpen={showPhotoPreview}
+        onClose={() => {
+          setShowPhotoPreview(false);
+          setSelectedFile(null);
+        }}
+        file={selectedFile}
+        onSend={handlePhotoSend}
       />
     </div>
   );

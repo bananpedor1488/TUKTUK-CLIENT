@@ -565,18 +565,6 @@ const MobileProfilePage = ({ isOpen, onClose, user }) => {
                           </div>
                         </div>
                       </div>
-
-                      <div className={styles.settingCard}>
-                        <div className={styles.settingInfo}>
-                          <h3 className={styles.settingLabel}>Username</h3>
-                          <p className={styles.settingDescription}>Ваш уникальный username</p>
-                        </div>
-                        <div className={styles.settingControl}>
-                          <div className={styles.usernameContainer}>
-                            <span className={styles.usernameDisplay}>@{settings.username}</span>
-                          </div>
-                        </div>
-                      </div>
                     </div>
                   )}
 

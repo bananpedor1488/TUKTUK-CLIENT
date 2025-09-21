@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { FiSend, FiZap, FiUser, FiRefreshCw, FiPlus } from 'react-icons/fi';
 import AttachModal from './AttachModal';
+import PhotoPreviewModal from './PhotoPreviewModal';
 import styles from './AIChatWindow.module.css';
 import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext';
@@ -10,6 +11,8 @@ const AIChatWindow = ({ onClose }) => {
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showAttachModal, setShowAttachModal] = useState(false);
+  const [showPhotoPreview, setShowPhotoPreview] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
   const { logout, isAuthenticated, user } = useAuth();
@@ -112,6 +115,71 @@ const AIChatWindow = ({ onClose }) => {
           }
         }, 2000);
       }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Handle file selection from AttachModal
+  const handleFileSelect = (file) => {
+    if (file.type.startsWith('image/')) {
+      setSelectedFile(file);
+      setShowPhotoPreview(true);
+    } else {
+      console.log('Unsupported file type:', file.type);
+      // TODO: Handle other file types
+    }
+  };
+
+  // Handle photo send
+  const handlePhotoSend = async (file, caption) => {
+    try {
+      // Upload photo to ImgBB
+      const formData = new FormData();
+      formData.append('image', file);
+      
+      const uploadResponse = await axios.post('/user/upload-avatar', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      if (uploadResponse.data.success && uploadResponse.data.imageUrl) {
+        // Send message with photo to AI
+        const userMessage = {
+          id: Date.now(),
+          type: 'user',
+          content: caption || '',
+          imageUrl: uploadResponse.data.imageUrl,
+          timestamp: new Date()
+        };
+
+        setMessages(prev => [...prev, userMessage]);
+        setIsLoading(true);
+
+        // Send to AI with image
+        const response = await axios.post('/ai/chat', {
+          messages: [...messages, userMessage]
+        });
+
+        const aiMessage = {
+          id: Date.now() + 1,
+          type: 'ai',
+          content: response.data.content || 'Извините, не удалось получить ответ от AI.',
+          timestamp: response.data.timestamp ? new Date(response.data.timestamp) : new Date()
+        };
+
+        setMessages(prev => [...prev, aiMessage]);
+        
+        // Clear states
+        setSelectedFile(null);
+        setShowPhotoPreview(false);
+      } else {
+        throw new Error('Failed to upload image');
+      }
+    } catch (error) {
+      console.error('Error sending photo:', error);
+      throw error;
     } finally {
       setIsLoading(false);
     }
@@ -266,6 +334,18 @@ const AIChatWindow = ({ onClose }) => {
       <AttachModal
         isOpen={showAttachModal}
         onClose={() => setShowAttachModal(false)}
+        onFileSelect={handleFileSelect}
+      />
+
+      {/* Photo Preview Modal */}
+      <PhotoPreviewModal
+        isOpen={showPhotoPreview}
+        onClose={() => {
+          setShowPhotoPreview(false);
+          setSelectedFile(null);
+        }}
+        file={selectedFile}
+        onSend={handlePhotoSend}
       />
     </div>
   );
