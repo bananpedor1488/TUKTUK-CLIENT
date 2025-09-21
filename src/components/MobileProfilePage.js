@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FiArrowLeft, FiUser, FiBell, FiShield, FiLogOut, FiEdit3, FiSave, FiSettings, FiEye, FiVolume2, FiVolumeX, FiBellOff, FiEyeOff, FiCheck, FiX, FiAlertCircle } from 'react-icons/fi';
+import { FiArrowLeft, FiUser, FiBell, FiShield, FiLogOut, FiEdit3, FiSave, FiSettings, FiEye, FiVolume2, FiVolumeX, FiBellOff, FiEyeOff, FiCheck, FiX, FiAlertCircle, FiCopy } from 'react-icons/fi';
 import ThemeToggle from './ThemeToggle/ThemeToggle';
 import axios from '../services/axiosConfig';
 import { useToast } from '../contexts/ToastContext';
@@ -260,6 +260,31 @@ const MobileProfilePage = ({ isOpen, onClose, user }) => {
     // Возвращаем к оригинальным настройкам
     setSettings(originalSettings);
     setHasUnsavedChanges(false);
+  };
+
+  const handleCopyUsername = async () => {
+    try {
+      const usernameToCopy = `@${settings.username}`;
+      await navigator.clipboard.writeText(usernameToCopy);
+      
+      if (success) {
+        success(`Username скопирован: ${usernameToCopy}`, 'Скопировано в буфер обмена');
+      }
+    } catch (err) {
+      console.error('❌ Error copying username:', err);
+      
+      // Fallback для старых браузеров
+      const textArea = document.createElement('textarea');
+      textArea.value = `@${settings.username}`;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      
+      if (success) {
+        success(`Username скопирован: @${settings.username}`, 'Скопировано в буфер обмена');
+      }
+    }
   };
 
   const handleLogout = () => {
@@ -537,16 +562,20 @@ const MobileProfilePage = ({ isOpen, onClose, user }) => {
 
                       <div className={styles.settingCard}>
                         <div className={styles.settingInfo}>
-                          <h3 className={styles.settingLabel}>Email</h3>
-                          <p className={styles.settingDescription}>Ваш email адрес</p>
+                          <h3 className={styles.settingLabel}>Username</h3>
+                          <p className={styles.settingDescription}>Ваш уникальный username</p>
                         </div>
                         <div className={styles.settingControl}>
-                          <input
-                            type="email"
-                            className={styles.textInput}
-                            value={settings.email}
-                            onChange={(e) => handleSettingChange('email', e.target.value)}
-                          />
+                          <div className={styles.usernameContainer}>
+                            <span className={styles.usernameDisplay}>@{settings.username}</span>
+                            <button 
+                              className={styles.copyButton}
+                              onClick={handleCopyUsername}
+                              title="Копировать username"
+                            >
+                              <FiCopy size={16} />
+                            </button>
+                          </div>
                         </div>
                       </div>
                     </div>
