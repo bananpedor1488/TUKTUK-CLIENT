@@ -49,16 +49,16 @@ const ChatWindow = ({ chat, onChatUpdate, onBackToChatList }) => {
           console.log('👤 Found user:', targetUser);
           
           // Create or find existing chat with this user
-          const chatResponse = await axios.post('/chat/create', {
-            participants: [targetUser._id]
+          const chatResponse = await axios.post('/chats', {
+            participantId: targetUser._id
           });
           
-          if (chatResponse.data.success) {
-            console.log('✅ Chat created/found:', chatResponse.data.chat);
+          if (chatResponse.data) {
+            console.log('✅ Chat created/found:', chatResponse.data);
             // Navigate to the chat
-            onChatUpdate(chatResponse.data.chat);
+            onChatUpdate(chatResponse.data);
           } else {
-            console.error('❌ Failed to create chat:', chatResponse.data.message);
+            console.error('❌ Failed to create chat: No data received');
             alert('Не удалось создать чат с пользователем');
           }
         } else {
