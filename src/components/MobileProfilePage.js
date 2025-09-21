@@ -414,7 +414,13 @@ const MobileProfilePage = ({ isOpen, onClose, user }) => {
         </div>
         <div className={styles.userDetails}>
           <h2 className={styles.userName}>{settings.name}</h2>
-          <p className={styles.userEmail}>{settings.email}</p>
+          <p 
+            className={styles.userEmail}
+            onClick={handleCopyUsername}
+            title="Нажмите чтобы скопировать username"
+          >
+            @{settings.username}
+          </p>
         </div>
       </div>
 

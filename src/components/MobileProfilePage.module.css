@@ -203,6 +203,17 @@
   font-size: 16px;
   color: var(--theme-text-secondary);
   margin: 0;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 4px 8px;
+  border-radius: 6px;
+  display: inline-block;
+}
+
+.userEmail:hover {
+  color: var(--theme-accent-color, #007AFF);
+  background: var(--theme-card-background, rgba(255, 255, 255, 0.05));
+  transform: translateY(-1px);
 }
 
 /* Секции настроек */
