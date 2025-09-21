@@ -211,7 +211,6 @@
 .imageContainer {
   display: flex;
   flex-direction: column;
-  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 8px;
   overflow: hidden;
 }
@@ -236,16 +235,17 @@
   word-wrap: break-word;
   padding: 8px 12px;
   background: var(--theme-background-secondary, rgba(255, 255, 255, 0.05));
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: none;
+  border-radius: 0 0 8px 8px;
 }
 
 /* Light theme adjustments for images */
-[data-theme="light"] .imageContainer {
-  border: 1px solid rgba(0, 0, 0, 0.1);
-}
-
 [data-theme="light"] .imageCaption {
   color: var(--theme-text-primary, #000000);
   background: var(--theme-background-secondary, rgba(0, 0, 0, 0.05));
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-top: none;
 }
 
 /* Animation for new messages */
