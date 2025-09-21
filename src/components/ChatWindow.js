@@ -94,7 +94,7 @@ const ChatWindow = ({ chat, onChatUpdate, onBackToChatList }) => {
       const formData = new FormData();
       formData.append('image', file);
       
-      const uploadResponse = await axios.post('/user/upload-avatar', formData, {
+      const uploadResponse = await axios.post('/user/upload-file', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
