@@ -4,6 +4,7 @@ import ThemeToggle from './ThemeToggle/ThemeToggle';
 import axios from '../services/axiosConfig';
 import { useToast } from '../contexts/ToastContext';
 import { useAuth } from '../contexts/AuthContext';
+import { updateTokens } from '../utils/tokenManager';
 import styles from './SettingsModalTabs.module.css';
 
 const SettingsModalTabs = ({ isOpen, onClose, user }) => {
@@ -186,16 +187,20 @@ const SettingsModalTabs = ({ isOpen, onClose, user }) => {
         if (response.data.tokens) {
           console.log('🔄 Received new tokens due to username change');
           
-          // Сохраняем новые токены
-          localStorage.setItem('accessToken', response.data.tokens.accessToken);
-          document.cookie = `refreshToken=${response.data.tokens.refreshToken}; path=/; max-age=${7 * 24 * 60 * 60}; secure; samesite=strict`;
+          // Используем новый token manager
+          const tokensUpdated = updateTokens(
+            response.data.tokens.accessToken,
+            response.data.tokens.refreshToken
+          );
           
-          // Обновляем axios config с новым токеном
-          const axios = require('../services/axiosConfig').default;
-          axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.tokens.accessToken}`;
-          
-          if (success) {
-            success('Профиль обновлен! Новые токены сохранены.', 'Сохранение завершено');
+          if (tokensUpdated) {
+            if (success) {
+              success('Профиль обновлен! Новые токены сохранены.', 'Сохранение завершено');
+            }
+          } else {
+            if (error) {
+              error('Ошибка при сохранении токенов', 'Ошибка безопасности');
+            }
           }
         } else if (success) {
           success('Профиль обновлен успешно!', 'Сохранение завершено');
