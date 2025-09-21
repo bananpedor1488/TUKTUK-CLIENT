@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FiArrowLeft, FiUser, FiBell, FiShield, FiLogOut, FiEdit3, FiSave, FiSettings, FiEye, FiVolume2, FiVolumeX, FiBellOff, FiEyeOff } from 'react-icons/fi';
+import { FiArrowLeft, FiUser, FiBell, FiShield, FiLogOut, FiEdit3, FiSave, FiSettings, FiEye, FiVolume2, FiVolumeX, FiBellOff, FiEyeOff, FiCheck, FiX, FiAlertCircle } from 'react-icons/fi';
 import ThemeToggle from './ThemeToggle/ThemeToggle';
 import axios from '../services/axiosConfig';
 import { useToast } from '../contexts/ToastContext';
@@ -8,6 +8,9 @@ import styles from './MobileProfilePage.module.css';
 
 const MobileProfilePage = ({ isOpen, onClose, user }) => {
   const [activeSection, setActiveSection] = useState('profile');
+  const [originalSettings, setOriginalSettings] = useState({});
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [settings, setSettings] = useState({
     // Профиль
     name: user?.displayName || user?.username || 'Пользователь',
@@ -44,16 +47,43 @@ const MobileProfilePage = ({ isOpen, onClose, user }) => {
   // Обновляем настройки при изменении пользователя
   useEffect(() => {
     if (user) {
-      setSettings(prev => ({
-        ...prev,
+      const newSettings = {
         name: user.displayName || user.username || 'Пользователь',
         username: user.username || '',
         email: user.email || 'user@example.com',
         bio: user.bio || '',
-        avatar: user.avatar || null
-      }));
+        avatar: user.avatar || null,
+        theme: 'dark',
+        fontSize: 'medium',
+        animationType: 'slideFromRight',
+        soundEnabled: true,
+        notificationsEnabled: true,
+        showOnlineStatus: true,
+        messagePreview: true,
+        vibrationEnabled: true,
+        twoFactorEnabled: false,
+        sessionTimeout: 30,
+        autoSave: true,
+        autoDownload: false,
+        language: 'ru'
+      };
+      
+      setSettings(newSettings);
+      setOriginalSettings(newSettings);
+      setHasUnsavedChanges(false);
     }
   }, [user]);
+
+  // Проверяем изменения при каждом обновлении settings
+  useEffect(() => {
+    const hasChanges = settings.name !== originalSettings.name ||
+                      settings.username !== originalSettings.username ||
+                      settings.bio !== originalSettings.bio ||
+                      settings.email !== originalSettings.email ||
+                      settings.avatar !== originalSettings.avatar;
+    
+    setHasUnsavedChanges(hasChanges);
+  }, [settings, originalSettings]);
 
   const sections = [
     { id: 'profile', label: 'Редактировать профиль', icon: FiUser },
@@ -79,48 +109,67 @@ const MobileProfilePage = ({ isOpen, onClose, user }) => {
   };
 
   const handleSave = async () => {
+    if (!hasUnsavedChanges) {
+      success('Нет изменений для сохранения', 'Все актуально');
+      return;
+    }
+
+    setIsSaving(true);
     try {
-      // Обновляем данные пользователя через API
-      const hasChanges = settings.name !== user?.displayName || 
-                        settings.username !== user?.username ||
-                        settings.bio !== user?.bio;
+      console.log('📤 Updating user profile...');
+      
+      const response = await axios.put('/user/profile', {
+        displayName: settings.name,
+        username: settings.username,
+        bio: settings.bio
+      });
 
-      if (hasChanges) {
-        console.log('📤 Updating user profile...');
+      if (response.data.success) {
+        console.log('✅ Profile updated successfully');
         
-        const response = await axios.put('/user/profile', {
-          displayName: settings.name,
+        // Обновляем оригинальные настройки
+        setOriginalSettings({
+          ...originalSettings,
+          name: settings.name,
           username: settings.username,
-          bio: settings.bio
+          bio: settings.bio,
+          avatar: settings.avatar
         });
-
-        if (response.data.success) {
-          console.log('✅ Profile updated successfully');
-          success('Профиль обновлен успешно!', 'Сохранение завершено');
-          
-          // Обновляем пользователя в AuthContext
-          if (updateUser) {
-            updateUser(response.data.user);
-          }
-          
-          // Закрываем модалку
+        
+        setHasUnsavedChanges(false);
+        success('Профиль обновлен успешно!', 'Сохранение завершено');
+        
+        // Обновляем пользователя в AuthContext
+        if (updateUser) {
+          updateUser(response.data.user);
+        }
+        
+        // Закрываем модалку через небольшую задержку
+        setTimeout(() => {
           if (onClose) {
             onClose();
           }
-        } else {
-          throw new Error(response.data.message || 'Update failed');
-        }
+        }, 1000);
       } else {
-        // Сохраняем только настройки приложения
-        localStorage.setItem('userSettings', JSON.stringify(settings));
-        console.log('Settings saved:', settings);
-        success('Настройки сохранены!', 'Готово');
-        onClose();
+        throw new Error(response.data.message || 'Update failed');
       }
     } catch (error) {
       console.error('❌ Error saving settings:', error);
       error(error.response?.data?.message || error.message || 'Ошибка при сохранении', 'Ошибка сохранения');
+    } finally {
+      setIsSaving(false);
     }
+  };
+
+  const handleCancel = () => {
+    if (hasUnsavedChanges) {
+      warning('У вас есть несохраненные изменения. Вы уверены, что хотите отменить?', 'Несохраненные изменения');
+      // Здесь можно добавить подтверждение
+    }
+    
+    // Возвращаем к оригинальным настройкам
+    setSettings(originalSettings);
+    setHasUnsavedChanges(false);
   };
 
   const handleLogout = () => {
@@ -196,10 +245,35 @@ const MobileProfilePage = ({ isOpen, onClose, user }) => {
         <button className={styles.backButton} onClick={onClose}>
           <FiArrowLeft size={24} />
         </button>
-        <h1 className={styles.pageTitle}>Профиль</h1>
-        <button className={styles.saveButton} onClick={handleSave}>
-          <FiSave size={20} />
-        </button>
+        <div className={styles.pageTitleContainer}>
+          <h1 className={styles.pageTitle}>Профиль</h1>
+          {hasUnsavedChanges && (
+            <div className={styles.unsavedIndicator}>
+              <FiAlertCircle size={16} />
+              <span>Несохраненные изменения</span>
+            </div>
+          )}
+        </div>
+        <div className={styles.headerActions}>
+          {hasUnsavedChanges && (
+            <button className={styles.cancelButton} onClick={handleCancel}>
+              <FiX size={20} />
+            </button>
+          )}
+          <button 
+            className={`${styles.saveButton} ${hasUnsavedChanges ? styles.saveButtonActive : ''} ${isSaving ? styles.saveButtonSaving : ''}`} 
+            onClick={handleSave}
+            disabled={isSaving}
+          >
+            {isSaving ? (
+              <div className={styles.spinner}></div>
+            ) : hasUnsavedChanges ? (
+              <FiCheck size={20} />
+            ) : (
+              <FiSave size={20} />
+            )}
+          </button>
+        </div>
       </div>
 
       {/* Информация о пользователе */}
@@ -268,53 +342,98 @@ const MobileProfilePage = ({ isOpen, onClose, user }) => {
                         </div>
                       </div>
 
-                      <div className={styles.settingCard}>
+                      <div className={`${styles.settingCard} ${settings.username !== originalSettings.username ? styles.settingCardChanged : ''}`}>
                         <div className={styles.settingInfo}>
-                          <h3 className={styles.settingLabel}>Username</h3>
+                          <h3 className={styles.settingLabel}>
+                            Username
+                            {settings.username !== originalSettings.username && (
+                              <span className={styles.changedIndicator}>
+                                <FiEdit3 size={12} />
+                                Изменено
+                              </span>
+                            )}
+                          </h3>
                           <p className={styles.settingDescription}>Ваш уникальный никнейм</p>
                         </div>
                         <div className={styles.settingControl}>
-                          <input
-                            type="text"
-                            className={styles.textInput}
-                            value={settings.username}
-                            onChange={(e) => handleSettingChange('username', e.target.value)}
-                            maxLength={20}
-                            placeholder="username"
-                          />
+                          <div className={styles.inputContainer}>
+                            <input
+                              type="text"
+                              className={`${styles.textInput} ${settings.username !== originalSettings.username ? styles.textInputChanged : ''}`}
+                              value={settings.username}
+                              onChange={(e) => handleSettingChange('username', e.target.value)}
+                              maxLength={20}
+                              placeholder="username"
+                            />
+                            {settings.username !== originalSettings.username && (
+                              <div className={styles.inputStatus}>
+                                <FiCheck size={14} />
+                              </div>
+                            )}
+                          </div>
                         </div>
                       </div>
 
-                      <div className={styles.settingCard}>
+                      <div className={`${styles.settingCard} ${settings.name !== originalSettings.name ? styles.settingCardChanged : ''}`}>
                         <div className={styles.settingInfo}>
-                          <h3 className={styles.settingLabel}>Имя</h3>
+                          <h3 className={styles.settingLabel}>
+                            Имя
+                            {settings.name !== originalSettings.name && (
+                              <span className={styles.changedIndicator}>
+                                <FiEdit3 size={12} />
+                                Изменено
+                              </span>
+                            )}
+                          </h3>
                           <p className={styles.settingDescription}>Ваше отображаемое имя</p>
                         </div>
                         <div className={styles.settingControl}>
-                          <input
-                            type="text"
-                            className={styles.textInput}
-                            value={settings.name}
-                            onChange={(e) => handleSettingChange('name', e.target.value)}
-                            maxLength={50}
-                          />
+                          <div className={styles.inputContainer}>
+                            <input
+                              type="text"
+                              className={`${styles.textInput} ${settings.name !== originalSettings.name ? styles.textInputChanged : ''}`}
+                              value={settings.name}
+                              onChange={(e) => handleSettingChange('name', e.target.value)}
+                              maxLength={50}
+                            />
+                            {settings.name !== originalSettings.name && (
+                              <div className={styles.inputStatus}>
+                                <FiCheck size={14} />
+                              </div>
+                            )}
+                          </div>
                         </div>
                       </div>
 
-                      <div className={styles.settingCard}>
+                      <div className={`${styles.settingCard} ${settings.bio !== originalSettings.bio ? styles.settingCardChanged : ''}`}>
                         <div className={styles.settingInfo}>
-                          <h3 className={styles.settingLabel}>Bio</h3>
+                          <h3 className={styles.settingLabel}>
+                            Bio
+                            {settings.bio !== originalSettings.bio && (
+                              <span className={styles.changedIndicator}>
+                                <FiEdit3 size={12} />
+                                Изменено
+                              </span>
+                            )}
+                          </h3>
                           <p className={styles.settingDescription}>Краткое описание о себе</p>
                         </div>
                         <div className={styles.settingControl}>
-                          <textarea
-                            className={styles.textInput}
-                            value={settings.bio}
-                            onChange={(e) => handleSettingChange('bio', e.target.value)}
-                            maxLength={160}
-                            rows={3}
-                            placeholder="Расскажите о себе..."
-                          />
+                          <div className={styles.inputContainer}>
+                            <textarea
+                              className={`${styles.textInput} ${settings.bio !== originalSettings.bio ? styles.textInputChanged : ''}`}
+                              value={settings.bio}
+                              onChange={(e) => handleSettingChange('bio', e.target.value)}
+                              maxLength={160}
+                              rows={3}
+                              placeholder="Расскажите о себе..."
+                            />
+                            {settings.bio !== originalSettings.bio && (
+                              <div className={styles.inputStatus}>
+                                <FiCheck size={14} />
+                              </div>
+                            )}
+                          </div>
                         </div>
                       </div>
 
