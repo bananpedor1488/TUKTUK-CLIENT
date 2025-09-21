@@ -5,23 +5,40 @@ class AuthManager {
     this.baseURL = process.env.REACT_APP_API_URL || 'https://tuktuk-server.onrender.com/api';
   }
 
-  // Получение токенов из localStorage
+  // Получение токенов из localStorage и cookies
   getTokens() {
+    const accessToken = localStorage.getItem('accessToken');
+    
+    // Получаем refresh token из cookies
+    let refreshToken = null;
+    try {
+      const cookies = document.cookie.split(';');
+      const refreshCookie = cookies.find(cookie => 
+        cookie.trim().startsWith('refreshToken=')
+      );
+      if (refreshCookie) {
+        refreshToken = refreshCookie.split('=')[1];
+      }
+    } catch (error) {
+      console.error('❌ Error reading refresh token from cookies:', error);
+    }
+    
     return {
-      accessToken: localStorage.getItem('accessToken'),
-      refreshToken: localStorage.getItem('refreshToken')
+      accessToken,
+      refreshToken
     };
   }
 
-  // Сохранение токенов в localStorage
+  // Сохранение токенов в localStorage и cookies
   setTokens(accessToken, refreshToken) {
     if (accessToken) {
       localStorage.setItem('accessToken', accessToken);
       console.log('✅ Access token saved');
     }
     if (refreshToken) {
-      localStorage.setItem('refreshToken', refreshToken);
-      console.log('✅ Refresh token saved');
+      // Сохраняем refresh token в cookies
+      document.cookie = `refreshToken=${refreshToken}; path=/; max-age=${7 * 24 * 60 * 60}; secure; samesite=strict`;
+      console.log('✅ Refresh token saved to cookies');
     }
   }
 
@@ -31,6 +48,9 @@ class AuthManager {
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
     localStorage.removeItem('user');
+    
+    // Очищаем refresh token из cookies
+    document.cookie = 'refreshToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
   }
 
   // Проверка, авторизован ли пользователь
