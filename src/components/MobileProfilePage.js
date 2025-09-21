@@ -117,6 +117,56 @@ const MobileProfilePage = ({ isOpen, onClose, user }) => {
       return;
     }
 
+    // Client-side validation
+    if (settings.username && settings.username.length < 3) {
+      if (error) {
+        error('Username должен содержать минимум 3 символа', 'Ошибка валидации');
+      }
+      return;
+    }
+
+    if (settings.username && !/^[a-zA-Z0-9_]+$/.test(settings.username)) {
+      if (error) {
+        error('Username может содержать только буквы, цифры и подчеркивания', 'Ошибка валидации');
+      }
+      return;
+    }
+
+    if (settings.name && settings.name.length > 50) {
+      if (error) {
+        error('Имя не может превышать 50 символов', 'Ошибка валидации');
+      }
+      return;
+    }
+
+    if (settings.bio && settings.bio.length > 160) {
+      if (error) {
+        error('Bio не может превышать 160 символов', 'Ошибка валидации');
+      }
+      return;
+    }
+
+    // Check for suspicious patterns
+    const suspiciousPatterns = [
+      /<script/i,
+      /javascript:/i,
+      /on\w+\s*=/i,
+      /eval\s*\(/i,
+      /expression\s*\(/i
+    ];
+
+    const fieldsToCheck = [settings.username, settings.name, settings.bio].filter(Boolean);
+    for (const field of fieldsToCheck) {
+      for (const pattern of suspiciousPatterns) {
+        if (pattern.test(field)) {
+          if (error) {
+            error('Обнаружены недопустимые символы', 'Ошибка безопасности');
+          }
+          return;
+        }
+      }
+    }
+
     setIsSaving(true);
     try {
       console.log('📤 Updating user profile...');
@@ -141,13 +191,28 @@ const MobileProfilePage = ({ isOpen, onClose, user }) => {
         
         setHasUnsavedChanges(false);
         
-        if (success) {
-          success('Профиль обновлен успешно!', 'Сохранение завершено');
-        }
-        
         // Обновляем пользователя в AuthContext
         if (updateUser) {
           updateUser(response.data.user);
+        }
+        
+        // Если получены новые токены (при смене username), сохраняем их
+        if (response.data.tokens) {
+          console.log('🔄 Received new tokens due to username change');
+          
+          // Сохраняем новые токены
+          localStorage.setItem('accessToken', response.data.tokens.accessToken);
+          document.cookie = `refreshToken=${response.data.tokens.refreshToken}; path=/; max-age=${7 * 24 * 60 * 60}; secure; samesite=strict`;
+          
+          // Обновляем axios config с новым токеном
+          const axios = require('../services/axiosConfig').default;
+          axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.tokens.accessToken}`;
+          
+          if (success) {
+            success('Профиль обновлен! Новые токены сохранены.', 'Сохранение завершено');
+          }
+        } else if (success) {
+          success('Профиль обновлен успешно!', 'Сохранение завершено');
         }
         
         // Закрываем модалку через небольшую задержку
