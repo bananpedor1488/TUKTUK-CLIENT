@@ -4,7 +4,7 @@ import { useSocket } from '../contexts/SocketContext';
 import { useAuth } from '../contexts/AuthContext';
 import { FiSearch, FiMoreHorizontal, FiSend, FiAlertCircle, FiPlus, FiArrowLeft } from 'react-icons/fi';
 import { formatLastSeen } from '../utils/timeUtils';
-import MessageBubble from './MessageBubble';
+import MessageBubbleWithMentions from './MessageBubbleWithMentions';
 import ChatSearch from './ChatSearch';
 import ChatMenu from './ChatMenu';
 import UserProfileModal from './UserProfileModal';
@@ -27,6 +27,50 @@ const ChatWindow = ({ chat, onChatUpdate, onBackToChatList }) => {
 
   const { socket, isConnected, joinChat, leaveChat, sendMessage, startTyping, stopTyping, isUserOnline, getUserStatus } = useSocket();
   const { user } = useAuth();
+
+  // Handle mention clicks
+  const handleMentionClick = async (username, isOwnMention) => {
+    if (isOwnMention) {
+      // Navigate to favorites/notes
+      console.log('📝 Navigating to favorites for own mention:', username);
+      // TODO: Implement favorites navigation
+      // For now, we'll show a placeholder
+      alert('Переход в избранные (в разработке)');
+    } else {
+      // Navigate to user's chat
+      console.log('💬 Navigating to chat with:', username);
+      try {
+        // Search for user by username
+        const response = await axios.get(`/user/search?q=${username}&limit=1`);
+        const users = response.data.users;
+        
+        if (users && users.length > 0) {
+          const targetUser = users[0];
+          console.log('👤 Found user:', targetUser);
+          
+          // Create or find existing chat with this user
+          const chatResponse = await axios.post('/chat/create', {
+            participants: [targetUser._id]
+          });
+          
+          if (chatResponse.data.success) {
+            console.log('✅ Chat created/found:', chatResponse.data.chat);
+            // Navigate to the chat
+            onChatUpdate(chatResponse.data.chat);
+          } else {
+            console.error('❌ Failed to create chat:', chatResponse.data.message);
+            alert('Не удалось создать чат с пользователем');
+          }
+        } else {
+          console.log('❌ User not found:', username);
+          alert(`Пользователь @${username} не найден`);
+        }
+      } catch (error) {
+        console.error('❌ Error handling mention click:', error);
+        alert('Ошибка при переходе к пользователю');
+      }
+    }
+  };
 
   // Отладка данных пользователя
   useEffect(() => {
@@ -383,13 +427,15 @@ const ChatWindow = ({ chat, onChatUpdate, onBackToChatList }) => {
               }
               
               return (
-                <MessageBubble
+                <MessageBubbleWithMentions
                   key={message._id}
                   message={message}
                   isOwn={isOwnMessage}
                   senderName={senderName}
                   senderAvatar={senderAvatar}
                   disableAnimation={message.disableAnimation}
+                  onMentionClick={handleMentionClick}
+                  currentUsername={user.username}
                 />
               );
             })}

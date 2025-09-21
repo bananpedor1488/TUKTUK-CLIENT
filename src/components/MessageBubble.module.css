@@ -288,5 +288,96 @@
   top: 1px;
 }
 
+/* Mention styles */
+.mention {
+  color: var(--theme-accent-color, #007AFF);
+  font-weight: 500;
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 4px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-block;
+  text-decoration: none;
+  background: rgba(0, 122, 255, 0.1);
+  border: 1px solid rgba(0, 122, 255, 0.2);
+}
+
+.mention:hover {
+  background: rgba(0, 122, 255, 0.2);
+  border-color: rgba(0, 122, 255, 0.4);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
+}
+
+.mention:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 4px rgba(0, 122, 255, 0.2);
+}
+
+/* Own mention styles (for favorites) */
+.own-mention {
+  color: var(--theme-success-color, #34C759);
+  background: rgba(52, 199, 89, 0.1);
+  border-color: rgba(52, 199, 89, 0.2);
+}
+
+.own-mention:hover {
+  background: rgba(52, 199, 89, 0.2);
+  border-color: rgba(52, 199, 89, 0.4);
+  box-shadow: 0 2px 8px rgba(52, 199, 89, 0.3);
+}
+
+.own-mention:active {
+  box-shadow: 0 1px 4px rgba(52, 199, 89, 0.2);
+}
+
+/* Other mention styles */
+.other-mention {
+  color: var(--theme-accent-color, #007AFF);
+  background: rgba(0, 122, 255, 0.1);
+  border-color: rgba(0, 122, 255, 0.2);
+}
+
+.other-mention:hover {
+  background: rgba(0, 122, 255, 0.2);
+  border-color: rgba(0, 122, 255, 0.4);
+  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
+}
+
+.other-mention:active {
+  box-shadow: 0 1px 4px rgba(0, 122, 255, 0.2);
+}
+
+/* Light theme adjustments */
+[data-theme="light"] .mention {
+  background: rgba(0, 122, 255, 0.08);
+  border-color: rgba(0, 122, 255, 0.15);
+}
+
+[data-theme="light"] .mention:hover {
+  background: rgba(0, 122, 255, 0.15);
+  border-color: rgba(0, 122, 255, 0.3);
+}
+
+[data-theme="light"] .own-mention {
+  background: rgba(52, 199, 89, 0.08);
+  border-color: rgba(52, 199, 89, 0.15);
+}
+
+[data-theme="light"] .own-mention:hover {
+  background: rgba(52, 199, 89, 0.15);
+  border-color: rgba(52, 199, 89, 0.3);
+}
+
+[data-theme="light"] .other-mention {
+  background: rgba(0, 122, 255, 0.08);
+  border-color: rgba(0, 122, 255, 0.15);
+}
+
+[data-theme="light"] .other-mention:hover {
+  background: rgba(0, 122, 255, 0.15);
+  border-color: rgba(0, 122, 255, 0.3);
+}
+
 
 
