@@ -190,17 +190,17 @@
 }
 
 [data-theme="light"] .closeButton:hover {
-  background: var(--theme-hover-background, rgba(0, 0, 0, 0.05);
+  background: var(--theme-hover-background, rgba(0, 0, 0, 0.05));
   color: var(--theme-text-primary, #000000);
 }
 
 [data-theme="light"] .imagePreview {
-  background: var(--theme-card-background, rgba(0, 0, 0, 0.05);
+  background: var(--theme-card-background, rgba(0, 0, 0, 0.05));
 }
 
 [data-theme="light"] .captionInput {
-  background: var(--theme-input-background, rgba(0, 0, 0, 0.05);
-  border-color: var(--theme-border, rgba(0, 0, 0, 0.2);
+  background: var(--theme-input-background, rgba(0, 0, 0, 0.05));
+  border-color: var(--theme-border, rgba(0, 0, 0, 0.2));
   color: var(--theme-text-primary, #000000);
 }
 
