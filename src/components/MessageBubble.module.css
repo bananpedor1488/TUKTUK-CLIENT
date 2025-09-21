@@ -291,139 +291,135 @@
 /* Mention styles */
 .mention {
   color: var(--theme-accent-color, #007AFF);
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
-  padding: 4px 8px;
-  border-radius: 8px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  display: inline-block;
+  padding: 0;
+  border-radius: 0;
+  transition: all 0.2s ease;
+  display: inline;
   text-decoration: none;
-  background: linear-gradient(135deg, rgba(0, 122, 255, 0.15) 0%, rgba(0, 122, 255, 0.25) 100%);
-  border: 2px solid rgba(0, 122, 255, 0.3);
-  box-shadow: 0 2px 4px rgba(0, 122, 255, 0.2);
+  background: none;
+  border: none;
+  box-shadow: none;
   position: relative;
-  font-size: 0.95em;
-  letter-spacing: 0.3px;
+  font-size: inherit;
+  letter-spacing: normal;
 }
 
 .mention::before {
-  content: '';
-  position: absolute;
-  top: -2px;
-  left: -2px;
-  right: -2px;
-  bottom: -2px;
-  background: linear-gradient(135deg, rgba(0, 122, 255, 0.1) 0%, rgba(0, 122, 255, 0.2) 100%);
-  border-radius: 10px;
-  z-index: -1;
-  opacity: 0;
-  transition: opacity 0.3s ease;
+  display: none;
 }
 
 .mention:hover {
-  background: linear-gradient(135deg, rgba(0, 122, 255, 0.25) 0%, rgba(0, 122, 255, 0.35) 100%);
-  border-color: rgba(0, 122, 255, 0.5);
-  transform: translateY(-2px) scale(1.05);
-  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.4);
-  color: #0056CC;
+  color: var(--theme-accent-hover, #0056CC);
+  background: none;
+  border: none;
+  transform: none;
+  box-shadow: none;
+  text-decoration: underline;
 }
 
 .mention:hover::before {
-  opacity: 1;
+  display: none;
 }
 
 .mention:active {
-  transform: translateY(-1px) scale(1.02);
-  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
+  transform: none;
+  box-shadow: none;
 }
 
 /* Own mention styles (for favorites) */
 .own-mention {
-  color: var(--theme-success-color, #34C759);
-  background: linear-gradient(135deg, rgba(52, 199, 89, 0.15) 0%, rgba(52, 199, 89, 0.25) 100%);
-  border-color: rgba(52, 199, 89, 0.3);
-  box-shadow: 0 2px 4px rgba(52, 199, 89, 0.2);
+  color: var(--theme-accent-color, #007AFF);
+  background: none;
+  border: none;
+  box-shadow: none;
 }
 
 .own-mention::before {
-  background: linear-gradient(135deg, rgba(52, 199, 89, 0.1) 0%, rgba(52, 199, 89, 0.2) 100%);
+  display: none;
 }
 
 .own-mention:hover {
-  background: linear-gradient(135deg, rgba(52, 199, 89, 0.25) 0%, rgba(52, 199, 89, 0.35) 100%);
-  border-color: rgba(52, 199, 89, 0.5);
-  transform: translateY(-2px) scale(1.05);
-  box-shadow: 0 4px 12px rgba(52, 199, 89, 0.4);
-  color: #28A745;
+  color: var(--theme-accent-hover, #0056CC);
+  background: none;
+  border: none;
+  transform: none;
+  box-shadow: none;
+  text-decoration: underline;
 }
 
 /* Other mention styles */
 .other-mention {
   color: var(--theme-accent-color, #007AFF);
-  background: linear-gradient(135deg, rgba(0, 122, 255, 0.15) 0%, rgba(0, 122, 255, 0.25) 100%);
-  border-color: rgba(0, 122, 255, 0.3);
-  box-shadow: 0 2px 4px rgba(0, 122, 255, 0.2);
+  background: none;
+  border: none;
+  box-shadow: none;
 }
 
 .other-mention::before {
-  background: linear-gradient(135deg, rgba(0, 122, 255, 0.1) 0%, rgba(0, 122, 255, 0.2) 100%);
+  display: none;
 }
 
 .other-mention:hover {
-  background: linear-gradient(135deg, rgba(0, 122, 255, 0.25) 0%, rgba(0, 122, 255, 0.35) 100%);
-  border-color: rgba(0, 122, 255, 0.5);
-  transform: translateY(-2px) scale(1.05);
-  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.4);
-  color: #0056CC;
+  color: var(--theme-accent-hover, #0056CC);
+  background: none;
+  border: none;
+  transform: none;
+  box-shadow: none;
+  text-decoration: underline;
 }
 
 /* Light theme adjustments */
 [data-theme="light"] .mention {
-  background: linear-gradient(135deg, rgba(0, 122, 255, 0.12) 0%, rgba(0, 122, 255, 0.18) 100%);
-  border-color: rgba(0, 122, 255, 0.25);
-  box-shadow: 0 2px 4px rgba(0, 122, 255, 0.15);
+  background: none;
+  border: none;
+  box-shadow: none;
 }
 
 [data-theme="light"] .mention:hover {
-  background: linear-gradient(135deg, rgba(0, 122, 255, 0.2) 0%, rgba(0, 122, 255, 0.3) 100%);
-  border-color: rgba(0, 122, 255, 0.4);
-  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.25);
+  background: none;
+  border: none;
+  box-shadow: none;
+  text-decoration: underline;
 }
 
 [data-theme="light"] .mention::before {
-  background: linear-gradient(135deg, rgba(0, 122, 255, 0.08) 0%, rgba(0, 122, 255, 0.15) 100%);
+  display: none;
 }
 
 [data-theme="light"] .own-mention {
-  background: linear-gradient(135deg, rgba(52, 199, 89, 0.12) 0%, rgba(52, 199, 89, 0.18) 100%);
-  border-color: rgba(52, 199, 89, 0.25);
-  box-shadow: 0 2px 4px rgba(52, 199, 89, 0.15);
+  background: none;
+  border: none;
+  box-shadow: none;
 }
 
 [data-theme="light"] .own-mention:hover {
-  background: linear-gradient(135deg, rgba(52, 199, 89, 0.2) 0%, rgba(52, 199, 89, 0.3) 100%);
-  border-color: rgba(52, 199, 89, 0.4);
-  box-shadow: 0 4px 12px rgba(52, 199, 89, 0.25);
+  background: none;
+  border: none;
+  box-shadow: none;
+  text-decoration: underline;
 }
 
 [data-theme="light"] .own-mention::before {
-  background: linear-gradient(135deg, rgba(52, 199, 89, 0.08) 0%, rgba(52, 199, 89, 0.15) 100%);
+  display: none;
 }
 
 [data-theme="light"] .other-mention {
-  background: linear-gradient(135deg, rgba(0, 122, 255, 0.12) 0%, rgba(0, 122, 255, 0.18) 100%);
-  border-color: rgba(0, 122, 255, 0.25);
-  box-shadow: 0 2px 4px rgba(0, 122, 255, 0.15);
+  background: none;
+  border: none;
+  box-shadow: none;
 }
 
 [data-theme="light"] .other-mention:hover {
-  background: linear-gradient(135deg, rgba(0, 122, 255, 0.2) 0%, rgba(0, 122, 255, 0.3) 100%);
-  border-color: rgba(0, 122, 255, 0.4);
-  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.25);
+  background: none;
+  border: none;
+  box-shadow: none;
+  text-decoration: underline;
 }
 
 [data-theme="light"] .other-mention::before {
-  background: linear-gradient(135deg, rgba(0, 122, 255, 0.08) 0%, rgba(0, 122, 255, 0.15) 100%);
+  display: none;
 }
 
 
