@@ -101,15 +101,33 @@ const ChatWindow = ({ chat, onChatUpdate, onBackToChatList }) => {
       });
 
       if (uploadResponse.data.success && uploadResponse.data.imageUrl) {
-        // Send message with photo
-        const messageData = {
+        // Create optimistic message with photo
+        const optimisticMessage = {
+          _id: `temp_${Date.now()}`,
+          chat: chat._id,
+          sender: {
+            _id: user._id,
+            username: user.username,
+            displayName: user.displayName,
+            avatar: user.avatar
+          },
           content: caption || '',
           type: 'image',
           imageUrl: uploadResponse.data.imageUrl,
-          chatId: chat._id
+          createdAt: new Date().toISOString(),
+          isOptimistic: true
         };
 
-        await sendMessage(messageData);
+        // Add optimistic message immediately
+        setMessages(prev => [...prev, optimisticMessage]);
+
+        // Send message via socket with full data
+        socket.emit('send_message', {
+          chatId: chat._id,
+          content: caption || '',
+          type: 'image',
+          imageUrl: uploadResponse.data.imageUrl
+        });
         
         // Clear states
         setSelectedFile(null);

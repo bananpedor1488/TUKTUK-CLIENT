@@ -20,7 +20,16 @@ const MessageBubbleWithMentions = ({
   const getMessageContent = () => {
     switch (message.type) {
       case 'image':
-        return '📷 Изображение';
+        return message.imageUrl ? (
+          <div className={styles.imageContainer}>
+            <img src={message.imageUrl} alt="Изображение" className={styles.messageImage} />
+            {message.content && (
+              <div className={styles.imageCaption}>
+                {renderMentions(message.content, handleMentionClick, currentUsername, styles)}
+              </div>
+            )}
+          </div>
+        ) : '📷 Изображение';
       case 'file':
         return '📎 Файл';
       case 'audio':
