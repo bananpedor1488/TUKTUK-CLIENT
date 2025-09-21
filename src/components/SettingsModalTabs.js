@@ -246,27 +246,6 @@ const SettingsModalTabs = ({ isOpen, onClose, user }) => {
               </div>
             )}
           </div>
-          <div className={styles.headerActions}>
-            {hasUnsavedChanges && (
-              <button className={styles.cancelButton} onClick={handleCancel} title="Отменить изменения">
-                <FiX size={20} />
-              </button>
-            )}
-            <button 
-              className={`${styles.saveButton} ${hasUnsavedChanges ? styles.saveButtonActive : ''} ${isSaving ? styles.saveButtonSaving : ''}`} 
-              onClick={handleSave}
-              disabled={isSaving}
-              title={hasUnsavedChanges ? "Сохранить изменения" : "Нет изменений"}
-            >
-              {isSaving ? (
-                <div className={styles.spinner}></div>
-              ) : hasUnsavedChanges ? (
-                <FiCheck size={20} />
-              ) : (
-                <FiSave size={20} />
-              )}
-            </button>
-          </div>
         </div>
 
         {/* Табы */}
@@ -627,6 +606,10 @@ const SettingsModalTabs = ({ isOpen, onClose, user }) => {
               <FiSave size={16} />
             )}
             {hasUnsavedChanges ? 'Сохранить изменения' : 'Сохранить'}
+          </button>
+          <button className={styles.footerCloseButton} onClick={onClose}>
+            <FiX size={16} />
+            Закрыть
           </button>
         </div>
       </div>

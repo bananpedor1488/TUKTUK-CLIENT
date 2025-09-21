@@ -548,6 +548,30 @@
   cursor: not-allowed;
 }
 
+.footerCloseButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: rgba(128, 128, 128, 0.1);
+  border: 1px solid rgba(128, 128, 128, 0.3);
+  border-radius: 12px;
+  color: var(--theme-text-secondary);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  min-width: 120px;
+  justify-content: center;
+}
+
+.footerCloseButton:hover {
+  background: rgba(128, 128, 128, 0.2);
+  border-color: rgba(128, 128, 128, 0.4);
+  color: var(--theme-text-primary);
+  transform: translateY(-2px);
+}
+
 .cancelButton {
   padding: 12px 24px;
   background: transparent;
@@ -723,7 +747,8 @@
   }
   
   .footerCancelButton,
-  .footerSaveButton {
+  .footerSaveButton,
+  .footerCloseButton {
     width: 100%;
     min-width: auto;
   }
