@@ -839,3 +839,35 @@ select {
     margin-bottom: 8px;
   }
 }
+
+/* УБИРАЕМ ФОН У СООБЩЕНИЙ С ИЗОБРАЖЕНИЯМИ */
+.imageMessage {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+/* ВОССТАНАВЛИВАЕМ НИЖНЮЮ РАМКУ */
+.imageMessage .imageCaption {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1) !important;
+  border-radius: 0 0 8px 8px !important;
+}
+
+/* ПРИНУДИТЕЛЬНЫЙ ЧЕРНЫЙ ЦВЕТ ДЛЯ ТЕКСТА ПОД ИЗОБРАЖЕНИЯМИ */
+.imageCaption,
+.imageCaption *,
+.imageCaption span,
+.imageCaption div {
+  color: #000000 !important;
+  background: transparent !important;
+}
+
+/* Максимальная специфичность */
+.messageContainer .messageBubble .messageContent .imageContainer .imageCaption,
+.messageContainer .messageBubble .messageContent .imageContainer .imageCaption *,
+.messageContainer .messageBubble .messageContent .imageContainer .imageCaption span,
+.messageContainer .messageBubble .messageContent .imageContainer .imageCaption div {
+  color: #000000 !important;
+  background: transparent !important;
+}

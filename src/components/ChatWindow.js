@@ -12,6 +12,7 @@ import AttachModal from './AttachModal';
 import PhotoPreviewModal from './PhotoPreviewModal';
 import OnlineStatusIndicator from './OnlineStatusIndicator';
 import styles from './ChatWindow.module.css';
+import ImageViewerModal from './ImageViewerModal';
 
 const ChatWindow = ({ chat, onChatUpdate, onBackToChatList }) => {
   const [messages, setMessages] = useState([]);
@@ -25,6 +26,7 @@ const ChatWindow = ({ chat, onChatUpdate, onBackToChatList }) => {
   const [showAttachModal, setShowAttachModal] = useState(false);
   const [showPhotoPreview, setShowPhotoPreview] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
+  const [imageViewer, setImageViewer] = useState({ isOpen: false, src: '', caption: '', items: [], currentIndex: 0 });
   const messagesEndRef = useRef(null);
   const typingTimeoutRef = useRef(null);
 
@@ -101,6 +103,7 @@ const ChatWindow = ({ chat, onChatUpdate, onBackToChatList }) => {
       });
 
       if (uploadResponse.data.success && uploadResponse.data.imageUrl) {
+        const contentToSend = caption && caption.trim() ? caption : '\u200B';
         // Create optimistic message with photo
         const optimisticMessage = {
           _id: `temp_${Date.now()}`,
@@ -111,7 +114,7 @@ const ChatWindow = ({ chat, onChatUpdate, onBackToChatList }) => {
             displayName: user.displayName,
             avatar: user.avatar
           },
-          content: caption || '',
+          content: contentToSend,
           type: 'image',
           imageUrl: uploadResponse.data.imageUrl,
           createdAt: new Date().toISOString(),
@@ -124,7 +127,7 @@ const ChatWindow = ({ chat, onChatUpdate, onBackToChatList }) => {
         // Send message via socket with full data
         socket.emit('send_message', {
           chatId: chat._id,
-          content: caption || '',
+          content: contentToSend,
           type: 'image',
           imageUrl: uploadResponse.data.imageUrl
         });
@@ -505,6 +508,15 @@ const ChatWindow = ({ chat, onChatUpdate, onBackToChatList }) => {
                   disableAnimation={message.disableAnimation}
                   onMentionClick={handleMentionClick}
                   currentUsername={user.username}
+                  onImageClick={(src, caption, id) => {
+                    // Build gallery from current messages
+                    const items = messages
+                      .filter(m => m && m.type === 'image' && m.imageUrl)
+                      .map(m => ({ src: m.imageUrl, caption: m.content || '', id: m._id }));
+                    const idxById = items.findIndex(it => it.id === id);
+                    const startIndex = idxById !== -1 ? idxById : items.findIndex(it => it.src === src) || 0;
+                    setImageViewer({ isOpen: true, src, caption, items, currentIndex: Math.max(0, startIndex) });
+                  }}
                 />
               );
             })}
@@ -598,6 +610,28 @@ const ChatWindow = ({ chat, onChatUpdate, onBackToChatList }) => {
         }}
         file={selectedFile}
         onSend={handlePhotoSend}
+      />
+
+      {/* Image Viewer Modal */}
+      <ImageViewerModal
+        isOpen={imageViewer.isOpen}
+        src={imageViewer.src}
+        caption={imageViewer.caption}
+        items={imageViewer.items}
+        currentIndex={imageViewer.currentIndex}
+        onPrev={() => setImageViewer(iv => {
+          if (!iv.items || iv.items.length === 0) return iv;
+          const nextIndex = Math.max(0, iv.currentIndex - 1);
+          const nextItem = iv.items[nextIndex];
+          return { ...iv, currentIndex: nextIndex, src: nextItem?.src, caption: nextItem?.caption };
+        })}
+        onNext={() => setImageViewer(iv => {
+          if (!iv.items || iv.items.length === 0) return iv;
+          const nextIndex = Math.min(iv.items.length - 1, iv.currentIndex + 1);
+          const nextItem = iv.items[nextIndex];
+          return { ...iv, currentIndex: nextIndex, src: nextItem?.src, caption: nextItem?.caption };
+        })}
+        onClose={() => setImageViewer({ isOpen: false, src: '', caption: '', items: [], currentIndex: 0 })}
       />
     </div>
   );

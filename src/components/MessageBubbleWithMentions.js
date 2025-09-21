@@ -11,10 +11,17 @@ const MessageBubbleWithMentions = ({
   senderAvatar, 
   disableAnimation = false,
   onMentionClick,
-  currentUsername 
+  currentUsername,
+  onImageClick
 }) => {
   const formatTime = (date) => {
     return formatMessageTime(date);
+  };
+
+  const cleanContent = (text) => {
+    if (!text) return '';
+    // Remove zero-width spaces and trim
+    return text.replace(/\u200B/g, '').trim();
   };
 
   const getMessageContent = () => {
@@ -28,9 +35,11 @@ const MessageBubbleWithMentions = ({
               className={styles.messageImage}
               onClick={handleImageClick}
             />
-            {message.content && (
-              <div className={styles.imageCaption}>
-                {renderMentions(message.content, handleMentionClick, currentUsername, styles)}
+            {cleanContent(message.content) && (
+              <div 
+                className={styles.imageCaption}
+              >
+                {renderMentions(cleanContent(message.content), handleMentionClick, currentUsername, styles)}
               </div>
             )}
           </div>
@@ -63,10 +72,13 @@ const MessageBubbleWithMentions = ({
   };
 
   const handleImageClick = () => {
-    if (message.imageUrl) {
-      // Open image in new tab for full screen view
-      window.open(message.imageUrl, '_blank');
+    if (!message.imageUrl) return;
+    if (onImageClick) {
+      onImageClick(message.imageUrl, message.content, message._id);
+      return;
     }
+    // fallback
+    window.open(message.imageUrl, '_blank');
   };
 
   return (
@@ -87,7 +99,7 @@ const MessageBubbleWithMentions = ({
         {/* Контент сообщения */}
         <div className={styles.messageContent}>
           {/* Текст сообщения */}
-          <div className={styles.messageText}>
+          <div className={`${styles.messageText} ${message.type === 'image' ? styles.imageMessage : ''}`}>
             {message.type === 'text' ? (
               renderMentions(message.content, handleMentionClick, currentUsername, styles)
             ) : (

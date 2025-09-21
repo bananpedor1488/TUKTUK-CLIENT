@@ -215,6 +215,10 @@
   overflow: hidden;
 }
 
+.imageContainer * {
+  color: inherit;
+}
+
 .messageImage {
   max-width: 100%;
   max-height: 300px;
@@ -228,24 +232,102 @@
   transform: scale(1.02);
 }
 
+/* Caption plaque under image */
 .imageCaption {
   font-size: 14px;
   line-height: 1.4;
   color: var(--theme-text-primary);
   word-wrap: break-word;
-  padding: 8px 12px;
-  background: var(--theme-background-secondary, rgba(255, 255, 255, 0.05));
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-top: none;
-  border-radius: 0 0 8px 8px;
+  padding: 10px 12px;
+  background: var(--theme-background);
+  border: 1px solid var(--theme-border-color, rgba(255, 255, 255, 0.1));
+  border-top: none; /* Seamless join with image above */
+  border-radius: 0 0 12px 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.imageCaption * {
+  color: inherit;
+}
+
+.imageCaption span {
+  color: inherit;
 }
 
 /* Light theme adjustments for images */
+[data-theme="light"] .imageContainer * {
+  color: var(--theme-text-primary, #000000) !important;
+}
+
+/* Light theme keeps defaults via variables */
 [data-theme="light"] .imageCaption {
+  color: var(--theme-text-primary, #000000);
+  background: var(--theme-background, #ffffff);
+  border-color: var(--theme-border-color, rgba(0, 0, 0, 0.1));
+}
+
+/* Debug styles - very specific selectors */
+/* Use theme variables for caption text color */
+.messageContainer .messageBubble .messageContent .imageContainer .imageCaption {
   color: var(--theme-text-primary);
-  background: var(--theme-background-secondary, rgba(0, 0, 0, 0.05));
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  border-top: none;
+}
+
+[data-theme="light"] .messageContainer .messageBubble .messageContent .imageContainer .imageCaption {
+  color: var(--theme-text-primary, #000000);
+}
+
+[data-theme="light"] .messageContainer .messageBubble .messageContent .imageContainer .imageCaption * {
+  color: inherit;
+}
+
+/* Убираем фон у сообщений с изображениями, но оставляем нижнюю рамку */
+.imageMessage {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+/* Own message variant matches own text bubble */
+.messageBubble.own .imageCaption {
+  background: linear-gradient(135deg, var(--theme-main-color, #d0bcff), #b69df8);
+  color: #000;
+  box-shadow: 0 4px 12px rgba(208, 188, 255, 0.3);
+}
+
+/* Убираем фон у сообщений с изображениями для всех тем */
+[data-theme] .imageMessage {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+/* Восстанавливаем нижнюю рамку для всех тем */
+/* Respect theme variables for all themes */
+[data-theme] .imageMessage .imageCaption {
+  border-top: none !important;
+}
+
+/* Children inherit caption color */
+.imageCaption * {
+  color: inherit;
+}
+
+/* Use natural theme colors instead of forcing black */
+.messageContainer .messageBubble .messageContent .imageContainer .imageCaption,
+.messageContainer .messageBubble .messageContent .imageContainer .imageCaption *,
+.messageContainer .messageBubble .messageContent .imageContainer .imageCaption span,
+.messageContainer .messageBubble .messageContent .imageContainer .imageCaption div {
+  color: inherit;
+}
+
+/* Для всех тем */
+[data-theme] .messageContainer .messageBubble .messageContent .imageContainer .imageCaption,
+[data-theme] .messageContainer .messageBubble .messageContent .imageContainer .imageCaption *,
+[data-theme] .messageContainer .messageBubble .messageContent .imageContainer .imageCaption span,
+[data-theme] .messageContainer .messageBubble .messageContent .imageContainer .imageCaption div {
+  color: inherit;
 }
 
 /* Animation for new messages */

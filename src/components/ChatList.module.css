@@ -179,6 +179,23 @@
   transition: color 0.3s ease;
 }
 
+/* Inline media preview for last message */
+.lastMessageMedia {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+}
+
+.lastMessageThumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  object-fit: cover;
+  flex-shrink: 0;
+  box-shadow: 0 0 0 1px var(--theme-border-color, rgba(255,255,255,0.15));
+}
+
 .chatItem.selected .lastMessage {
   color: rgba(0, 0, 0, 0.7);
 }

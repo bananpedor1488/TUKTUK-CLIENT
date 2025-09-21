@@ -87,6 +87,13 @@ const ChatList = ({ chats, selectedChat, onChatSelect, isLoading, showAIChat, on
       return message.content.length > 50 
         ? message.content.substring(0, 50) + '...'
         : message.content;
+    } else if (message.type === 'image' && message.imageUrl) {
+      return (
+        <span className={styles.lastMessageMedia}>
+          <img src={message.imageUrl} alt="thumb" className={styles.lastMessageThumb} />
+          <span>Изображение</span>
+        </span>
+      );
     } else {
       return `📎 ${message.type}`;
     }
