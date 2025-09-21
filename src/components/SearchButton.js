@@ -123,7 +123,7 @@ const SearchButton = ({ onSearch, placeholder = "Поиск чатов...", sear
                       </div>
                       <div className={styles.userInfo}>
                         <div className={styles.userName}>{user.displayName}</div>
-                        <div className={styles.userEmail}>{user.email}</div>
+                        <div className={styles.userEmail}>@{user.username}</div>
                       </div>
                     </div>
                   ))}
