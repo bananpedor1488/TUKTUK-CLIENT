@@ -493,6 +493,61 @@
   background: rgba(255, 255, 255, 0.05);
 }
 
+.footerCancelButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: rgba(244, 67, 54, 0.1);
+  border: 1px solid rgba(244, 67, 54, 0.3);
+  border-radius: 12px;
+  color: #f44336;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  min-width: 120px;
+  justify-content: center;
+}
+
+.footerCancelButton:hover {
+  background: rgba(244, 67, 54, 0.2);
+  border-color: rgba(244, 67, 54, 0.4);
+  transform: translateY(-2px);
+}
+
+.footerSaveButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: var(--theme-main-color, #d0bcff);
+  border: none;
+  border-radius: 12px;
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  min-width: 140px;
+  justify-content: center;
+}
+
+.footerSaveButton:hover {
+  background: #b69df8;
+  transform: translateY(-2px);
+}
+
+.footerSaveButtonActive {
+  background: #4caf50 !important;
+  animation: glow 1.5s ease-in-out infinite alternate;
+}
+
+.footerSaveButtonSaving {
+  background: #ff9800 !important;
+  cursor: not-allowed;
+}
+
 .cancelButton {
   padding: 12px 24px;
   background: transparent;
@@ -664,6 +719,13 @@
   .modalFooter {
     padding: 16px;
     flex-direction: column;
+    gap: 8px;
+  }
+  
+  .footerCancelButton,
+  .footerSaveButton {
+    width: 100%;
+    min-width: auto;
   }
 }
 

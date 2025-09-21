@@ -266,9 +266,6 @@ const SettingsModalTabs = ({ isOpen, onClose, user }) => {
                 <FiSave size={20} />
               )}
             </button>
-            <button className={styles.closeButton} onClick={onClose} title="Закрыть">
-              <FiX size={20} />
-            </button>
           </div>
         </div>
 
@@ -611,12 +608,25 @@ const SettingsModalTabs = ({ isOpen, onClose, user }) => {
 
         {/* Кнопки действий */}
         <div className={styles.modalFooter}>
-          <button className={styles.cancelButton} onClick={handleCancel}>
-            Отмена
-          </button>
-          <button className={styles.saveButton} onClick={handleSave}>
-            <FiSave size={16} />
-            Сохранить
+          {hasUnsavedChanges && (
+            <button className={styles.footerCancelButton} onClick={handleCancel}>
+              <FiX size={16} />
+              Отмена
+            </button>
+          )}
+          <button 
+            className={`${styles.footerSaveButton} ${hasUnsavedChanges ? styles.footerSaveButtonActive : ''} ${isSaving ? styles.footerSaveButtonSaving : ''}`} 
+            onClick={handleSave}
+            disabled={isSaving}
+          >
+            {isSaving ? (
+              <div className={styles.spinner}></div>
+            ) : hasUnsavedChanges ? (
+              <FiCheck size={16} />
+            ) : (
+              <FiSave size={16} />
+            )}
+            {hasUnsavedChanges ? 'Сохранить изменения' : 'Сохранить'}
           </button>
         </div>
       </div>
