@@ -211,15 +211,16 @@
 .imageContainer {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
 }
 
 .messageImage {
   max-width: 100%;
   max-height: 300px;
-  border-radius: 8px;
+  border-radius: 8px 8px 0 0;
   object-fit: contain;
-  border: 1px solid rgba(255, 255, 255, 0.1);
   cursor: pointer;
   transition: transform 0.2s ease;
 }
@@ -231,17 +232,20 @@
 .imageCaption {
   font-size: 14px;
   line-height: 1.4;
-  color: var(--theme-text-secondary, #888888);
+  color: var(--theme-text-primary, #ffffff);
   word-wrap: break-word;
+  padding: 8px 12px;
+  background: var(--theme-background-secondary, rgba(255, 255, 255, 0.05));
 }
 
 /* Light theme adjustments for images */
-[data-theme="light"] .imageCaption {
-  color: var(--theme-text-secondary, #666666);
+[data-theme="light"] .imageContainer {
+  border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-[data-theme="light"] .messageImage {
-  border: 1px solid rgba(0, 0, 0, 0.1);
+[data-theme="light"] .imageCaption {
+  color: var(--theme-text-primary, #000000);
+  background: var(--theme-background-secondary, rgba(0, 0, 0, 0.05));
 }
 
 /* Animation for new messages */

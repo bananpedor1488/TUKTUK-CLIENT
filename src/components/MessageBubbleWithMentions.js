@@ -22,7 +22,12 @@ const MessageBubbleWithMentions = ({
       case 'image':
         return message.imageUrl ? (
           <div className={styles.imageContainer}>
-            <img src={message.imageUrl} alt="Изображение" className={styles.messageImage} />
+            <img 
+              src={message.imageUrl} 
+              alt="Изображение" 
+              className={styles.messageImage}
+              onClick={handleImageClick}
+            />
             {message.content && (
               <div className={styles.imageCaption}>
                 {renderMentions(message.content, handleMentionClick, currentUsername, styles)}
@@ -54,6 +59,13 @@ const MessageBubbleWithMentions = ({
   const handleMentionClick = (username, isOwnMention) => {
     if (onMentionClick) {
       onMentionClick(username, isOwnMention);
+    }
+  };
+
+  const handleImageClick = () => {
+    if (message.imageUrl) {
+      // Open image in new tab for full screen view
+      window.open(message.imageUrl, '_blank');
     }
   };
 
