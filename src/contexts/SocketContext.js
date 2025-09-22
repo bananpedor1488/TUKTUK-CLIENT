@@ -77,14 +77,27 @@ export const SocketProvider = ({ children }) => {
     }
   };
 
-  const sendMessage = (chatId, content, type = 'text') => {
-    if (socket && isConnected) {
+  const sendMessage = (chatId, contentOrOpts, maybeType = 'text') => {
+    if (!(socket && isConnected)) return;
+    // Backward compatible: sendMessage(chatId, content, type)
+    if (typeof contentOrOpts === 'string') {
       socket.emit('send_message', {
         chatId,
-        content,
-        type
+        content: contentOrOpts,
+        type: maybeType
       });
+      return;
     }
+    // New signature: sendMessage(chatId, { content, type, replyTo, imageUrl, fileUrl })
+    const { content, type = 'text', replyTo, imageUrl, fileUrl } = contentOrOpts || {};
+    socket.emit('send_message', {
+      chatId,
+      content,
+      type,
+      replyTo,
+      imageUrl,
+      fileUrl
+    });
   };
 
   const startTyping = (chatId) => {

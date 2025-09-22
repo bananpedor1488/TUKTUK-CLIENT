@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { FiX, FiEdit, FiCamera, FiUser, FiMail, FiCalendar, FiMapPin, FiPhone } from 'react-icons/fi';
+import { FiX, FiUser, FiCalendar, FiMapPin, FiAtSign } from 'react-icons/fi';
+import { useToast } from '../contexts/ToastContext';
 import styles from './UserProfileModal.module.css';
 
 const UserProfileModal = ({ user, isOpen, onClose, isOwnProfile = false }) => {
@@ -12,6 +13,10 @@ const UserProfileModal = ({ user, isOpen, onClose, isOwnProfile = false }) => {
     phone: user?.phone || '',
     birthday: user?.birthday || ''
   });
+
+  // Toast helpers (like on mobile)
+  const toast = useToast();
+  const { success } = toast || {};
 
   const handleInputChange = (field, value) => {
     setProfileData(prev => ({
@@ -61,12 +66,36 @@ const UserProfileModal = ({ user, isOpen, onClose, isOwnProfile = false }) => {
                   {user?.displayName?.charAt(0)?.toUpperCase() || '?'}
                 </div>
               )}
-              <button className={styles.avatarEditButton}>
-                <FiCamera size={16} />
-              </button>
+              {/* Removed avatar change button by request */}
             </div>
             <h3 className={styles.displayName}>{user?.displayName}</h3>
-            <p className={styles.username}>@{user?.username}</p>
+            <p
+              className={styles.username}
+              title="Нажмите, чтобы скопировать"
+              onClick={async () => {
+                if (!user?.username) return;
+                const value = `@${user.username}`;
+                try {
+                  if (navigator.clipboard?.writeText) {
+                    await navigator.clipboard.writeText(value);
+                  } else {
+                    throw new Error('Clipboard API not available');
+                  }
+                } catch (e) {
+                  // Fallback
+                  const ta = document.createElement('textarea');
+                  ta.value = value;
+                  document.body.appendChild(ta);
+                  ta.select();
+                  document.execCommand('copy');
+                  document.body.removeChild(ta);
+                } finally {
+                  if (success) success(`Скопировано: ${value}`, 'Буфер обмена');
+                }
+              }}
+            >
+              @{user?.username}
+            </p>
           </div>
 
           {/* Информация профиля */}
@@ -91,38 +120,12 @@ const UserProfileModal = ({ user, isOpen, onClose, isOwnProfile = false }) => {
                 </div>
               </div>
 
+              {/* Username row under Name */}
               <div className={styles.infoItem}>
-                <FiMail className={styles.infoIcon} />
+                <FiAtSign className={styles.infoIcon} />
                 <div className={styles.infoContent}>
-                  <label className={styles.infoLabel}>Email</label>
-                  {isEditing ? (
-                    <input
-                      type="email"
-                      value={profileData.email}
-                      onChange={(e) => handleInputChange('email', e.target.value)}
-                      className={styles.infoInput}
-                    />
-                  ) : (
-                    <span className={styles.infoValue}>{profileData.email}</span>
-                  )}
-                </div>
-              </div>
-
-              <div className={styles.infoItem}>
-                <FiPhone className={styles.infoIcon} />
-                <div className={styles.infoContent}>
-                  <label className={styles.infoLabel}>Телефон</label>
-                  {isEditing ? (
-                    <input
-                      type="tel"
-                      value={profileData.phone}
-                      onChange={(e) => handleInputChange('phone', e.target.value)}
-                      className={styles.infoInput}
-                      placeholder="+7 (999) 123-45-67"
-                    />
-                  ) : (
-                    <span className={styles.infoValue}>{profileData.phone || 'Не указан'}</span>
-                  )}
+                  <label className={styles.infoLabel}>Юзернейм</label>
+                  <span className={styles.infoValue}>@{user?.username}</span>
                 </div>
               </div>
 
@@ -183,28 +186,12 @@ const UserProfileModal = ({ user, isOpen, onClose, isOwnProfile = false }) => {
               </div>
             </div>
 
+            
+
           </div>
         </div>
 
-        {isOwnProfile && (
-          <div className={styles.footer}>
-            {isEditing ? (
-              <div className={styles.editButtons}>
-                <button onClick={handleCancel} className={styles.cancelButton}>
-                  Отмена
-                </button>
-                <button onClick={handleSave} className={styles.saveButton}>
-                  Сохранить
-                </button>
-              </div>
-            ) : (
-              <button onClick={() => setIsEditing(true)} className={styles.editButton}>
-                <FiEdit size={16} />
-                Редактировать профиль
-              </button>
-            )}
-          </div>
-        )}
+        {/* Edit profile footer removed by request */}
       </div>
     </div>
   );

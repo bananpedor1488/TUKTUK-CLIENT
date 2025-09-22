@@ -7,8 +7,8 @@ import { useAuth } from '../contexts/AuthContext';
 import { updateTokens } from '../utils/tokenManager';
 import styles from './MobileProfilePage.module.css';
 
-const MobileProfilePage = ({ isOpen, onClose, user }) => {
-  const [activeSection, setActiveSection] = useState('profile');
+const MobileProfilePage = ({ isOpen, onClose, user, onOpenArchive }) => {
+  const [activeSection, setActiveSection] = useState(null);
   const [originalSettings, setOriginalSettings] = useState({});
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -73,6 +73,8 @@ const MobileProfilePage = ({ isOpen, onClose, user }) => {
       setSettings(newSettings);
       setOriginalSettings(newSettings);
       setHasUnsavedChanges(false);
+      // Keep all subsections closed by default on load/change
+      setActiveSection(null);
     }
   }, [user]);
 
@@ -381,6 +383,15 @@ const MobileProfilePage = ({ isOpen, onClose, user }) => {
           {hasUnsavedChanges && (
             <button className={styles.cancelButton} onClick={handleCancel}>
               <FiX size={20} />
+            </button>
+          )}
+          {onOpenArchive && (
+            <button 
+              className={styles.saveButton} 
+              onClick={onOpenArchive}
+              title="Архив чатов"
+            >
+              🗄️
             </button>
           )}
           <button 

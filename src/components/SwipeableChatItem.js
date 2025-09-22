@@ -138,13 +138,7 @@ const SwipeableChatItem = ({
           >
             <FiBellOff size={18} />
           </button>
-          <button 
-            className={`${styles.actionButton} ${styles.moreButton}`}
-            onClick={onMore}
-            title="Еще"
-          >
-            <FiMoreHorizontal size={18} />
-          </button>
+          {/* Removed three-dots more button as requested */}
         </div>
       )}
 

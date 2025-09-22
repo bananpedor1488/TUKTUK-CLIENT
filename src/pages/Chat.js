@@ -10,6 +10,7 @@ import AIChatWindow from '../components/AIChatWindow';
 import UserProfileModal from '../components/UserProfileModal';
 import SettingsModalTabs from '../components/SettingsModalTabs';
 import UserAvatarDropdown from '../components/UserAvatarDropdown';
+import ArchivedChatList from '../components/ArchivedChatList';
 import MobileNavigation from '../components/MobileNavigation';
 import MobileProfilePage from '../components/MobileProfilePage';
 import SearchButton from '../components/SearchButton';
@@ -36,6 +37,7 @@ const Chat = () => {
   const { user, logout, isAuthenticated } = useAuth();
   const { socket, isConnected } = useSocket();
   const { theme } = useTheme();
+  const [showArchived, setShowArchived] = useState(false); // archive view in sidebar on all devices
   const isMobile = useIsMobile();
 
   // Load chats on component mount
@@ -195,21 +197,30 @@ const Chat = () => {
 
   const handleChatSelect = (chat) => {
     if (isAnimating) return; // Предотвращаем множественные клики во время анимации
-    
+
+    // Если передали null (например, после удаления) — просто вернёмся к списку
+    if (!chat) {
+      setSelectedChat(null);
+      setShowChatList(true);
+      setShowAIChat(false);
+      if (isMobile) setShowMobileNav(true);
+      return;
+    }
+
     setIsAnimating(true);
     setSelectedChat(chat);
     setShowChatList(false);
     setShowAIChat(false); // Закрываем чат с ИИ
-    
+
     // Скрываем мобильную навигацию при входе в чат
     if (isMobile) {
       setShowMobileNav(false);
     }
-    
-    if (socket && isConnected) {
+
+    if (socket && isConnected && chat?._id) {
       socket.emit('join_chat', chat._id);
     }
-    
+
     // Сброс флага анимации после завершения
     setTimeout(() => {
       setIsAnimating(false);
@@ -307,6 +318,21 @@ const Chat = () => {
     setShowDesktopSettings(true);
   };
 
+  const handleOpenArchived = () => {
+    setShowArchived(true);
+  };
+
+  const handleUnarchived = () => {
+    // refresh chat list when some chat was unarchived
+    loadChats();
+  };
+
+  const handleOpenChatFromArchive = (chat) => {
+    // select chat and close archive view/modal
+    setShowArchived(false);
+    handleChatSelect(chat);
+  };
+
   // const handleThemeToggle = () => {
   //   toggleTheme();
   // };
@@ -328,11 +354,12 @@ const Chat = () => {
               user={user}
               onProfileClick={handleProfileClick}
               onSettingsClick={handleDesktopSettingsClick}
+              onArchiveClick={handleOpenArchived}
               onLogout={handleLogout}
               isConnected={isConnected}
             />
           )}
-          <h2 className={styles.sidebarTitle}>Чаты</h2>
+          <h2 className={styles.sidebarTitle}>{(!isMobile && showArchived) ? 'Архив' : 'Чаты'}</h2>
           <SearchButton 
             onSearch={(query) => {
               setSearchQuery(query);
@@ -354,14 +381,23 @@ const Chat = () => {
 
         {/* Chat List */}
         <div className={styles.chatListContainer}>
-          <ChatList
-            chats={chats}
-            selectedChat={selectedChat}
-            onChatSelect={handleChatSelect}
-            isLoading={isLoading}
-            showAIChat={showAIChat}
-            onAIChatSelect={handleAIChatSelect}
-          />
+          {showArchived ? (
+            <ArchivedChatList
+              onOpenChat={handleOpenChatFromArchive}
+              onUnarchive={handleUnarchived}
+              onBack={() => setShowArchived(false)}
+            />
+          ) : (
+            <ChatList
+              chats={chats}
+              selectedChat={selectedChat}
+              onChatSelect={handleChatSelect}
+              isLoading={isLoading}
+              showAIChat={showAIChat}
+              onAIChatSelect={handleAIChatSelect}
+              onOpenArchive={handleOpenArchived}
+            />
+          )}
         </div>
       </div>
 
@@ -434,6 +470,7 @@ const Chat = () => {
         onClose={handleMobileProfileClose}
         user={user}
       />
+
     </div>
   );
 };

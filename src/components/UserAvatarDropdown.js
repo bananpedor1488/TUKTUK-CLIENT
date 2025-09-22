@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { FiUser, FiSettings, FiLogOut, FiChevronDown } from 'react-icons/fi';
+import { FiArchive } from 'react-icons/fi';
 import styles from './UserAvatarDropdown.module.css';
 
-const UserAvatarDropdown = ({ user, onProfileClick, onSettingsClick, onLogout, isConnected }) => {
+const UserAvatarDropdown = ({ user, onProfileClick, onSettingsClick, onLogout, onArchiveClick, isConnected }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
 
@@ -30,6 +31,8 @@ const UserAvatarDropdown = ({ user, onProfileClick, onSettingsClick, onLogout, i
       onProfileClick();
     } else if (action === 'settings' && onSettingsClick) {
       onSettingsClick();
+    } else if (action === 'archive' && onArchiveClick) {
+      onArchiveClick();
     } else if (action === 'logout' && onLogout) {
       onLogout();
     }
@@ -106,6 +109,14 @@ const UserAvatarDropdown = ({ user, onProfileClick, onSettingsClick, onLogout, i
             >
               <FiSettings size={16} />
               <span>Настройки</span>
+            </button>
+
+            <button 
+              className={styles.menuItem}
+              onClick={() => handleMenuItemClick('archive')}
+            >
+              <FiArchive size={16} />
+              <span>Архив чатов</span>
             </button>
 
             <div className={styles.divider} />

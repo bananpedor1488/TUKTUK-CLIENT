@@ -53,6 +53,100 @@
   min-width: 0;
 }
 
+/* Reply preview (inside bubble) */
+.replyPreview {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+  margin: 0 0 6px 0;
+}
+
+.replyLine {
+  width: 3px;
+  border-radius: 2px;
+  background: var(--theme-main-color, #d0bcff);
+  opacity: 0.85;
+}
+
+.replyBody {
+  flex: 1;
+  min-width: 0;
+}
+
+.replyAuthor {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--theme-text-secondary);
+  margin-bottom: 2px;
+}
+
+.replyText {
+  font-size: 13px;
+  color: var(--theme-text-primary);
+  opacity: 0.9;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Reactions bar with avatars */
+.reactionsBar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.reactionChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px 4px 4px;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.14);
+  color: var(--theme-text-primary);
+  font-size: 13px;
+}
+
+.reactionAvatar {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: rgba(255,255,255,0.2);
+  display: inline-flex;
+}
+
+.reactionAvatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.reactionStub {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.35);
+}
+
+.reactionEmoji {
+  font-size: 16px;
+}
+
+.reactionAvatarsStack {
+  display: inline-flex;
+  align-items: center;
+  margin-right: 4px;
+}
+
+.reactionCount {
+  font-size: 12px;
+  opacity: 0.8;
+  margin-left: 6px;
+}
+
 /* Текст сообщения */
 .messageText {
   font-size: 14px;
@@ -65,6 +159,17 @@
   border-radius: 12px;
   border: 1px solid var(--theme-border-color, rgba(255, 255, 255, 0.1));
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Синие ссылки в сообщениях */
+.messageLink {
+  color: #3B82F6;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.messageLink:hover {
+  text-decoration: underline;
 }
 
 /* Стили для собственных сообщений */

@@ -7,6 +7,24 @@
   overflow: hidden;
 }
 
+/* Day separators */
+.daySeparator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 10px 0 6px;
+}
+
+.dayLabel {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.14);
+  color: var(--theme-text-primary);
+  padding: 6px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  backdrop-filter: var(--theme-backdrop-filter, blur(6px));
+}
+
 .chatHeader {
   display: flex;
   align-items: center;
@@ -14,6 +32,61 @@
   padding: 16px 20px;
   border-bottom: 1px solid var(--theme-border-color, rgba(255, 255, 255, 0.12));
   background: var(--theme-background);
+}
+
+/* Pinned banner under header */
+.pinnedBanner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  background: var(--theme-card-background, rgba(255,255,255,0.04));
+  border-bottom: 1px solid var(--theme-border-color, rgba(255,255,255,0.12));
+}
+
+.pinnedInfo {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--theme-text-secondary);
+  font-size: 13px;
+}
+
+.pinnedTitle {
+  font-weight: 600;
+}
+
+.pinnedCount {
+  opacity: 0.8;
+}
+
+.pinnedPreview {
+  flex: 1;
+  min-width: 0;
+  color: var(--theme-text-primary);
+  font-size: 13px;
+  background: var(--theme-input-background, rgba(255,255,255,0.04));
+  border: 1px solid var(--theme-border-color, rgba(255,255,255,0.12));
+  padding: 8px 10px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.pinnedPreview:hover {
+  background: rgba(255,255,255,0.06);
+}
+
+.pinnedHideBtn {
+  border: 1px solid var(--theme-border-color, rgba(255,255,255,0.18));
+  background: transparent;
+  color: var(--theme-text-secondary);
+  border-radius: 8px;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+.pinnedHideBtn:hover {
+  background: rgba(255,255,255,0.06);
 }
 
 .backButton {
@@ -211,6 +284,64 @@
   background: var(--theme-card-background, var(--theme-background));
 }
 
+/* Reply composer (above input) */
+.replyComposer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 10px 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.06);
+}
+
+.replyComposer .replyLine {
+  width: 3px;
+  min-height: 32px;
+  border-radius: 2px;
+  background: var(--theme-main-color, #d0bcff);
+}
+
+.replyComposer .replyBody {
+  flex: 1;
+  min-width: 0;
+}
+
+.replyComposer .replyAuthor {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--theme-text-secondary);
+  margin-bottom: 2px;
+}
+
+.replyComposer .replyText {
+  font-size: 13px;
+  color: var(--theme-text-primary);
+  opacity: 0.9;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.replyCancel {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(255,255,255,0.08);
+  color: var(--theme-text-primary);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+
+.replyCancel:hover {
+  background: rgba(255,255,255,0.14);
+}
+
 .messageForm {
   width: 100%;
 }
@@ -298,6 +429,99 @@
   color: rgba(128, 128, 128, 0.7);
   cursor: not-allowed;
   transform: none;
+}
+
+/* Actions Menu styles */
+.actionsMenuOverlay {
+  position: fixed;
+  inset: 0;
+  background: transparent;
+  z-index: 9999;
+}
+
+.actionsMenu {
+  position: fixed;
+  top: var(--menu-y, 50vh);
+  left: var(--menu-x, 50vw);
+  transform: translate(-10%, -110%);
+  background: color-mix(in oklab, var(--theme-card-background, rgba(28,28,30,0.7)) 85%, transparent);
+  color: var(--theme-text-primary, #fff);
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 14px;
+  padding: 10px;
+  min-width: 230px;
+  box-shadow: 0 18px 48px rgba(0,0,0,0.5);
+  backdrop-filter: blur(14px) saturate(120%);
+  -webkit-backdrop-filter: blur(14px) saturate(120%);
+  animation: menuPop 140ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.actionsRow {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.reactionBtn {
+  font-size: 18px;
+  padding: 6px 8px;
+  border-radius: 10px;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.12);
+  color: inherit;
+  cursor: pointer;
+}
+
+.reactionBtn:hover {
+  background: rgba(255,255,255,0.08);
+}
+
+.actionsList {
+  display: flex;
+  flex-direction: column;
+}
+
+.actionsList button {
+  text-align: left;
+  padding: 8px 10px;
+  background: transparent;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  border-radius: 8px;
+}
+
+.actionsList button:hover {
+  background: rgba(255,255,255,0.06);
+}
+
+@keyframes menuPop {
+  0% {
+    opacity: 0;
+    transform: translate(-10%, -110%) scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-10%, -110%) scale(1);
+  }
+}
+
+/* Light theme adjustments */
+[data-theme="light"] .actionsMenu {
+  background: color-mix(in oklab, var(--theme-card-background, rgba(255,255,255,0.7)) 85%, transparent);
+  border-color: rgba(0,0,0,0.08);
+  box-shadow: 0 18px 48px rgba(0,0,0,0.12);
+}
+
+/* Global flash highlight when jumped to message */
+:global(.flash-highlight) {
+  animation: flash 1.2s ease-out;
+}
+
+@keyframes flash {
+  0% { box-shadow: 0 0 0 0 rgba(208,188,255,0.9); }
+  50% { box-shadow: 0 0 0 8px rgba(208,188,255,0.0); }
+  100% { box-shadow: none; }
 }
 
 /* Responsive design */
