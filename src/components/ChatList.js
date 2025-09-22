@@ -16,7 +16,7 @@ import { getUserAvatarUrl } from '../utils/avatarUrl';
 
 const ChatList = ({ chats, selectedChat, onChatSelect, isLoading, showAIChat, onAIChatSelect, onOpenArchive }) => {
   const { user } = useAuth();
-  const { isUserOnline, getUserStatus, refreshAllUsersStatus } = useSocket();
+  const { socket, isConnected, isUserOnline, getUserStatus, refreshAllUsersStatus } = useSocket();
   const isMobile = useIsMobile();
   const toast = useToast();
   const { success, error } = toast || {};
@@ -44,7 +44,23 @@ const ChatList = ({ chats, selectedChat, onChatSelect, isLoading, showAIChat, on
 
   // Синхронизируем локальный список с пропсами
   useEffect(() => {
-    setList(chats || []);
+    if (!Array.isArray(chats)) { setList([]); return; }
+    setList(prev => {
+      const byId = new Map(prev.map(c => [c._id, c]));
+      for (const c of chats) {
+        const existing = byId.get(c._id);
+        if (!existing) {
+          byId.set(c._id, c);
+        } else {
+          const prevTime = new Date(existing.updatedAt || 0).getTime();
+          const nextTime = new Date(c.updatedAt || 0).getTime();
+          // prefer newer
+          byId.set(c._id, nextTime >= prevTime ? c : existing);
+        }
+      }
+      const merged = Array.from(byId.values()).sort((a, b) => new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0));
+      return merged;
+    });
   }, [chats]);
 
   // (removed) server unread-counts usage per request
@@ -66,6 +82,20 @@ const ChatList = ({ chats, selectedChat, onChatSelect, isLoading, showAIChat, on
 
   // Не скрываем тизер автоматически на scroll, чтобы он не пропадал после отпускания пальца
   
+  // Realtime: reflect lastMessage changes (delete for all, edits, new messages)
+  useEffect(() => {
+    if (!socket) return;
+    const handleChatUpdated = (data) => {
+      setList(prev => {
+        const next = prev.map(c => c._id === data.chatId ? { ...c, lastMessage: data.lastMessage, updatedAt: data.updatedAt || new Date().toISOString() } : c);
+        // Reorder by updatedAt desc
+        return [...next].sort((a, b) => new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0));
+      });
+    };
+    socket.on('chat_updated', handleChatUpdated);
+    return () => socket.off('chat_updated', handleChatUpdated);
+  }, [socket]);
+
   if (isLoading) {
     return (
       <div className={styles.loadingContainer}>
