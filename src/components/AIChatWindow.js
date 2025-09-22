@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+  import React, { useState, useRef, useEffect } from 'react';
 import { FiSend, FiZap, FiUser, FiRefreshCw, FiPlus } from 'react-icons/fi';
 import AttachModal from './AttachModal';
 import PhotoPreviewModal from './PhotoPreviewModal';
@@ -60,6 +60,8 @@ const AIChatWindow = ({ onClose }) => {
     setMessages(prev => [...prev, userMessage]);
     setInputMessage('');
     setIsLoading(true);
+
+    // No image generation branch; plain AI chat only
 
     try {
       const response = await axios.post('/ai/chat', {
@@ -225,7 +227,7 @@ const AIChatWindow = ({ onClose }) => {
           <div>
             <h2 className={styles.title}>AI Ассистент</h2>
             <p className={styles.subtitle}>
-              Google Gemini 2.0 Flash (Прямая интеграция)
+              Google Gemini 2.0 Flash
               {isAuthenticated && user ? (
                 <span className={styles.authStatus}> • Авторизован как {user.displayName || user.username}</span>
               ) : (
@@ -270,7 +272,11 @@ const AIChatWindow = ({ onClose }) => {
                 </div>
                 <div className={styles.messageContent}>
                   <div className={styles.messageText}>
-                    {message.content}
+                    {message.imageUrl ? (
+                      <img src={message.imageUrl} alt="AI" style={{ maxWidth: '100%', borderRadius: 12, display: 'block' }} />
+                    ) : (
+                      message.content
+                    )}
                   </div>
                   <div className={styles.messageTime}>
                     {formatTime(message.timestamp)}
@@ -314,7 +320,7 @@ const AIChatWindow = ({ onClose }) => {
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyPress={handleKeyPress}
-              placeholder="Напишите сообщение..."
+              placeholder={'Напишите сообщение...'}
               className={styles.messageInput}
               rows={1}
               disabled={isLoading}

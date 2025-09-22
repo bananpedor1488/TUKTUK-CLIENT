@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { FiUser, FiSettings, FiLogOut, FiChevronDown } from 'react-icons/fi';
 import { FiArchive } from 'react-icons/fi';
 import styles from './UserAvatarDropdown.module.css';
+import { getUserAvatarUrl } from '../utils/avatarUrl';
 
 const UserAvatarDropdown = ({ user, onProfileClick, onSettingsClick, onLogout, onArchiveClick, isConnected }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -49,7 +50,7 @@ const UserAvatarDropdown = ({ user, onProfileClick, onSettingsClick, onLogout, o
         <div className={styles.avatar}>
           {user?.avatar ? (
             <img 
-              src={user.avatar} 
+              src={getUserAvatarUrl(user)} 
               alt={user.displayName || 'Пользователь'} 
               className={styles.avatarImage}
             />
@@ -73,7 +74,7 @@ const UserAvatarDropdown = ({ user, onProfileClick, onSettingsClick, onLogout, o
               <div className={styles.userAvatar}>
                 {user?.avatar ? (
                   <img 
-                    src={user.avatar} 
+                    src={getUserAvatarUrl(user)} 
                     alt={user.displayName || 'Пользователь'} 
                     className={styles.userAvatarImage}
                   />

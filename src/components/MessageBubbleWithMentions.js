@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { FiCheck } from 'react-icons/fi';
 import { formatMessageTime } from '../utils/timeUtils';
 import { renderMentions } from '../utils/mentionParser';
@@ -15,22 +15,39 @@ const MessageBubbleWithMentions = ({
   currentUsername,
   onImageClick,
   onOpenActions, // function(message, event)
-  participants = []
+  participants = [],
+  quickReactionEmoji = '❤️',
+  onQuickReact, // function(message, emoji)
+  onReactionClick // function(message, emoji)
 }) => {
   const formatTime = (date) => {
     return formatMessageTime(date);
   };
 
-  // Long-press detection (mobile)
+  // Long-press and double-tap detection (mobile)
   let longPressTimer;
+  const lastTapRef = useRef(0);
+  const longPressedRef = useRef(false);
   const handleTouchStart = () => {
     clearTimeout(longPressTimer);
+    longPressedRef.current = false;
     longPressTimer = setTimeout(() => {
+      longPressedRef.current = true;
       onOpenActions && onOpenActions(message);
     }, 400);
   };
-  const handleTouchEnd = () => {
+  const handleTouchEnd = (e) => {
     clearTimeout(longPressTimer);
+    if (longPressedRef.current) return; // already handled as long-press
+    // double-tap
+    const now = Date.now();
+    if (now - lastTapRef.current < 280) {
+      // double tap detected
+      if (!message.isDeleted && onQuickReact) onQuickReact(message, quickReactionEmoji);
+      lastTapRef.current = 0;
+    } else {
+      lastTapRef.current = now;
+    }
   };
 
   const cleanContent = (text) => {
@@ -149,10 +166,16 @@ const MessageBubbleWithMentions = ({
     return p?.avatar || null;
   };
 
+  // Simple: no overlay burst, reactions will animate via CSS when rendered
+
   return (
     <div 
       id={`message-${message._id}`}
       className={`${styles.messageContainer} ${isOwn ? styles.own : styles.other}`}
+      onDoubleClick={(e) => {
+        // quick react on desktop double-click
+        if (!message.isDeleted && onQuickReact) onQuickReact(message, quickReactionEmoji);
+      }}
       onContextMenu={(e) => {
         e.preventDefault();
         if (!message.isDeleted) onOpenActions && onOpenActions(message, e);
@@ -205,7 +228,12 @@ const MessageBubbleWithMentions = ({
                   byEmoji.get(emoji).push({ uid, avatar });
                 }
                 return Array.from(byEmoji.entries()).map(([emoji, users]) => (
-                  <span key={emoji} className={styles.reactionChip} title={emoji}>
+                  <span
+                    key={emoji}
+                    className={styles.reactionChip}
+                    title={emoji}
+                    onClick={() => { if (typeof onReactionClick === 'function') onReactionClick(message, emoji); }}
+                  >
                     <span className={styles.reactionAvatarsStack}>
                       {users.slice(0, 3).map((u, i) => (
                         <span key={u.uid + '-' + i} className={styles.reactionAvatar} style={{ marginLeft: i === 0 ? 0 : -6 }}>

@@ -2,6 +2,8 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { io } from 'socket.io-client';
 import { useAuth } from './AuthContext';
 import useOnlineStatus from '../hooks/useOnlineStatus';
+import CallModal from '../components/calls/CallModal';
+import CallService from '../services/CallService';
 
 const SocketContext = createContext();
 
@@ -64,6 +66,69 @@ export const SocketProvider = ({ children }) => {
       }
     };
   }, [isAuthenticated, accessToken]);
+
+  // Global Call UI state
+  const [callUI, setCallUI] = useState({ isOpen: false, call: null, isIncoming: false });
+
+  // Socket events for calls (global)
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleIncoming = (data) => {
+      // Open incoming call modal globally
+      setCallUI({
+        isOpen: true,
+        isIncoming: true,
+        call: {
+          _id: data.callId,
+          type: data.type,
+          caller: data.caller,
+          callee: null,
+          chat: data.chat
+        }
+      });
+    };
+    const handleInitiated = (data) => {
+      // Update outgoing call id if already open
+      setCallUI(prev => prev.isOpen && !prev.isIncoming ? { ...prev, call: { ...prev.call, _id: data.callId } } : prev);
+    };
+    const handleAccepted = ({ callId }) => {
+      setCallUI(prev => (prev.call && prev.call._id === callId) ? { ...prev, call: { ...prev.call, status: 'accepted' } } : prev);
+    };
+    const handleDeclined = ({ callId }) => {
+      setCallUI(prev => (prev.call && prev.call._id === callId) ? { isOpen: false, call: null, isIncoming: false } : prev);
+    };
+    const handleEnded = ({ callId }) => {
+      setCallUI(prev => (prev.call && prev.call._id === callId) ? { isOpen: false, call: null, isIncoming: false } : prev);
+    };
+
+    socket.on('incomingCall', handleIncoming);
+    socket.on('callInitiated', handleInitiated);
+    socket.on('callAccepted', handleAccepted);
+    socket.on('callDeclined', handleDeclined);
+    socket.on('callEnded', handleEnded);
+
+    return () => {
+      socket.off('incomingCall', handleIncoming);
+      socket.off('callInitiated', handleInitiated);
+      socket.off('callAccepted', handleAccepted);
+      socket.off('callDeclined', handleDeclined);
+      socket.off('callEnded', handleEnded);
+    };
+  }, [socket]);
+
+  // Global call actions
+  const acceptCall = async () => {
+    try { if (callUI.call?._id) await CallService.accept(callUI.call._id); } catch (_) {}
+  };
+  const declineCall = async () => {
+    try { if (callUI.call?._id) await CallService.decline(callUI.call._id); } catch (_) {}
+    setCallUI({ isOpen: false, call: null, isIncoming: false });
+  };
+  const endCall = async () => {
+    try { if (callUI.call?._id) await CallService.end(callUI.call._id); } catch (_) {}
+    setCallUI({ isOpen: false, call: null, isIncoming: false });
+  };
 
   const joinChat = (chatId) => {
     if (socket && isConnected) {
@@ -130,6 +195,12 @@ export const SocketProvider = ({ children }) => {
     startTyping,
     stopTyping,
     updateStatus,
+    // Call UI state exposed for pages if needed
+    callUI,
+    setCallUI,
+    acceptCall,
+    declineCall,
+    endCall,
     
     // Online status (from our professional hook)
     ...onlineStatus
@@ -138,6 +209,15 @@ export const SocketProvider = ({ children }) => {
   return (
     <SocketContext.Provider value={value}>
       {children}
+      {/* Global Call Modal */}
+      <CallModal
+        isOpen={callUI.isOpen}
+        call={callUI.call}
+        isIncoming={callUI.isIncoming}
+        onAccept={acceptCall}
+        onDecline={declineCall}
+        onEnd={endCall}
+      />
     </SocketContext.Provider>
   );
 };

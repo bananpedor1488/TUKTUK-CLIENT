@@ -12,6 +12,7 @@ import UserProfileModal from './UserProfileModal';
 import { useToast } from '../contexts/ToastContext';
 import ConfirmModal from './ConfirmModal';
 import styles from './ChatList.module.css';
+import { getUserAvatarUrl } from '../utils/avatarUrl';
 
 const ChatList = ({ chats, selectedChat, onChatSelect, isLoading, showAIChat, onAIChatSelect, onOpenArchive }) => {
   const { user } = useAuth();
@@ -123,7 +124,7 @@ const ChatList = ({ chats, selectedChat, onChatSelect, isLoading, showAIChat, on
     } else {
       // For private chats, show the other participant's avatar
       const otherParticipant = chat.participants?.find(p => p && p._id !== user._id);
-      return otherParticipant?.avatar;
+      return otherParticipant ? getUserAvatarUrl(otherParticipant) : undefined;
     }
   };
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FiX, FiSun, FiMoon, FiVolume2, FiVolumeX, FiBell, FiBellOff, FiEye, FiEyeOff } from 'react-icons/fi';
 import styles from './SettingsModal.module.css';
 
@@ -12,14 +12,29 @@ const SettingsModal = ({ isOpen, onClose }) => {
     autoSave: true,
     showOnlineStatus: true,
     messagePreview: true,
-    animationType: 'slideFromRight'
+    animationType: 'slideFromRight',
+    quickReaction: '❤️'
   });
+
+  // Load quick reaction from localStorage on open
+  useEffect(() => {
+    if (isOpen) {
+      try {
+        const saved = localStorage.getItem('tuktuk-quick-reaction');
+        if (saved) setSettings(prev => ({ ...prev, quickReaction: saved }));
+      } catch (_) {}
+    }
+  }, [isOpen]);
 
   const handleSettingChange = (key, value) => {
     setSettings(prev => ({
       ...prev,
       [key]: value
     }));
+
+    if (key === 'quickReaction') {
+      try { localStorage.setItem('tuktuk-quick-reaction', value); } catch (_) {}
+    }
   };
 
   const handleSave = () => {
@@ -184,6 +199,24 @@ const SettingsModal = ({ isOpen, onClose }) => {
           <div className={styles.settingsSection}>
             <h3 className={styles.sectionTitle}>Дополнительно</h3>
             
+            <div className={styles.settingItem}>
+              <div className={styles.settingInfo}>
+                <label className={styles.settingLabel}>Быстрая реакция</label>
+                <span className={styles.settingDescription}>Эмодзи по двойному клику/тапу на сообщение</span>
+              </div>
+              <div className={styles.settingControl}>
+                <select
+                  className={styles.select}
+                  value={settings.quickReaction}
+                  onChange={(e) => handleSettingChange('quickReaction', e.target.value)}
+                >
+                  {['❤️','👍','😂','🔥','👏','💯','😮','😢','😎','🙏','🤯'].map(em => (
+                    <option key={em} value={em}>{em}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
             <div className={styles.settingItem}>
               <div className={styles.settingInfo}>
                 <label className={styles.settingLabel}>Язык интерфейса</label>

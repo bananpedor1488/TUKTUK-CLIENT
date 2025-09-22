@@ -1,0 +1,67 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+}
+.modal {
+  width: 360px;
+  background: var(--bg-primary, #0f0f12);
+  color: var(--text-primary, #fff);
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.45);
+  padding: 20px 24px;
+}
+.avatarWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+.avatarWrap img, .avatarPlaceholder {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #22242a;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  font-size: 28px;
+}
+.title {
+  text-align: center;
+  font-weight: 600;
+  font-size: 16px;
+  opacity: 0.9;
+}
+.userName {
+  text-align: center;
+  margin-top: 6px;
+  font-size: 18px;
+  font-weight: 700;
+}
+.buttons {
+  margin-top: 16px;
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+.btn {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.accept {
+  background: #10B981;
+  color: #fff;
+}
+.decline {
+  background: #EF4444;
+  color: #fff;
+}

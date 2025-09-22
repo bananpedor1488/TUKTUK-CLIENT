@@ -69,6 +69,21 @@ const MobileProfilePage = ({ isOpen, onClose, user, onOpenArchive }) => {
         autoDownload: false,
         language: 'ru'
       };
+      // Подхватываем быструю реакцию из localStorage (единое значение)
+      try {
+        const single = localStorage.getItem('tuktuk-quick-reaction');
+        if (single) {
+          newSettings.quickReaction = single;
+        } else {
+          // миграция со старого формата, если есть
+          const legacy = JSON.parse(localStorage.getItem('tuktuk-quick-reactions') || '{}');
+          const chosen = legacy?.desktop || legacy?.mobile || '❤️';
+          newSettings.quickReaction = chosen;
+          localStorage.setItem('tuktuk-quick-reaction', chosen);
+        }
+      } catch (_) {
+        newSettings.quickReaction = '❤️';
+      }
       
       setSettings(newSettings);
       setOriginalSettings(newSettings);
@@ -103,6 +118,19 @@ const MobileProfilePage = ({ isOpen, onClose, user, onOpenArchive }) => {
       ...prev,
       [key]: value
     }));
+
+    // Если меняем быструю реакцию — сохраняем сразу в localStorage
+    if (key === 'quickReaction') {
+      try {
+        localStorage.setItem('tuktuk-quick-reaction', value);
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('tuktuk-quick-reaction-changed', { detail: value }));
+        }
+        if (success) success('Быстрая реакция сохранена', 'Настройки');
+      } catch (e) {
+        console.error('Failed to persist quick reaction', e);
+      }
+    }
   };
 
   const handleThemeChange = (theme) => {
@@ -745,6 +773,25 @@ const MobileProfilePage = ({ isOpen, onClose, user, onOpenArchive }) => {
                             <option value="es">Español</option>
                             <option value="fr">Français</option>
                             <option value="de">Deutsch</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      {/* Быстрая реакция (единое значение) */}
+                      <div className={styles.settingCard}>
+                        <div className={styles.settingInfo}>
+                          <h3 className={styles.settingLabel}>Быстрая реакция</h3>
+                          <p className={styles.settingDescription}>Эмодзи по двойному тапу/клику на сообщение</p>
+                        </div>
+                        <div className={styles.settingControl}>
+                          <select
+                            className={styles.select}
+                            value={settings.quickReaction}
+                            onChange={(e) => handleSettingChange('quickReaction', e.target.value)}
+                          >
+                            {['❤️','👍','😂','🔥','👏','💯','😮','😢','😎','🙏','🤯'].map(em => (
+                              <option key={em} value={em}>{em}</option>
+                            ))}
                           </select>
                         </div>
                       </div>

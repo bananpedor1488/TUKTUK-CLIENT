@@ -22,6 +22,8 @@ const ChatMenu = ({ chat, user, onClose, isOpen, onLogout, onOpenProfile }) => {
     };
   }, [isOpen, onClose]);
 
+  
+
   const handleMenuItemClick = (action) => {
     onClose();
     

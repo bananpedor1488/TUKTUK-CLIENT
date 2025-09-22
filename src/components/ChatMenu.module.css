@@ -43,6 +43,47 @@
   padding: 8px 0;
 }
 
+.menuGroupTitle {
+  padding: 10px 16px 4px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #6b7280;
+}
+
+.settingRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 16px 12px;
+}
+
+.settingLabel {
+  font-size: 14px;
+  color: #374151;
+}
+
+.select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  color: #111827;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 14px;
+  min-width: 120px;
+  cursor: pointer;
+}
+
+.select:focus {
+  outline: none;
+  border-color: #d0bcff;
+  box-shadow: 0 0 0 3px rgba(208,188,255,0.35);
+}
+
 .menuItem {
   width: 100%;
   background: none;
@@ -98,6 +139,21 @@
   
   .menuItem {
     color: #d1d5db;
+  }
+
+  .settingLabel {
+    color: #d1d5db;
+  }
+
+  .select {
+    background: #111827;
+    border-color: #374151;
+    color: #e5e7eb;
+  }
+
+  .select:focus {
+    border-color: #b69df8;
+    box-shadow: 0 0 0 3px rgba(182,157,248,0.25);
   }
   
   .menuItem:hover {

@@ -13,6 +13,9 @@ import PhotoPreviewModal from './PhotoPreviewModal';
 import OnlineStatusIndicator from './OnlineStatusIndicator';
 import styles from './ChatWindow.module.css';
 import ImageViewerModal from './ImageViewerModal';
+import CallService from '../services/CallService';
+import { FiPhone, FiVideo } from 'react-icons/fi';
+import { requestMediaPermissions, getOptimalConstraints } from '../utils/webrtc';
 
 const ChatWindow = ({ chat, onChatUpdate, onBackToChatList }) => {
   const [messages, setMessages] = useState([]);
@@ -31,12 +34,13 @@ const ChatWindow = ({ chat, onChatUpdate, onBackToChatList }) => {
   const [pinned, setPinned] = useState([]);
   const [showPinned, setShowPinned] = useState(true);
   const [imageViewer, setImageViewer] = useState({ isOpen: false, src: '', caption: '', items: [], currentIndex: 0 });
+  const [quickReaction, setQuickReaction] = useState('❤️');
   const messagesEndRef = useRef(null);
   const messagesListRef = useRef(null);
   const [stickyDayLabel, setStickyDayLabel] = useState('');
   const typingTimeoutRef = useRef(null);
 
-  const { socket, isConnected, joinChat, leaveChat, sendMessage, startTyping, stopTyping, isUserOnline, getUserStatus } = useSocket();
+  const { socket, isConnected, joinChat, leaveChat, sendMessage, startTyping, stopTyping, isUserOnline, getUserStatus, setCallUI, callUI } = useSocket();
   const { user } = useAuth();
 
   // Handle mention clicks
@@ -82,6 +86,68 @@ const ChatWindow = ({ chat, onChatUpdate, onBackToChatList }) => {
         alert('Ошибка при переходе к пользователю');
       }
     }
+  };
+
+  // Call helpers
+  const initiateCall = async (type) => {
+    // Prompt media permissions ASAP to match expected UX
+    try {
+      const constraints = getOptimalConstraints(type);
+      await requestMediaPermissions(constraints);
+    } catch (permErr) {
+      alert('Дайте доступ к микрофону/камере в настройках браузера');
+      return;
+    }
+    // Open outgoing UI immediately (SocialSpace-like UX)
+    setCallUI({
+      isOpen: true,
+      call: {
+        _id: null,
+        type,
+        caller: { _id: user._id, username: user.username, displayName: user.displayName, avatar: user.avatar },
+        callee: getOtherParticipant(),
+        chat
+      },
+      isIncoming: false
+    });
+    try {
+      const res = await CallService.initiate({ chatId: chat._id, type });
+      // Update UI with real callId after server confirms
+      setCallUI(prev => prev.isOpen ? { ...prev, call: { ...prev.call, _id: res.callId } } : prev);
+    } catch (e) {
+      const status = e?.response?.status;
+      if (status === 409) {
+        try {
+          // Авточистка зависших звонков и повтор
+          await CallService.cleanup();
+          // Дополнительно чистим по текущему чату (если собеседник занят)
+          try { await CallService.cleanupChat(chat._id); } catch (_) {}
+          const res2 = await CallService.initiate({ chatId: chat._id, type });
+          setCallUI(prev => prev.isOpen ? { ...prev, call: { ...prev.call, _id: res2.callId } } : prev);
+          return;
+        } catch (e2) {
+          const msg2 = e2?.response?.data?.message || 'Не удалось начать звонок после очистки';
+          alert(msg2);
+          // Close outgoing UI since call didn't start
+          setCallUI({ isOpen: false, call: null, isIncoming: false });
+        }
+      } else {
+        const msg = e?.response?.data?.message || 'Не удалось начать звонок';
+        alert(msg);
+        setCallUI({ isOpen: false, call: null, isIncoming: false });
+      }
+    }
+  };
+  const acceptCall = async () => {
+    try { await CallService.accept(callUI.call._id); } catch (_) {}
+  };
+  const declineCall = async () => {
+    try { await CallService.decline(callUI.call._id); } catch (_) {}
+    setCallUI({ isOpen: false, call: null, isIncoming: false });
+  };
+  const endCall = async () => {
+    try { await CallService.end(callUI.call._id); } catch (_) {}
+    setCallUI({ isOpen: false, call: null, isIncoming: false });
   };
 
   // Handle file selection from AttachModal
@@ -162,6 +228,28 @@ const ChatWindow = ({ chat, onChatUpdate, onBackToChatList }) => {
 
   // Load messages when chat changes
   useEffect(() => {
+    // Subscribe to quick reaction live changes
+    const handler = (e) => {
+      const emoji = e?.detail;
+      if (emoji) setQuickReaction(emoji);
+    };
+    window.addEventListener('tuktuk-quick-reaction-changed', handler);
+
+    // Load quick reaction from localStorage (single value). Backward compatible with old structure.
+    try {
+      const single = localStorage.getItem('tuktuk-quick-reaction');
+      if (single) {
+        setQuickReaction(single);
+      } else {
+        const legacy = JSON.parse(localStorage.getItem('tuktuk-quick-reactions') || '{}');
+        if (legacy && (legacy.desktop || legacy.mobile)) {
+          const chosen = legacy.desktop || legacy.mobile || '❤️';
+          setQuickReaction(chosen);
+          localStorage.setItem('tuktuk-quick-reaction', chosen);
+        }
+      }
+    } catch (_) {}
+
     if (chat) {
       loadMessages();
       if (socket && isConnected) {
@@ -172,6 +260,7 @@ const ChatWindow = ({ chat, onChatUpdate, onBackToChatList }) => {
     }
 
     return () => {
+      window.removeEventListener('tuktuk-quick-reaction-changed', handler);
       if (chat && socket && isConnected) {
         leaveChat(chat._id);
       }
@@ -294,8 +383,17 @@ const ChatWindow = ({ chat, onChatUpdate, onBackToChatList }) => {
         if (data.chatId !== chat._id) return;
         setMessages(prev => prev.map(m => {
           if (m._id !== data.messageId) return m;
-          const withoutUser = (m.reactions || []).filter(r => (r.user?._id || r.user) !== data.userId);
-          return { ...m, reactions: [...withoutUser, { user: data.userId, emoji: data.emoji }] };
+          const current = m.reactions || [];
+          const userId = data.userId;
+          const emoji = data.emoji;
+          const hasSame = current.some(r => (r.user?._id || r.user) === userId && r.emoji === emoji);
+          if (hasSame) {
+            // Toggle off same emoji
+            return { ...m, reactions: current.filter(r => !((r.user?._id || r.user) === userId && r.emoji === emoji)) };
+          }
+          // Replace any existing reaction from user with the new one
+          const withoutUser = current.filter(r => (r.user?._id || r.user) !== userId);
+          return { ...m, reactions: [...withoutUser, { user: userId, emoji }] };
         }));
       };
       const handleDeleted = (data) => {
@@ -315,6 +413,30 @@ const ChatWindow = ({ chat, onChatUpdate, onBackToChatList }) => {
       socket.on('message_pinned', handlePinned);
       socket.on('message_unpinned', handleUnpinned);
 
+      // Calls
+      const handleIncomingCall = (data) => {
+        if (!data?.chat || data.chat._id !== chat._id) return;
+        setCallUI({ isOpen: true, call: { _id: data.callId, type: data.type, caller: data.caller, callee: getOtherParticipant(), chat }, isIncoming: true });
+      };
+      const handleCallInitiated = (data) => {
+        if (!data?.chat || data.chat._id !== chat._id) return;
+        setCallUI({ isOpen: true, call: { _id: data.callId, type: data.type, caller: data.caller, callee: data.callee, chat }, isIncoming: false });
+      };
+      const handleCallAccepted = ({ callId }) => {
+        setCallUI(prev => prev.call && prev.call._id === callId ? { ...prev, call: { ...prev.call, status: 'accepted' } } : prev);
+      };
+      const handleCallDeclined = ({ callId }) => {
+        setCallUI(prev => prev.call && prev.call._id === callId ? { isOpen: false, call: null, isIncoming: false } : prev);
+      };
+      const handleCallEnded = ({ callId }) => {
+        setCallUI(prev => prev.call && prev.call._id === callId ? { isOpen: false, call: null, isIncoming: false } : prev);
+      };
+      socket.on('incomingCall', handleIncomingCall);
+      socket.on('callInitiated', handleCallInitiated);
+      socket.on('callAccepted', handleCallAccepted);
+      socket.on('callDeclined', handleCallDeclined);
+      socket.on('callEnded', handleCallEnded);
+
       return () => {
         socket.off('new_message', handleNewMessage);
         socket.off('user_typing', handleUserTyping);
@@ -324,6 +446,11 @@ const ChatWindow = ({ chat, onChatUpdate, onBackToChatList }) => {
         socket.off('message_deleted', handleDeleted);
         socket.off('message_pinned', handlePinned);
         socket.off('message_unpinned', handleUnpinned);
+        socket.off('incomingCall', handleIncomingCall);
+        socket.off('callInitiated', handleCallInitiated);
+        socket.off('callAccepted', handleCallAccepted);
+        socket.off('callDeclined', handleCallDeclined);
+        socket.off('callEnded', handleCallEnded);
       };
     }
   }, [socket, chat?._id, onChatUpdate]);
@@ -608,6 +735,21 @@ const ChatWindow = ({ chat, onChatUpdate, onBackToChatList }) => {
           >
             <FiSearch size={18} />
           </button>
+          {/* Call buttons */}
+          <button
+            className={styles.actionButton}
+            title="Аудио-звонок"
+            onClick={() => initiateCall('audio')}
+          >
+            <FiPhone size={18} />
+          </button>
+          <button
+            className={styles.actionButton}
+            title="Видео-звонок"
+            onClick={() => initiateCall('video')}
+          >
+            <FiVideo size={18} />
+          </button>
         </div>
       </div>
 
@@ -691,6 +833,11 @@ const ChatWindow = ({ chat, onChatUpdate, onBackToChatList }) => {
                   senderName = message.sender.displayName || message.sender.username || 'Неизвестный';
                   senderAvatar = message.sender.avatar;
                 }
+                const handleQuickReact = async (msg, emoji) => {
+                  try {
+                    await reactTo(msg, emoji);
+                  } catch (_) {}
+                };
                 out.push(
                   <MessageBubbleWithMentions
                     key={message._id}
@@ -699,6 +846,9 @@ const ChatWindow = ({ chat, onChatUpdate, onBackToChatList }) => {
                     senderName={senderName}
                     senderAvatar={senderAvatar}
                     participants={chat.participants || []}
+                    quickReactionEmoji={quickReaction}
+                    onQuickReact={handleQuickReact}
+                    onReactionClick={handleQuickReact}
                     disableAnimation={message.disableAnimation}
                     onMentionClick={handleMentionClick}
                     currentUsername={user.username}

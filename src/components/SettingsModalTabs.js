@@ -6,6 +6,8 @@ import { useToast } from '../contexts/ToastContext';
 import { useAuth } from '../contexts/AuthContext';
 import { updateTokens } from '../utils/tokenManager';
 import styles from './SettingsModalTabs.module.css';
+import EmojiSelect from './EmojiSelect';
+import { getVersionedAvatar } from '../utils/avatarUrl';
 
 const SettingsModalTabs = ({ isOpen, onClose, user }) => {
   const [activeTab, setActiveTab] = useState('profile');
@@ -32,7 +34,8 @@ const SettingsModalTabs = ({ isOpen, onClose, user }) => {
     
     // Безопасность
     twoFactorEnabled: false,
-    sessionTimeout: 30
+    sessionTimeout: 30,
+    quickReaction: '❤️'
   });
 
   const toast = useToast();
@@ -61,7 +64,7 @@ const SettingsModalTabs = ({ isOpen, onClose, user }) => {
         username: user.username || '',
         email: user.email || 'user@example.com',
         bio: user.bio || '',
-        avatar: user.avatar || null,
+        avatar: getVersionedAvatar(user?.avatar) || null,
         theme: 'dark',
         fontSize: 'medium',
         animationType: 'slideFromRight',
@@ -69,9 +72,15 @@ const SettingsModalTabs = ({ isOpen, onClose, user }) => {
         notificationsEnabled: true,
         showOnlineStatus: true,
         twoFactorEnabled: false,
-        sessionTimeout: 30
+        sessionTimeout: 30,
+        quickReaction: '❤️'
       };
-      
+      // Подхватываем быструю реакцию с desktop настроек
+      try {
+        const saved = localStorage.getItem('tuktuk-quick-reaction');
+        if (saved) newSettings.quickReaction = saved;
+      } catch (_) {}
+
       setSettings(newSettings);
       setOriginalSettings(newSettings);
       setHasUnsavedChanges(false);
@@ -95,6 +104,16 @@ const SettingsModalTabs = ({ isOpen, onClose, user }) => {
     document.documentElement.setAttribute('data-theme', theme);
     localStorage.setItem('tuktuk-theme', theme);
   };
+
+  // При открытии модалки подхватим быструю реакцию
+  useEffect(() => {
+    if (isOpen) {
+      try {
+        const saved = localStorage.getItem('tuktuk-quick-reaction');
+        if (saved) setSettings(prev => ({ ...prev, quickReaction: saved }));
+      } catch (_) {}
+    }
+  }, [isOpen]);
 
   const handleSave = async () => {
     if (!hasUnsavedChanges) {
@@ -350,7 +369,7 @@ const SettingsModalTabs = ({ isOpen, onClose, user }) => {
                   <div className={styles.avatarUpload}>
                     <div className={styles.avatarPreview}>
                       {settings.avatar ? (
-                        <img src={settings.avatar} alt="Avatar" className={styles.avatarImage} />
+                        <img src={getVersionedAvatar(settings.avatar, user?.avatarUpdatedAt || user?.updatedAt)} alt="Avatar" className={styles.avatarImage} />
                       ) : (
                         <div className={styles.avatarPlaceholder}>
                           {settings.name?.charAt(0)?.toUpperCase() || 'U'}
@@ -514,6 +533,28 @@ const SettingsModalTabs = ({ isOpen, onClose, user }) => {
                     <option value="medium">Средний</option>
                     <option value="large">Большой</option>
                   </select>
+                </div>
+              </div>
+
+              <div className={styles.settingItem}>
+                <div className={styles.settingInfo}>
+                  <label className={styles.settingLabel}>Быстрая реакция</label>
+                  <span className={styles.settingDescription}>Эмодзи по двойному клику/тапу на сообщение</span>
+                </div>
+                <div className={styles.settingControl}>
+                  <EmojiSelect
+                    value={settings.quickReaction}
+                    onChange={(emoji) => {
+                      handleSettingChange('quickReaction', emoji);
+                      try {
+                        localStorage.setItem('tuktuk-quick-reaction', emoji);
+                        if (typeof window !== 'undefined') {
+                          window.dispatchEvent(new CustomEvent('tuktuk-quick-reaction-changed', { detail: emoji }));
+                        }
+                        if (success) success(`Быстрая реакция: ${emoji}`, 'Настройки обновлены');
+                      } catch (_) {}
+                    }}
+                  />
                 </div>
               </div>
 

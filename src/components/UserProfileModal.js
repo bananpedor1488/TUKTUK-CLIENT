@@ -1,10 +1,14 @@
 import React, { useState } from 'react';
-import { FiX, FiUser, FiCalendar, FiMapPin, FiAtSign } from 'react-icons/fi';
+import { FiX, FiUser, FiCalendar, FiMapPin, FiAtSign, FiPhone, FiVideo } from 'react-icons/fi';
+import CallService from '../services/CallService';
+import axios from '../services/axiosConfig';
+import CallModal from './calls/CallModal';
 import { useToast } from '../contexts/ToastContext';
 import styles from './UserProfileModal.module.css';
 
 const UserProfileModal = ({ user, isOpen, onClose, isOwnProfile = false }) => {
   const [isEditing, setIsEditing] = useState(false);
+  const [callUI, setCallUI] = useState({ isOpen: false, call: null, isIncoming: false });
   const [profileData, setProfileData] = useState({
     displayName: user?.displayName || '',
     email: user?.email || '',
@@ -23,6 +27,53 @@ const UserProfileModal = ({ user, isOpen, onClose, isOwnProfile = false }) => {
       ...prev,
       [field]: value
     }));
+  };
+
+  const startCall = async (type) => {
+    try {
+      if (!user?._id) return;
+      // Create or find private chat with this user
+      const chatResp = await axios.post('/chat', { participants: [user._id], type: 'private' });
+      const chatId = chatResp?.data?.chat?._id || chatResp?.data?._id;
+      if (!chatId) throw new Error('Не удалось открыть чат для звонка');
+      // Open outgoing UI immediately here (in case ChatWindow isn't mounted)
+      setCallUI({
+        isOpen: true,
+        isIncoming: false,
+        call: {
+          _id: null,
+          type,
+          caller: { _id: 'me' },
+          callee: { _id: user._id, username: user.username, displayName: user.displayName, avatar: user.avatar },
+          chat: { _id: chatId }
+        }
+      });
+      // Initiate call
+      const res = await CallService.initiate({ chatId, type });
+      setCallUI(prev => prev.isOpen ? { ...prev, call: { ...prev.call, _id: res.callId } } : prev);
+      if (onClose) onClose();
+    } catch (e) {
+      // Handle 409 by cleanup and retry once
+      if (e?.response?.status === 409) {
+        try {
+          await CallService.cleanup();
+          // retry: need chat again if previous failed before chat
+          const chatResp2 = await axios.post('/chat', { participants: [user._id], type: 'private' });
+          const chatId2 = chatResp2?.data?.chat?._id || chatResp2?.data?._id;
+          const res2 = await CallService.initiate({ chatId: chatId2, type });
+          setCallUI(prev => prev.isOpen ? { ...prev, call: { ...prev.call, _id: res2.callId } } : prev);
+          if (onClose) onClose();
+          return;
+        } catch (e2) {
+          alert(e2?.response?.data?.message || 'Не удалось начать звонок после очистки');
+        }
+      } else {
+        const msg = e?.response?.data?.message || e.message || 'Не удалось начать звонок';
+        alert(msg);
+      }
+      // Close local UI if still failed
+      setCallUI({ isOpen: false, call: null, isIncoming: false });
+    }
   };
 
   const handleSave = () => {
@@ -96,6 +147,30 @@ const UserProfileModal = ({ user, isOpen, onClose, isOwnProfile = false }) => {
             >
               @{user?.username}
             </p>
+
+            {/* Call actions */}
+            {!isOwnProfile && (
+              <div className={styles.callActions}>
+                <button
+                  type="button"
+                  className={`${styles.callBtn} ${styles.audioBtn}`}
+                  onClick={() => startCall('audio')}
+                  title="Аудио-звонок"
+                >
+                  <FiPhone size={16} />
+                  <span>Позвонить</span>
+                </button>
+                <button
+                  type="button"
+                  className={`${styles.callBtn} ${styles.videoBtn}`}
+                  onClick={() => startCall('video')}
+                  title="Видео-звонок"
+                >
+                  <FiVideo size={16} />
+                  <span>Видео</span>
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Информация профиля */}
