@@ -24,42 +24,70 @@ const ThemeToggle = ({ variant = 'buttons' }) => {
   const [showAllThemes, setShowAllThemes] = useState(false);
 
   const handleThemeChange = async (themeType) => {
+    const applyMetaThemeColor = () => {
+      try {
+        const meta = document.querySelector('meta[name="theme-color"]');
+        if (!meta) return;
+        const root = document.documentElement;
+        const cs = getComputedStyle(root);
+        // Prefer themed card/background variables; fallback to body background
+        let color = cs.getPropertyValue('--theme-card-background').trim() || cs.getPropertyValue('--theme-background').trim();
+        if (!color) {
+          const bodyBg = getComputedStyle(document.body).backgroundColor;
+          color = bodyBg || '#0f0f12';
+        }
+        meta.setAttribute('content', color);
+      } catch (_) {}
+    };
+
     switch (themeType) {
       case 'default':
         await switchToDefaultTheme();
+        applyMetaThemeColor();
         break;
       case 'blur':
         await switchToBlurTheme();
+        applyMetaThemeColor();
         break;
       case 'light':
         await switchToLightTheme();
+        applyMetaThemeColor();
         break;
       case 'midnight':
         await switchToMidnightTheme();
+        applyMetaThemeColor();
         break;
       case 'ocean':
         await switchToOceanTheme();
+        applyMetaThemeColor();
         break;
       case 'sunset':
         await switchToSunsetTheme();
+        applyMetaThemeColor();
         break;
       case 'forest':
         await switchToForestTheme();
+        applyMetaThemeColor();
         break;
       case 'aurora':
         await switchToAuroraTheme();
+        applyMetaThemeColor();
         break;
       case 'cosmic':
         await switchToCosmicTheme();
+        applyMetaThemeColor();
         break;
       case 'neon':
         await switchToNeonTheme();
+        applyMetaThemeColor();
         break;
       case 'vintage':
         await switchToVintageTheme();
+        applyMetaThemeColor();
         break;
       case 'pickme':
         await switchToPickmeTheme();
+        applyMetaThemeColor();
         break;
     }
   };

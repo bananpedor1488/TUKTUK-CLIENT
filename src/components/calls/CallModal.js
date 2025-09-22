@@ -1,7 +1,8 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import styles from './CallModal.module.css';
 import { FiMic, FiMicOff, FiVideo, FiVideoOff, FiWifi } from 'react-icons/fi';
 import { useSocket } from '../../contexts/SocketContext';
+import { attachStatsMonitor } from '../../utils/webrtc';
 
 // Под стиль приложения: тёмная карточка, акцентные кнопки
 const CallModal = ({ isOpen, call, isIncoming, onAccept, onDecline, onEnd }) => {
@@ -10,10 +11,12 @@ const CallModal = ({ isOpen, call, isIncoming, onAccept, onDecline, onEnd }) => 
   const [muted, setMuted] = useState(false);
   const [videoOff, setVideoOff] = useState(call?.type === 'audio');
 
+  const [qualityState, setQualityState] = useState({ quality: (call && call.quality) || 4, kbps: 0, loss: 0 });
+
   const qualityBars = useMemo(() => {
-    const q = Math.max(1, Math.min(5, (call && call.quality) || 4));
+    const q = Math.max(1, Math.min(5, qualityState.quality || 4));
     return new Array(5).fill(0).map((_, i) => i < q);
-  }, [call?.quality]);
+  }, [qualityState.quality]);
 
   const emojis = useMemo(() => {
     const pool = ['🔺','🔹','🟢','⭐','❤️','⚡','🍀','🌙','🔥','🎧','🔒','🌈','🛰️','🧿','🧩','🎲'];
@@ -22,6 +25,16 @@ const CallModal = ({ isOpen, call, isIncoming, onAccept, onDecline, onEnd }) => 
     for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) >>> 0;
     return [0,1,2,3].map(k => pool[(h >> (k*5)) % pool.length]);
   }, [call?._id]);
+
+  // Attach real stats monitor when connection accepted and a PC is available
+  useEffect(() => {
+    if (!isOpen || !call) return;
+    if (call.status !== 'accepted') return;
+    const pc = window.__tuktukPC; // optional global if set by call flow
+    if (!pc) return;
+    const stop = attachStatsMonitor(pc, ({ quality, kbps, loss }) => setQualityState({ quality, kbps, loss }));
+    return () => stop && stop();
+  }, [isOpen, call?.status]);
 
   if (!isOpen || !call) return null;
 
@@ -44,6 +57,15 @@ const CallModal = ({ isOpen, call, isIncoming, onAccept, onDecline, onEnd }) => 
     setVideoOff(!videoOff);
     try {
       socket?.emit('call-video-toggle', { callId: call._id, isVideoEnabled: next, targetUserId });
+    } catch {}
+  };
+
+  
+
+  const handleRetry = () => {
+    try {
+      const detail = { chatId: call?.chat?._id, type: call?.type };
+      window.dispatchEvent(new CustomEvent('tuktuk-call-retry', { detail }));
     } catch {}
   };
 
@@ -73,7 +95,7 @@ const CallModal = ({ isOpen, call, isIncoming, onAccept, onDecline, onEnd }) => 
         {/* Status and quality */}
         <div className={styles.statusRow}>
           <div className={styles.statusText}>
-            {connected ? 'Соединение установлено' : 'Соединение…'}
+            {connected ? 'Соединение установлено' : (call.status === 'busy' ? 'Занято' : 'Соединение…')}
           </div>
           {connected && (
             <div className={styles.quality} title="Качество соединения">
@@ -106,7 +128,12 @@ const CallModal = ({ isOpen, call, isIncoming, onAccept, onDecline, onEnd }) => 
               <button className={`${styles.btn} ${styles.decline}`} onClick={onDecline}>Отклонить</button>
             </>
           ) : (
-            <button className={`${styles.btn} ${styles.decline}`} onClick={onEnd}>Завершить</button>
+            <>
+              {call.status === 'busy' ? (
+                <button className={`${styles.btn} ${styles.accept}`} onClick={handleRetry}>Повторить</button>
+              ) : null}
+              <button className={`${styles.btn} ${styles.decline}`} onClick={onEnd}>Завершить</button>
+            </>
           )}
         </div>
       </div>

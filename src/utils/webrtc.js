@@ -28,3 +28,52 @@ export const handleWebRTCError = (error) => {
   else if (String(error.message || '').toLowerCase().includes('ice')) userMessage = 'Проблемы со связью';
   return userMessage;
 };
+
+// Монитор качества связи на основе getStats
+// Возвращает функцию stop()
+export const attachStatsMonitor = (pc, onQuality) => {
+  if (!pc || typeof pc.getStats !== 'function') return () => {};
+  let lastBytes = 0;
+  let lastTs = 0;
+  let stopped = false;
+  const calc = async () => {
+    if (stopped) return;
+    try {
+      const stats = await pc.getStats(null);
+      let bytesNow = 0;
+      let packetsLost = 0;
+      let packetsTotal = 0;
+      stats.forEach(r => {
+        if (r.type === 'outbound-rtp' && !r.isRemote) {
+          if (typeof r.bytesSent === 'number') bytesNow += r.bytesSent;
+        }
+        if (r.type === 'remote-inbound-rtp') {
+          if (typeof r.packetsLost === 'number') packetsLost += r.packetsLost;
+          if (typeof r.packetsReceived === 'number') packetsTotal += r.packetsReceived + r.packetsLost;
+        }
+      });
+      const now = performance.now();
+      let kbps = 0;
+      if (lastTs && bytesNow >= lastBytes) {
+        const deltaBytes = bytesNow - lastBytes;
+        const deltaMs = now - lastTs;
+        kbps = deltaMs > 0 ? Math.round((deltaBytes * 8) / deltaMs) : 0; // kbit/s approx
+      }
+      lastBytes = bytesNow;
+      lastTs = now;
+      const loss = packetsTotal > 0 ? (packetsLost / packetsTotal) : 0;
+      // Простая эвристика качества 1..5
+      let q = 5;
+      if (loss > 0.1 || kbps < 16) q = 1;
+      else if (loss > 0.05 || kbps < 32) q = 2;
+      else if (loss > 0.02 || kbps < 64) q = 3;
+      else if (loss > 0.01 || kbps < 96) q = 4;
+      else q = 5;
+      onQuality && onQuality({ quality: q, kbps, loss });
+    } catch (_) {}
+  };
+  const timer = setInterval(calc, 2000);
+  // первый замер через 1с
+  setTimeout(calc, 1000);
+  return () => { stopped = true; clearInterval(timer); };
+};
