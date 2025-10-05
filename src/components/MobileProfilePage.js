@@ -263,7 +263,7 @@ const MobileProfilePage = ({ isOpen, onClose, user, onOpenArchive }) => {
       
       console.log('📤 Request data:', payload);
       
-      const response = await axios.put('/user/profile', requestData);
+      const response = await axios.put('/user/profile', payload);
 
       if (response.data.success) {
         console.log('✅ Profile updated successfully');
