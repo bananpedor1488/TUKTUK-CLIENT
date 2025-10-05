@@ -21,6 +21,8 @@ const SettingsModalTabs = ({ isOpen, onClose, user }) => {
     email: user?.email || 'user@example.com',
     bio: user?.bio || '',
     avatar: user?.avatar || null,
+    bannerImage: user?.bannerImage || null,
+    bannerColor: user?.bannerColor || null,
     
     // Внешний вид
     theme: 'dark',
@@ -56,6 +58,36 @@ const SettingsModalTabs = ({ isOpen, onClose, user }) => {
     }));
   };
 
+  const handleBannerUpload = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      error('Неподдерживаемый формат файла. Разрешены: JPEG, PNG, GIF, WebP', 'Неподдерживаемый формат');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      error('Размер файла не должен превышать 5MB', 'Файл слишком большой');
+      return;
+    }
+    try {
+      const base64 = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result.replace(/^data:image\/[^;]+;base64,/, ''));
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+      const res = await axios.post('/user/upload-banner', { base64Data: base64, fileName: `banner_${user?._id}_${Date.now()}.png` });
+      if (res.data?.success) {
+        setSettings(prev => ({ ...prev, bannerImage: res.data.banner }));
+        if (updateUser) updateUser(res.data.user);
+        if (success) success('Баннер загружен', 'Профиль');
+      }
+    } catch (e) {
+      error(e?.response?.data?.message || 'Ошибка загрузки баннера', 'Ошибка');
+    }
+  };
+
   // Обновляем данные пользователя при изменении user
   useEffect(() => {
     if (user) {
@@ -65,6 +97,8 @@ const SettingsModalTabs = ({ isOpen, onClose, user }) => {
         email: user.email || 'user@example.com',
         bio: user.bio || '',
         avatar: getVersionedAvatar(user?.avatar) || null,
+        bannerImage: user.bannerImage || null,
+        bannerColor: user.bannerColor || null,
         theme: 'dark',
         fontSize: 'medium',
         animationType: 'slideFromRight',
@@ -93,7 +127,9 @@ const SettingsModalTabs = ({ isOpen, onClose, user }) => {
                       settings.username !== originalSettings.username ||
                       settings.bio !== originalSettings.bio ||
                       settings.email !== originalSettings.email ||
-                      settings.avatar !== originalSettings.avatar;
+                      settings.avatar !== originalSettings.avatar ||
+                      settings.bannerImage !== originalSettings.bannerImage ||
+                      settings.bannerColor !== originalSettings.bannerColor;
     
     setHasUnsavedChanges(hasChanges);
   }, [settings, originalSettings]);
@@ -180,7 +216,9 @@ const SettingsModalTabs = ({ isOpen, onClose, user }) => {
       const response = await axios.put('/user/profile', {
         displayName: settings.name,
         username: settings.username,
-        bio: settings.bio
+        bio: settings.bio,
+        bannerColor: settings.bannerImage ? null : (settings.bannerColor ?? null),
+        ...(settings.bannerImage === null ? { bannerImage: null } : {})
       });
 
       if (response.data.success) {
@@ -192,7 +230,9 @@ const SettingsModalTabs = ({ isOpen, onClose, user }) => {
           name: settings.name,
           username: settings.username,
           bio: settings.bio,
-          avatar: settings.avatar
+          avatar: settings.avatar,
+          bannerImage: settings.bannerImage === null ? null : getVersionedAvatar(settings.bannerImage, user?.avatarUpdatedAt || user?.updatedAt),
+          bannerColor: settings.bannerColor
         });
         
         setHasUnsavedChanges(false);
@@ -359,35 +399,58 @@ const SettingsModalTabs = ({ isOpen, onClose, user }) => {
           {activeTab === 'profile' && (
             <div className={styles.tabPanel}>
               <h3 className={styles.panelTitle}>Профиль</h3>
-              
+
+              {/* Баннер профиля */}
               <div className={styles.settingItem}>
                 <div className={styles.settingInfo}>
-                  <label className={styles.settingLabel}>Аватар</label>
-                  <span className={styles.settingDescription}>Загрузите изображение профиля</span>
+                  <label className={styles.settingLabel}>Баннер профиля</label>
+                  <span className={styles.settingDescription}>Картинка баннера или цвет фона, если картинка не загружена</span>
                 </div>
                 <div className={styles.settingControl}>
-                  <div className={styles.avatarUpload}>
-                    <div className={styles.avatarPreview}>
-                      {settings.avatar ? (
-                        <img src={getVersionedAvatar(settings.avatar, user?.avatarUpdatedAt || user?.updatedAt)} alt="Avatar" className={styles.avatarImage} />
-                      ) : (
-                        <div className={styles.avatarPlaceholder}>
-                          {settings.name?.charAt(0)?.toUpperCase() || 'U'}
-                        </div>
-                      )}
-                    </div>
+                  <div className={styles.bannerPreview}>
+                    {settings.bannerImage ? (
+                      <img src={settings.bannerImage} alt="Banner" />
+                    ) : (
+                      <div style={{ width: '100%', height: '100%', background: settings.bannerColor || 'linear-gradient(135deg, #2a2b2f, #1f2023)' }} />
+                    )}
+                  </div>
+                  <div className={styles.bannerControls}>
                     <button className={styles.uploadButton}>
                       <input
                         type="file"
                         accept="image/*"
-                        onChange={handleAvatarUpload}
+                        onChange={handleBannerUpload}
                         style={{ display: 'none' }}
-                        id="desktop-avatar-upload"
+                        id="desktop-banner-upload"
                       />
-                      <label htmlFor="desktop-avatar-upload" style={{ cursor: 'pointer', display: 'block' }}>
-                        Загрузить
-                      </label>
+                      <label htmlFor="desktop-banner-upload" style={{ cursor: 'pointer', display: 'block' }}>Загрузить баннер</label>
                     </button>
+                    {!settings.bannerImage && (
+                      <>
+                        <input
+                          type="color"
+                          className={styles.colorInput}
+                          value={settings.bannerColor || '#2a2b2f'}
+                          onChange={(e) => handleSettingChange('bannerColor', e.target.value)}
+                          title="Цвет баннера"
+                        />
+                        <input
+                          type="text"
+                          className={styles.hexInput}
+                          placeholder="#2a2b2f"
+                          value={settings.bannerColor || ''}
+                          onChange={(e) => handleSettingChange('bannerColor', e.target.value)}
+                        />
+                      </>
+                    )}
+                    {settings.bannerImage && (
+                      <button
+                        type="button"
+                        className={styles.dangerButton}
+                        onClick={() => setSettings(prev => ({ ...prev, bannerImage: null }))}
+                        title="Удалить изображение баннера"
+                      >Удалить</button>
+                    )}
                   </div>
                 </div>
               </div>
