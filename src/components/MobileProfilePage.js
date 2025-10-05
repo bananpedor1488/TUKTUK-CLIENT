@@ -73,8 +73,31 @@ const MobileProfilePage = ({ isOpen, onClose, user, onOpenArchive }) => {
         autoDownload: false,
         language: 'ru'
       };
+      // Подхватываем быструю реакцию из localStorage (единое значение)
+      try {
+        const single = localStorage.getItem('tuktuk-quick-reaction');
+        if (single) {
+          newSettings.quickReaction = single;
+        } else {
+          // миграция со старого формата, если есть
+          const legacy = JSON.parse(localStorage.getItem('tuktuk-quick-reactions') || '{}');
+          const chosen = legacy?.desktop || legacy?.mobile || '❤️';
+          newSettings.quickReaction = chosen;
+          localStorage.setItem('tuktuk-quick-reaction', chosen);
+        }
+      } catch (_) {
+        newSettings.quickReaction = '❤️';
+      }
+      
+      setSettings(newSettings);
+      setOriginalSettings(newSettings);
+      setHasUnsavedChanges(false);
+      // Keep all subsections closed by default on load/change
+      setActiveSection(null);
+    }
+  }, [user]);
 
-  // Banner handlers
+  // Banner handlers (component scope)
   const handleBannerUpload = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
@@ -90,7 +113,7 @@ const MobileProfilePage = ({ isOpen, onClose, user, onOpenArchive }) => {
     }
 
     try {
-      // Convert to base64
+      // Convert to base64 (strip header for ImgBB)
       const base64 = await new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.onload = () => resolve(reader.result.replace(/^data:image\/[^;]+;base64,/, ''));
@@ -124,29 +147,6 @@ const MobileProfilePage = ({ isOpen, onClose, user, onOpenArchive }) => {
   const handleBannerColorChange = (value) => {
     setSettings(prev => ({ ...prev, bannerColor: value }));
   };
-      // Подхватываем быструю реакцию из localStorage (единое значение)
-      try {
-        const single = localStorage.getItem('tuktuk-quick-reaction');
-        if (single) {
-          newSettings.quickReaction = single;
-        } else {
-          // миграция со старого формата, если есть
-          const legacy = JSON.parse(localStorage.getItem('tuktuk-quick-reactions') || '{}');
-          const chosen = legacy?.desktop || legacy?.mobile || '❤️';
-          newSettings.quickReaction = chosen;
-          localStorage.setItem('tuktuk-quick-reaction', chosen);
-        }
-      } catch (_) {
-        newSettings.quickReaction = '❤️';
-      }
-      
-      setSettings(newSettings);
-      setOriginalSettings(newSettings);
-      setHasUnsavedChanges(false);
-      // Keep all subsections closed by default on load/change
-      setActiveSection(null);
-    }
-  }, [user]);
 
   // Проверяем изменения при каждом обновлении settings
   useEffect(() => {
