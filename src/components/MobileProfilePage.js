@@ -509,28 +509,28 @@ const MobileProfilePage = ({ isOpen, onClose, user, onOpenArchive }) => {
               style={{ background: settings.bannerColor || 'linear-gradient(135deg, #2a2b2f, #1f2023)' }}
             />
           )}
-        </div>
-        <div className={styles.userInfoInner}>
-          <div className={styles.userAvatar}>
-          {settings.avatar ? (
-            <img 
-              src={settings.avatar} 
-              alt={settings.name} 
-              className={styles.avatarImage}
-            />
-          ) : (
-            <FiUser size={32} className={styles.avatarIcon} />
-          )}
-          </div>
-          <div className={styles.userDetails}>
-            <h2 className={styles.userName}>{settings.name}</h2>
-            <p 
-              className={styles.userEmail}
-              onClick={handleCopyUsername}
-              title="Нажмите чтобы скопировать username"
-            >
-              @{settings.username}
-            </p>
+          <div className={styles.bannerOverlay}>
+            <div className={styles.userAvatar}>
+              {settings.avatar ? (
+                <img 
+                  src={settings.avatar} 
+                  alt={settings.name} 
+                  className={styles.avatarImage}
+                />
+              ) : (
+                <FiUser size={32} className={styles.avatarIcon} />
+              )}
+            </div>
+            <div className={styles.userDetails}>
+              <h2 className={styles.userName}>{settings.name}</h2>
+              <p 
+                className={styles.userEmail}
+                onClick={handleCopyUsername}
+                title="Нажмите чтобы скопировать username"
+              >
+                @{settings.username}
+              </p>
+            </div>
           </div>
         </div>
       </div>

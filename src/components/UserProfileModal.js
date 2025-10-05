@@ -109,79 +109,50 @@ const UserProfileModal = ({ user, isOpen, onClose, isOwnProfile = false }) => {
         </div>
 
         <div className={styles.content}>
-          {/* Баннер + Аватар */}
+          {/* Баннер с оверлеем (аватар + имя) */}
           <div className={styles.bannerContainer}>
             {bannerImage ? (
               <img src={bannerImage} alt="Banner" className={styles.bannerImage} />
             ) : (
-              <div className={styles.bannerColorFallback} style={{ background: bannerColor || 'linear-gradient(135deg, #2a2b2f, #1f2023)' }} />
+              <div
+                className={styles.bannerColorFallback}
+                style={{ background: bannerColor || 'linear-gradient(135deg, #2a2b2f, #1f2023)' }}
+              />
             )}
-          </div>
-          <div className={styles.avatarSection}>
-            <div className={styles.avatarContainer}>
-              {user?.avatar ? (
-                <img src={user.avatar} alt={user.displayName} className={styles.avatar} />
-              ) : (
-                <div className={styles.avatarPlaceholder}>
-                  {user?.displayName?.charAt(0)?.toUpperCase() || '?'}
-                </div>
-              )}
-            </div>
-            <h3 className={styles.displayName}>{user?.displayName}</h3>
-            <p
-              className={styles.username}
-              title="Нажмите, чтобы скопировать"
-              onClick={async () => {
-                if (!user?.username) return;
-                const value = `@${user.username}`;
-                try {
-                  if (navigator.clipboard?.writeText) {
-                    await navigator.clipboard.writeText(value);
-                  } else {
-                    throw new Error('Clipboard API not available');
-                  }
-                } catch (e) {
-                  // Fallback
-                  const ta = document.createElement('textarea');
-                  ta.value = value;
-                  document.body.appendChild(ta);
-                  ta.select();
-                  document.execCommand('copy');
-                  document.body.removeChild(ta);
-                } finally {
-                  if (success) success(`Скопировано: ${value}`, 'Буфер обмена');
-                }
-              }}
-            >
-              @{user?.username}
-            </p>
-
-            {/* Call actions */}
-            {!isOwnProfile && (
-              <div className={styles.callActions}>
-                <button
-                  type="button"
-                  className={`${styles.callBtn} ${styles.audioBtn}`}
-                  onClick={() => startCall('audio')}
-                  title="Аудио-звонок"
-                >
-                  <FiPhone size={16} />
-                  <span>Позвонить</span>
-                </button>
-                <button
-                  type="button"
-                  className={`${styles.callBtn} ${styles.videoBtn}`}
-                  onClick={() => startCall('video')}
-                  title="Видео-звонок"
-                >
-                  <FiVideo size={16} />
-                  <span>Видео</span>
-                </button>
+            <div className={styles.bannerOverlay}>
+              <div className={styles.avatarContainer}>
+                {user?.avatar ? (
+                  <img src={user.avatar} alt={user.displayName} className={styles.avatar} />
+                ) : (
+                  <div className={styles.avatarPlaceholder}>
+                    {user?.displayName?.charAt(0)?.toUpperCase() || '?'}
+                  </div>
+                )}
               </div>
-            )}
+              <h3 className={styles.displayName}>{user?.displayName}</h3>
+              <p
+                className={styles.username}
+                title="Нажмите, чтобы скопировать"
+                onClick={async () => {
+                  if (!user?.username) return;
+                  const value = `@${user.username}`;
+                  try {
+                    if (navigator.clipboard?.writeText) {
+                      await navigator.clipboard.writeText(value);
+                    } else {
+                      const ta = document.createElement('textarea');
+                      ta.value = value;
+                      document.body.appendChild(ta);
+                      ta.select();
+                      document.execCommand('copy');
+                      document.body.removeChild(ta);
+                    }
+                  } catch (e) {}
+                }}
+              >@{user?.username}</p>
+            </div>
           </div>
 
-          {/* Контролы баннера только для своего профиля */}
           {isOwnProfile && (
             <div className={styles.bannerControls}>
               <div>
@@ -233,7 +204,6 @@ const UserProfileModal = ({ user, isOpen, onClose, isOwnProfile = false }) => {
           <div className={styles.profileInfo}>
             <div className={styles.infoSection}>
               <h4 className={styles.sectionTitle}>Личная информация</h4>
-              
               <div className={styles.infoItem}>
                 <FiUser className={styles.infoIcon} />
                 <div className={styles.infoContent}>

@@ -85,7 +85,7 @@
 .bannerContainer {
   position: relative;
   width: 100%;
-  height: 140px;
+  height: 180px;
   background: var(--theme-card-background, rgba(255, 255, 255, 0.05));
   overflow: hidden;
   border-radius: 12px;
@@ -102,6 +102,18 @@
 .bannerColorFallback {
   position: absolute;
   inset: 0;
+}
+
+.bannerOverlay {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
 }
 
 .bannerControls {
