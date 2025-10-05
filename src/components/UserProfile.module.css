@@ -63,6 +63,31 @@
   padding: 20px;
 }
 
+/* Banner */
+.bannerContainer {
+  position: relative;
+  width: 100%;
+  height: 140px;
+  background-color: var(--bg-secondary);
+  border-radius: var(--radius-medium);
+  overflow: hidden;
+  margin-bottom: 12px;
+  border: 1px solid var(--border-color);
+}
+
+.bannerImage {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.bannerColorFallback {
+  position: absolute;
+  inset: 0;
+}
+
 .avatarSection {
   display: flex;
   flex-direction: column;
@@ -114,6 +139,59 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
+}
+
+.bannerPreview {
+  width: 100%;
+  height: 120px;
+  border-radius: var(--radius-medium);
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-secondary);
+}
+
+.bannerControls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.uploadButton {
+  padding: 8px 12px;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-medium);
+  color: var(--text-primary);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.dangerButton {
+  padding: 8px 12px;
+  background: rgba(244, 67, 54, 0.1);
+  border: 1px solid rgba(244, 67, 54, 0.3);
+  border-radius: var(--radius-medium);
+  color: #f44336;
+}
+
+.colorInput {
+  width: 40px;
+  height: 32px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-small);
+  background: transparent;
+  padding: 0;
+}
+
+.hexInput {
+  width: 120px;
+  padding: 8px 10px;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-medium);
+  color: var(--text-primary);
 }
 
 .formGroup {

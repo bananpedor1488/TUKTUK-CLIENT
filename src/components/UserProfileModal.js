@@ -17,6 +17,8 @@ const UserProfileModal = ({ user, isOpen, onClose, isOwnProfile = false }) => {
     phone: user?.phone || '',
     birthday: user?.birthday || ''
   });
+  const [bannerImage, setBannerImage] = useState(user?.bannerImage || null);
+  const [bannerColor, setBannerColor] = useState(user?.bannerColor || '');
 
   // Toast helpers (like on mobile)
   const toast = useToast();
@@ -107,7 +109,14 @@ const UserProfileModal = ({ user, isOpen, onClose, isOwnProfile = false }) => {
         </div>
 
         <div className={styles.content}>
-          {/* Аватар */}
+          {/* Баннер + Аватар */}
+          <div className={styles.bannerContainer}>
+            {bannerImage ? (
+              <img src={bannerImage} alt="Banner" className={styles.bannerImage} />
+            ) : (
+              <div className={styles.bannerColorFallback} style={{ background: bannerColor || 'linear-gradient(135deg, #2a2b2f, #1f2023)' }} />
+            )}
+          </div>
           <div className={styles.avatarSection}>
             <div className={styles.avatarContainer}>
               {user?.avatar ? (
@@ -117,7 +126,6 @@ const UserProfileModal = ({ user, isOpen, onClose, isOwnProfile = false }) => {
                   {user?.displayName?.charAt(0)?.toUpperCase() || '?'}
                 </div>
               )}
-              {/* Removed avatar change button by request */}
             </div>
             <h3 className={styles.displayName}>{user?.displayName}</h3>
             <p
@@ -172,6 +180,54 @@ const UserProfileModal = ({ user, isOpen, onClose, isOwnProfile = false }) => {
               </div>
             )}
           </div>
+
+          {/* Контролы баннера только для своего профиля */}
+          {isOwnProfile && (
+            <div className={styles.bannerControls}>
+              <div>
+                <input type="file" accept="image/*" id="modal-banner-upload" style={{ display: 'none' }}
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    try {
+                      const base64 = await new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onload = () => resolve(reader.result.replace(/^data:image\/[^;]+;base64,/, ''));
+                        reader.onerror = reject;
+                        reader.readAsDataURL(file);
+                      });
+                      const res = await axios.post('/user/upload-banner', { base64Data: base64, fileName: `banner_${user?._id}_${Date.now()}.png` });
+                      if (res.data?.success) {
+                        setBannerImage(res.data.banner);
+                        if (success) success('Баннер обновлен', 'Профиль');
+                      }
+                    } catch (e) {
+                      alert(e?.response?.data?.message || 'Не удалось загрузить баннер');
+                    }
+                  }}
+                />
+                <label htmlFor="modal-banner-upload" className={styles.uploadButton}>Загрузить баннер</label>
+              </div>
+              <input type="color" className={styles.colorInput} value={bannerColor || '#2a2b2f'} onChange={(e) => setBannerColor(e.target.value)} />
+              <input type="text" className={styles.hexInput} placeholder="#2a2b2f" value={bannerColor || ''} onChange={(e) => setBannerColor(e.target.value)} />
+              {bannerImage && (
+                <button type="button" className={styles.dangerButton} onClick={() => setBannerImage(null)}>Удалить баннер</button>
+              )}
+              <button
+                type="button"
+                className={styles.uploadButton}
+                onClick={async () => {
+                  try {
+                    const payload = { bannerColor: bannerColor || null, ...(bannerImage === null ? { bannerImage: null } : {}) };
+                    await axios.put('/user/profile', payload);
+                    if (success) success('Баннер сохранен', 'Профиль');
+                  } catch (e) {
+                    alert(e?.response?.data?.message || 'Не удалось сохранить баннер');
+                  }
+                }}
+              >Сохранить баннер</button>
+            </div>
+          )}
 
           {/* Информация профиля */}
           <div className={styles.profileInfo}>

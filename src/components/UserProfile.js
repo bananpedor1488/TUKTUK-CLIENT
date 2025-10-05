@@ -12,6 +12,8 @@ const UserProfile = ({ user, onClose }) => {
     username: user?.username || ''
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [bannerImage, setBannerImage] = useState(user?.bannerImage || null);
+  const [bannerColor, setBannerColor] = useState(user?.bannerColor || '');
   const [error, setError] = useState('');
 
   const { updateUser } = useAuth();
@@ -36,7 +38,11 @@ const UserProfile = ({ user, onClose }) => {
     setError('');
 
     try {
-      const response = await axios.put('/user/profile', formData);
+      const response = await axios.put('/user/profile', {
+        ...formData,
+        bannerColor: bannerColor || null,
+        ...(bannerImage === null ? { bannerImage: null } : {})
+      });
       updateUser(response.data.user);
       setIsEditing(false);
     } catch (error) {
@@ -67,6 +73,14 @@ const UserProfile = ({ user, onClose }) => {
         </div>
 
         <div className={styles.profileContent}>
+          {/* Banner */}
+          <div className={styles.bannerContainer}>
+            {bannerImage ? (
+              <img src={bannerImage} alt="Banner" className={styles.bannerImage} />
+            ) : (
+              <div className={styles.bannerColorFallback} style={{ background: bannerColor || 'linear-gradient(135deg, #2a2b2f, #1f2023)' }} />
+            )}
+          </div>
           <div className={styles.avatarSection}>
             <AvatarUpload
               currentAvatar={user?.avatar}
@@ -84,6 +98,53 @@ const UserProfile = ({ user, onClose }) => {
           )}
 
           <form onSubmit={handleSubmit} className={styles.profileForm}>
+            {/* Banner controls */}
+            <div className={styles.formGroup}>
+              <label className={styles.formLabel}>Profile Banner</label>
+              <div className={styles.bannerPreview}>
+                {bannerImage ? (
+                  <img src={bannerImage} alt="Banner" />
+                ) : (
+                  <div style={{ width: '100%', height: '100%', background: bannerColor || 'linear-gradient(135deg, #2a2b2f, #1f2023)' }} />
+                )}
+              </div>
+              <div className={styles.bannerControls}>
+                <div>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    id="banner-upload-desktop"
+                    style={{ display: 'none' }}
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      try {
+                        const base64 = await new Promise((resolve, reject) => {
+                          const reader = new FileReader();
+                          reader.onload = () => resolve(reader.result.replace(/^data:image\/[^;]+;base64,/, ''));
+                          reader.onerror = reject;
+                          reader.readAsDataURL(file);
+                        });
+                        const res = await axios.post('/user/upload-banner', { base64Data: base64, fileName: `banner_${user?._id}_${Date.now()}.png` });
+                        if (res.data?.success) {
+                          setBannerImage(res.data.banner);
+                          updateUser(res.data.user);
+                        }
+                      } catch (e) {
+                        setError(e?.response?.data?.message || 'Failed to upload banner');
+                      }
+                    }}
+                  />
+                  <label htmlFor="banner-upload-desktop" className={styles.uploadButton}>Upload Banner</label>
+                </div>
+                <input type="color" className={styles.colorInput} value={bannerColor || '#2a2b2f'} onChange={(e) => setBannerColor(e.target.value)} />
+                <input type="text" className={styles.hexInput} placeholder="#2a2b2f" value={bannerColor || ''} onChange={(e) => setBannerColor(e.target.value)} />
+                {bannerImage && (
+                  <button type="button" className={styles.dangerButton} onClick={() => setBannerImage(null)}>Remove Banner</button>
+                )}
+              </div>
+            </div>
+
             <div className={styles.formGroup}>
               <label htmlFor="displayName" className={styles.formLabel}>
                 Display Name

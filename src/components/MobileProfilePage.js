@@ -19,6 +19,8 @@ const MobileProfilePage = ({ isOpen, onClose, user, onOpenArchive }) => {
     email: user?.email || 'user@example.com',
     bio: user?.bio || '',
     avatar: user?.avatar || null,
+    bannerImage: user?.bannerImage || null,
+    bannerColor: user?.bannerColor || null,
     
     // Внешний вид
     theme: 'dark',
@@ -55,6 +57,8 @@ const MobileProfilePage = ({ isOpen, onClose, user, onOpenArchive }) => {
         email: user.email || 'user@example.com',
         bio: user.bio || '',
         avatar: user.avatar || null,
+        bannerImage: user.bannerImage || null,
+        bannerColor: user.bannerColor || null,
         theme: 'dark',
         fontSize: 'medium',
         animationType: 'slideFromRight',
@@ -69,6 +73,57 @@ const MobileProfilePage = ({ isOpen, onClose, user, onOpenArchive }) => {
         autoDownload: false,
         language: 'ru'
       };
+
+  // Banner handlers
+  const handleBannerUpload = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      if (error) error('Неподдерживаемый формат файла. Разрешены: JPEG, PNG, GIF, WebP', 'Неподдерживаемый формат');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      if (error) error('Размер файла не должен превышать 5MB', 'Файл слишком большой');
+      return;
+    }
+
+    try {
+      // Convert to base64
+      const base64 = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result.replace(/^data:image\/[^;]+;base64,/, ''));
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+
+      const response = await axios.post('/user/upload-banner', {
+        base64Data: base64,
+        fileName: `banner_${user?._id}_${Date.now()}.png`
+      });
+
+      if (response.data.success) {
+        setSettings(prev => ({ ...prev, bannerImage: response.data.banner }));
+        if (updateUser) updateUser(response.data.user);
+        if (success) success('Баннер загружен успешно!', 'Загрузка завершена');
+      } else {
+        throw new Error(response.data.message || 'Upload failed');
+      }
+    } catch (err) {
+      console.error('❌ Banner upload error:', err);
+      if (error) error(err.response?.data?.message || err.message || 'Ошибка при загрузке баннера', 'Ошибка загрузки');
+    }
+  };
+
+  const handleBannerRemove = () => {
+    setSettings(prev => ({ ...prev, bannerImage: null }));
+    setHasUnsavedChanges(true);
+  };
+
+  const handleBannerColorChange = (value) => {
+    setSettings(prev => ({ ...prev, bannerColor: value }));
+  };
       // Подхватываем быструю реакцию из localStorage (единое значение)
       try {
         const single = localStorage.getItem('tuktuk-quick-reaction');
@@ -99,7 +154,9 @@ const MobileProfilePage = ({ isOpen, onClose, user, onOpenArchive }) => {
                       settings.username !== originalSettings.username ||
                       settings.bio !== originalSettings.bio ||
                       settings.email !== originalSettings.email ||
-                      settings.avatar !== originalSettings.avatar;
+                      settings.avatar !== originalSettings.avatar ||
+                      settings.bannerImage !== originalSettings.bannerImage ||
+                      settings.bannerColor !== originalSettings.bannerColor;
     
     setHasUnsavedChanges(hasChanges);
   }, [settings, originalSettings]);
@@ -186,7 +243,7 @@ const MobileProfilePage = ({ isOpen, onClose, user, onOpenArchive }) => {
       /expression\s*\(/i
     ];
 
-    const fieldsToCheck = [settings.username, settings.name, settings.bio].filter(Boolean);
+    const fieldsToCheck = [settings.username, settings.name, settings.bio, settings.bannerColor].filter(Boolean);
     for (const field of fieldsToCheck) {
       for (const pattern of suspiciousPatterns) {
         if (pattern.test(field)) {
@@ -205,7 +262,10 @@ const MobileProfilePage = ({ isOpen, onClose, user, onOpenArchive }) => {
       const requestData = {
         displayName: settings.name,
         username: settings.username,
-        bio: settings.bio
+        bio: settings.bio,
+        bannerColor: settings.bannerColor ?? null,
+        // Allow clearing banner image when user removed it
+        ...(settings.bannerImage === null ? { bannerImage: null } : {})
       };
       
       console.log('📤 Request data:', requestData);
@@ -440,7 +500,18 @@ const MobileProfilePage = ({ isOpen, onClose, user, onOpenArchive }) => {
 
       {/* Информация о пользователе */}
       <div className={styles.userInfoSection}>
-        <div className={styles.userAvatar}>
+        <div className={styles.bannerContainer}>
+          {settings.bannerImage ? (
+            <img src={settings.bannerImage} alt="Banner" className={styles.bannerImage} />
+          ) : (
+            <div
+              className={styles.bannerColorFallback}
+              style={{ background: settings.bannerColor || 'linear-gradient(135deg, #2a2b2f, #1f2023)' }}
+            />
+          )}
+        </div>
+        <div className={styles.userInfoInner}>
+          <div className={styles.userAvatar}>
           {settings.avatar ? (
             <img 
               src={settings.avatar} 
@@ -450,16 +521,17 @@ const MobileProfilePage = ({ isOpen, onClose, user, onOpenArchive }) => {
           ) : (
             <FiUser size={32} className={styles.avatarIcon} />
           )}
-        </div>
-        <div className={styles.userDetails}>
-          <h2 className={styles.userName}>{settings.name}</h2>
-          <p 
-            className={styles.userEmail}
-            onClick={handleCopyUsername}
-            title="Нажмите чтобы скопировать username"
-          >
-            @{settings.username}
-          </p>
+          </div>
+          <div className={styles.userDetails}>
+            <h2 className={styles.userName}>{settings.name}</h2>
+            <p 
+              className={styles.userEmail}
+              onClick={handleCopyUsername}
+              title="Нажмите чтобы скопировать username"
+            >
+              @{settings.username}
+            </p>
+          </div>
         </div>
       </div>
 
@@ -482,6 +554,55 @@ const MobileProfilePage = ({ isOpen, onClose, user, onOpenArchive }) => {
                 <div className={styles.sectionContent}>
                   {section.id === 'profile' && (
                     <div className={styles.sectionPanel}>
+                      {/* Banner settings */}
+                      <div className={styles.settingCard}>
+                        <div className={styles.settingInfo}>
+                          <h3 className={styles.settingLabel}>Баннер профиля</h3>
+                          <p className={styles.settingDescription}>Картинка или цвет за аватаркой</p>
+                        </div>
+                        <div className={styles.settingControl}>
+                          <div className={styles.bannerPreview}>
+                            {settings.bannerImage ? (
+                              <img src={settings.bannerImage} alt="Banner" />
+                            ) : (
+                              <div style={{ width: '100%', height: '100%', background: settings.bannerColor || 'linear-gradient(135deg, #2a2b2f, #1f2023)' }} />
+                            )}
+                          </div>
+                          <div className={styles.bannerControls}>
+                            <div>
+                              <input
+                                type="file"
+                                accept="image/*"
+                                id="banner-upload"
+                                style={{ display: 'none' }}
+                                onChange={handleBannerUpload}
+                              />
+                              <label htmlFor="banner-upload" className={styles.uploadButton}>Загрузить баннер</label>
+                            </div>
+                            <div className={styles.colorPicker}>
+                              <input
+                                type="color"
+                                className={styles.colorInput}
+                                value={settings.bannerColor || '#2a2b2f'}
+                                onChange={(e) => handleBannerColorChange(e.target.value)}
+                              />
+                              <input
+                                type="text"
+                                className={styles.hexInput}
+                                value={settings.bannerColor || ''}
+                                placeholder="#2a2b2f"
+                                onChange={(e) => handleBannerColorChange(e.target.value)}
+                              />
+                            </div>
+                            {settings.bannerImage && (
+                              <button type="button" className={styles.dangerButton} onClick={handleBannerRemove}>
+                                Удалить баннер
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
                       <div className={styles.settingCard}>
                         <div className={styles.settingInfo}>
                           <h3 className={styles.settingLabel}>Аватар</h3>
