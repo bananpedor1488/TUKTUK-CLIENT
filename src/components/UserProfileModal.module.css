@@ -216,15 +216,13 @@
 }
 
 .displayName {
-  margin: 0 0 8px 0;
-  font-size: 24px;
+  margin: 8px 0 4px;
+  font-size: 20px;
   font-weight: 600;
-  color: var(--theme-text-primary, #ffffff);
+  color: var(--theme-text-primary);
 }
 
-.username {
-  margin: 0;
-  font-size: 16px;
+.nameRow {
   color: var(--theme-text-secondary, #c2c2c2);
 }
 

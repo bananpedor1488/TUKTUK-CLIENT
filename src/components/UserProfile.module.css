@@ -33,6 +33,11 @@
   border-radius: var(--radius-large) var(--radius-large) 0 0;
 }
 
+.premiumBadge {
+  color: var(--accent-primary);
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.2));
+}
+
 .profileHeader h2 {
   margin: 0;
   font-size: 24px;

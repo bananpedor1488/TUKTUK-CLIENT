@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { FiX, FiUser, FiCalendar, FiMapPin, FiAtSign, FiPhone, FiVideo } from 'react-icons/fi';
+import { FaMeteor } from 'react-icons/fa';
 import CallService from '../services/CallService';
 import axios from '../services/axiosConfig';
 import CallModal from './calls/CallModal';
@@ -128,7 +129,14 @@ const UserProfileModal = ({ user, isOpen, onClose, isOwnProfile = false }) => {
                   </div>
                 )}
               </div>
-              <h3 className={styles.displayName}>{user?.displayName}</h3>
+              <h3 className={styles.displayName}>
+                <span className={styles.nameRow}>
+                  {user?.displayName}
+                  {user?.isPremium && (
+                    <FaMeteor className={styles.premiumBadge} size={18} />
+                  )}
+                </span>
+              </h3>
               <p
                 className={styles.username}
                 title="Нажмите, чтобы скопировать"

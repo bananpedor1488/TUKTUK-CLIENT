@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { FaMeteor } from 'react-icons/fa';
 import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext';
 import AvatarUpload from './AvatarUpload';
@@ -64,7 +65,10 @@ const UserProfile = ({ user, onClose }) => {
     <div className={styles.profileOverlay}>
       <div className={styles.profileContainer}>
         <div className={styles.profileHeader}>
-          <h2>Profile</h2>
+          <h2 style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            Profile
+            {user?.isPremium && <FaMeteor className={styles.premiumBadge} size={18} />}
+          </h2>
           <button onClick={onClose} className={styles.closeButton}>
             ✕
           </button>

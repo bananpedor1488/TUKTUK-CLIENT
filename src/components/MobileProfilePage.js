@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FiArrowLeft, FiUser, FiBell, FiShield, FiLogOut, FiEdit3, FiSave, FiSettings, FiEye, FiVolume2, FiVolumeX, FiBellOff, FiEyeOff, FiCheck, FiX, FiAlertCircle } from 'react-icons/fi';
+import { FaMeteor } from 'react-icons/fa';
 import ThemeToggle from './ThemeToggle/ThemeToggle';
 import axios from '../services/axiosConfig';
 import { useToast } from '../contexts/ToastContext';
@@ -534,7 +535,14 @@ const MobileProfilePage = ({ isOpen, onClose, user, onOpenArchive }) => {
               )}
             </div>
             <div className={styles.userDetails}>
-              <h2 className={styles.userName}>{settings.name}</h2>
+              <h2 className={styles.userName}>
+                <span className={styles.nameRow}>
+                  {settings.name}
+                  {user?.isPremium && (
+                    <FaMeteor className={styles.premiumBadge} size={18} />
+                  )}
+                </span>
+              </h2>
               <p 
                 className={styles.userEmail}
                 onClick={handleCopyUsername}
@@ -876,6 +884,43 @@ const MobileProfilePage = ({ isOpen, onClose, user, onOpenArchive }) => {
 
                   {section.id === 'additional' && (
                     <div className={styles.sectionPanel}>
+                      {/* Premium subscription */}
+                      <div className={styles.settingCard}>
+                        <div className={styles.settingInfo}>
+                          <h3 className={styles.settingLabel}>Премиум</h3>
+                          <p className={styles.settingDescription}>
+                            {user?.isPremium ? 'У вас активен Премиум' : 'Получите значок метеорита и другие бонусы'}
+                          </p>
+                        </div>
+                        <div className={styles.settingControl}>
+                          {user?.isPremium ? (
+                            <button className={styles.actionButton} disabled>
+                              Премиум активен ✓
+                            </button>
+                          ) : (
+                            <button
+                              className={styles.actionButton}
+                              onClick={async () => {
+                                try {
+                                  const res = await axios.post('/user/premium/activate');
+                                  if (res.data?.success) {
+                                    if (updateUser) updateUser(res.data.user);
+                                    if (success) success('Премиум активирован', 'Подписка');
+                                  } else {
+                                    throw new Error(res.data?.message || 'Activation failed');
+                                  }
+                                } catch (e) {
+                                  if (error) error(e?.response?.data?.message || e.message || 'Не удалось активировать премиум', 'Ошибка');
+                                }
+                              }}
+                            >
+                              Активировать Премиум
+                            </button>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Language */}
                       <div className={styles.settingCard}>
                         <div className={styles.settingInfo}>
                           <h3 className={styles.settingLabel}>Язык интерфейса</h3>
@@ -890,7 +935,6 @@ const MobileProfilePage = ({ isOpen, onClose, user, onOpenArchive }) => {
                             <option value="ru">Русский</option>
                             <option value="en">English</option>
                             <option value="es">Español</option>
-                            <option value="fr">Français</option>
                             <option value="de">Deutsch</option>
                           </select>
                         </div>
