@@ -425,7 +425,23 @@ const SettingsModalTabs = ({ isOpen, onClose, user }) => {
                       <button
                         type="button"
                         className={styles.dangerButton}
-                        onClick={() => setSettings(prev => ({ ...prev, bannerImage: null }))}
+                        onClick={async () => {
+                          try {
+                            // локально убираем картинку
+                            setSettings(prev => ({ ...prev, bannerImage: null }));
+                            // сразу сохраняем на сервере
+                            const res = await axios.put('/user/profile', { bannerImage: null });
+                            if (res.data?.success) {
+                              // обновляем пользователя и оригинальные настройки, чтобы не горели unsaved
+                              if (updateUser) updateUser(res.data.user);
+                              setOriginalSettings(prev => ({ ...prev, bannerImage: null }));
+                              setHasUnsavedChanges(false);
+                              if (success) success('Баннер удалён', 'Профиль');
+                            }
+                          } catch (e) {
+                            if (error) error(e?.response?.data?.message || 'Не удалось удалить баннер', 'Ошибка');
+                          }
+                        }}
                         title="Удалить изображение баннера"
                       >Удалить</button>
                     )}
