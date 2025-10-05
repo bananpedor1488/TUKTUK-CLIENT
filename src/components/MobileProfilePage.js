@@ -495,7 +495,10 @@ const MobileProfilePage = ({ isOpen, onClose, user, onOpenArchive }) => {
       <div className={styles.userInfoSection}>
         <div className={styles.bannerContainer}>
           {settings.bannerImage ? (
-            <img src={settings.bannerImage} alt="Banner" className={styles.bannerImage} />
+            <>
+              <img src={settings.bannerImage} alt="Banner" className={styles.bannerImage} />
+              <div className={styles.bannerShade} />
+            </>
           ) : (
             <div className={styles.bannerColorFallback} style={{ background: 'transparent' }} />
           )}
@@ -504,7 +507,7 @@ const MobileProfilePage = ({ isOpen, onClose, user, onOpenArchive }) => {
               {settings.avatar ? (
                 <img 
                   src={settings.avatar} 
-                  alt={settings.name} 
+                  alt={settings.name}
                   className={styles.avatarImage}
                 />
               ) : (
@@ -548,7 +551,7 @@ const MobileProfilePage = ({ isOpen, onClose, user, onOpenArchive }) => {
                       <div className={styles.settingCard}>
                         <div className={styles.settingInfo}>
                           <h3 className={styles.settingLabel}>Баннер профиля</h3>
-                          <p className={styles.settingDescription}>Картинка или цвет за аватаркой</p>
+                          <p className={styles.settingDescription}>Картинка баннера или прозрачность</p>
                         </div>
                         <div className={styles.settingControl}>
                           <div className={styles.bannerPreview}>

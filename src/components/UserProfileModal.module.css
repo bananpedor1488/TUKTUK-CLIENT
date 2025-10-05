@@ -86,7 +86,7 @@
   position: relative;
   width: 100%;
   height: 210px; /* компактнее: заканчивается около ника */
-  background: var(--theme-card-background, rgba(255, 255, 255, 0.05));
+  background: transparent; /* прозрачный фон — виден фон модалки */
   overflow: hidden;
   border-radius: 0; /* full-bleed, no rounding */
   /* stretch to the edges of the modal, compensating content padding */

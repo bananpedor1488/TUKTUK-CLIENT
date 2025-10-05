@@ -399,7 +399,7 @@ const SettingsModalTabs = ({ isOpen, onClose, user }) => {
               <div className={styles.settingItem}>
                 <div className={styles.settingInfo}>
                   <label className={styles.settingLabel}>Баннер профиля</label>
-                  <span className={styles.settingDescription}>Картинка баннера или цвет фона, если картинка не загружена</span>
+                  <span className={styles.settingDescription}>Картинка баннера или прозрачность, если картинка не загружена</span>
                 </div>
                 <div className={styles.settingControl}>
                   <div className={styles.bannerPreview}>

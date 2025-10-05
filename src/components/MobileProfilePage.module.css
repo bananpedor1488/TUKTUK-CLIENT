@@ -165,7 +165,7 @@
   position: relative;
   width: 100%;
   height: 180px;
-  background: var(--theme-card-background, rgba(255, 255, 255, 0.05));
+  background: transparent; /* прозрачный фон — виден фон страницы */
   overflow: hidden;
 }
 

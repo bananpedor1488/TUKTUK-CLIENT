@@ -68,7 +68,7 @@
   position: relative;
   width: 100%;
   height: 220px;
-  background-color: var(--bg-secondary);
+  background-color: transparent; /* прозрачный фон — виден фон контейнера */
   border-radius: 0; /* full-bleed */
   overflow: hidden;
   margin-bottom: 12px;
