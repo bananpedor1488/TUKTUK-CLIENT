@@ -69,10 +69,14 @@
   width: 100%;
   height: 140px;
   background-color: var(--bg-secondary);
-  border-radius: var(--radius-medium);
+  border-radius: 0; /* full-bleed */
   overflow: hidden;
   margin-bottom: 12px;
-  border: 1px solid var(--border-color);
+  border: none;
+  /* stretch to edges of container paddings */
+  margin-left: -20px;
+  margin-right: -20px;
+  width: calc(100% + 40px);
 }
 
 .bannerImage {

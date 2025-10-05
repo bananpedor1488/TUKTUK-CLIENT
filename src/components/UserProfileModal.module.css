@@ -88,7 +88,11 @@
   height: 180px;
   background: var(--theme-card-background, rgba(255, 255, 255, 0.05));
   overflow: hidden;
-  border-radius: 12px;
+  border-radius: 0; /* full-bleed, no rounding */
+  /* stretch to the edges of the modal, compensating content padding */
+  margin-left: -24px;
+  margin-right: -24px;
+  width: calc(100% + 48px);
 }
 
 .bannerImage {
