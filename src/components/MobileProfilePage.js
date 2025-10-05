@@ -579,21 +579,23 @@ const MobileProfilePage = ({ isOpen, onClose, user, onOpenArchive }) => {
                               />
                               <label htmlFor="banner-upload" className={styles.uploadButton}>Загрузить баннер</label>
                             </div>
-                            <div className={styles.colorPicker}>
-                              <input
-                                type="color"
-                                className={styles.colorInput}
-                                value={settings.bannerColor || '#2a2b2f'}
-                                onChange={(e) => handleBannerColorChange(e.target.value)}
-                              />
-                              <input
-                                type="text"
-                                className={styles.hexInput}
-                                value={settings.bannerColor || ''}
-                                placeholder="#2a2b2f"
-                                onChange={(e) => handleBannerColorChange(e.target.value)}
-                              />
-                            </div>
+                            {!settings.bannerImage && (
+                              <div className={styles.colorPicker}>
+                                <input
+                                  type="color"
+                                  className={styles.colorInput}
+                                  value={settings.bannerColor || '#2a2b2f'}
+                                  onChange={(e) => handleBannerColorChange(e.target.value)}
+                                />
+                                <input
+                                  type="text"
+                                  className={styles.hexInput}
+                                  value={settings.bannerColor || ''}
+                                  placeholder="#2a2b2f"
+                                  onChange={(e) => handleBannerColorChange(e.target.value)}
+                                />
+                              </div>
+                            )}
                             {settings.bannerImage && (
                               <button type="button" className={styles.dangerButton} onClick={handleBannerRemove}>
                                 Удалить баннер

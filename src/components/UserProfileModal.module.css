@@ -85,7 +85,7 @@
 .bannerContainer {
   position: relative;
   width: 100%;
-  height: 240px;
+  height: 180px; /* компактнее: заканчивается около ника */
   background: var(--theme-card-background, rgba(255, 255, 255, 0.05));
   overflow: hidden;
   border-radius: 0; /* full-bleed, no rounding */
@@ -112,7 +112,7 @@
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 12px;
+  bottom: 6px; /* чуть ближе к низу баннера */
   display: flex;
   flex-direction: column;
   align-items: center;
