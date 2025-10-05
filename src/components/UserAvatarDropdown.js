@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { FaMeteor } from 'react-icons/fa';
 import { FiUser, FiSettings, FiLogOut, FiChevronDown } from 'react-icons/fi';
 import { FiArchive } from 'react-icons/fi';
 import styles from './UserAvatarDropdown.module.css';
@@ -86,7 +87,12 @@ const UserAvatarDropdown = ({ user, onProfileClick, onSettingsClick, onLogout, o
               </div>
               <div className={styles.userDetails}>
                 <div className={styles.userName}>
-                  {user?.displayName || 'Пользователь'}
+                  <span className={styles.nameRow}>
+                    {user?.displayName || 'Пользователь'}
+                    {user?.isPremium && (
+                      <FaMeteor className={styles.premiumBadge} size={16} />
+                    )}
+                  </span>
                 </div>
                 <div className={styles.userStatus}>
                   {isConnected ? 'Онлайн' : 'Офлайн'}

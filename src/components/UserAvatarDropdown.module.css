@@ -134,6 +134,18 @@
   font-weight: 600;
   color: var(--theme-text-primary);
   margin-bottom: 4px;
+  display: inline-flex;
+}
+
+.nameRow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.premiumBadge {
+  color: var(--theme-main-color, #d0bcff);
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.2));
 }
 
 .userStatus {
