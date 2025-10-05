@@ -137,9 +137,28 @@ const MobileProfilePage = ({ isOpen, onClose, user, onOpenArchive }) => {
     }
   };
 
-  const handleBannerRemove = () => {
+  const handleBannerRemove = async () => {
+    // локально убираем картинку
     setSettings(prev => ({ ...prev, bannerImage: null }));
-    setHasUnsavedChanges(true);
+    try {
+      // сразу сохраняем на сервере
+      const res = await axios.put('/user/profile', { bannerImage: null });
+      if (res.data?.success) {
+        // обновляем пользователя в контексте
+        if (updateUser) updateUser(res.data.user);
+        // так как состояние соответствует серверу — снимаем флаг изменений
+        setOriginalSettings(prev => ({ ...prev, bannerImage: null }));
+        setHasUnsavedChanges(false);
+        if (success) success('Баннер удалён', 'Профиль');
+      } else {
+        throw new Error(res.data?.message || 'Update failed');
+      }
+    } catch (e) {
+      // откатим локально, если запрос упал
+      setSettings(prev => ({ ...prev, bannerImage: originalSettings.bannerImage || null }));
+      setHasUnsavedChanges(false);
+      if (error) error(e?.response?.data?.message || e.message || 'Не удалось удалить баннер', 'Ошибка');
+    }
   };
 
   // banner color removed: only image or transparent
