@@ -120,6 +120,13 @@
   padding: 0 12px;
 }
 
+/* Светлый баннер: делаем текст тёмным для читабельности */
+.overlayLight .displayName,
+.overlayLight .username {
+  color: #000 !important;
+  text-shadow: none;
+}
+
 .bannerControls {
   display: flex;
   flex-wrap: wrap;

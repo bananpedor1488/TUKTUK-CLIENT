@@ -20,6 +20,19 @@ const UserProfileModal = ({ user, isOpen, onClose, isOwnProfile = false }) => {
   const [bannerImage, setBannerImage] = useState(user?.bannerImage || null);
   const [bannerColor, setBannerColor] = useState(user?.bannerColor || '');
 
+  const isLightColor = (hex) => {
+    if (!hex || typeof hex !== 'string') return false;
+    const m = hex.trim().match(/^#?([0-9a-fA-F]{6})$/);
+    if (!m) return false;
+    const intVal = parseInt(m[1], 16);
+    const r = (intVal >> 16) & 255;
+    const g = (intVal >> 8) & 255;
+    const b = intVal & 255;
+    // относительная яркость
+    const luminance = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
+    return luminance > 0.8; // считаем очень светлым
+  };
+
   // Toast helpers (like on mobile)
   const toast = useToast();
   const { success } = toast || {};
@@ -119,7 +132,7 @@ const UserProfileModal = ({ user, isOpen, onClose, isOwnProfile = false }) => {
                 style={{ background: bannerColor || 'linear-gradient(135deg, #2a2b2f, #1f2023)' }}
               />
             )}
-            <div className={styles.bannerOverlay}>
+            <div className={`${styles.bannerOverlay} ${(!bannerImage && isLightColor(bannerColor)) ? styles.overlayLight : ''}`}>
               <div className={styles.avatarContainer}>
                 {user?.avatar ? (
                   <img src={user.avatar} alt={user.displayName} className={styles.avatar} />
