@@ -455,6 +455,39 @@ const SettingsModalTabs = ({ isOpen, onClose, user }) => {
                 </div>
               </div>
 
+              {/* Аватар */}
+              <div className={styles.settingItem}>
+                <div className={styles.settingInfo}>
+                  <label className={styles.settingLabel}>Аватар</label>
+                  <span className={styles.settingDescription}>Загрузите изображение профиля</span>
+                </div>
+                <div className={styles.settingControl}>
+                  <div className={styles.avatarUpload}>
+                    <div className={styles.avatarPreview}>
+                      {settings.avatar ? (
+                        <img src={getVersionedAvatar(settings.avatar, user?.avatarUpdatedAt || user?.updatedAt)} alt="Avatar" className={styles.avatarImage} />
+                      ) : (
+                        <div className={styles.avatarPlaceholder}>
+                          {settings.name?.charAt(0)?.toUpperCase() || 'U'}
+                        </div>
+                      )}
+                    </div>
+                    <button className={styles.uploadButton}>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleAvatarUpload}
+                        style={{ display: 'none' }}
+                        id="desktop-avatar-upload"
+                      />
+                      <label htmlFor="desktop-avatar-upload" style={{ cursor: 'pointer', display: 'block' }}>
+                        Загрузить
+                      </label>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
               <div className={`${styles.settingItem} ${settings.username !== originalSettings.username ? styles.settingItemChanged : ''}`}>
                 <div className={styles.settingInfo}>
                   <label className={styles.settingLabel}>
