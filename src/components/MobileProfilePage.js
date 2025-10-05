@@ -20,7 +20,6 @@ const MobileProfilePage = ({ isOpen, onClose, user, onOpenArchive }) => {
     bio: user?.bio || '',
     avatar: user?.avatar || null,
     bannerImage: user?.bannerImage || null,
-    bannerColor: user?.bannerColor || null,
     
     // Внешний вид
     theme: 'dark',
@@ -58,7 +57,6 @@ const MobileProfilePage = ({ isOpen, onClose, user, onOpenArchive }) => {
         bio: user.bio || '',
         avatar: user.avatar || null,
         bannerImage: user.bannerImage || null,
-        bannerColor: user.bannerColor || null,
         theme: 'dark',
         fontSize: 'medium',
         animationType: 'slideFromRight',
@@ -144,9 +142,7 @@ const MobileProfilePage = ({ isOpen, onClose, user, onOpenArchive }) => {
     setHasUnsavedChanges(true);
   };
 
-  const handleBannerColorChange = (value) => {
-    setSettings(prev => ({ ...prev, bannerColor: value }));
-  };
+  // banner color removed: only image or transparent
 
   // Проверяем изменения при каждом обновлении settings
   useEffect(() => {
@@ -155,8 +151,7 @@ const MobileProfilePage = ({ isOpen, onClose, user, onOpenArchive }) => {
                       settings.bio !== originalSettings.bio ||
                       settings.email !== originalSettings.email ||
                       settings.avatar !== originalSettings.avatar ||
-                      settings.bannerImage !== originalSettings.bannerImage ||
-                      settings.bannerColor !== originalSettings.bannerColor;
+                      settings.bannerImage !== originalSettings.bannerImage;
     
     setHasUnsavedChanges(hasChanges);
   }, [settings, originalSettings]);
@@ -243,7 +238,7 @@ const MobileProfilePage = ({ isOpen, onClose, user, onOpenArchive }) => {
       /expression\s*\(/i
     ];
 
-    const fieldsToCheck = [settings.username, settings.name, settings.bio, settings.bannerColor].filter(Boolean);
+    const fieldsToCheck = [settings.username, settings.name, settings.bio].filter(Boolean);
     for (const field of fieldsToCheck) {
       for (const pattern of suspiciousPatterns) {
         if (pattern.test(field)) {
@@ -254,21 +249,19 @@ const MobileProfilePage = ({ isOpen, onClose, user, onOpenArchive }) => {
         }
       }
     }
-
     setIsSaving(true);
     try {
       console.log('📤 Updating user profile...');
       
-      const requestData = {
+      const payload = {
         displayName: settings.name,
         username: settings.username,
         bio: settings.bio,
-        bannerColor: settings.bannerColor ?? null,
         // Allow clearing banner image when user removed it
         ...(settings.bannerImage === null ? { bannerImage: null } : {})
       };
       
-      console.log('📤 Request data:', requestData);
+      console.log('📤 Request data:', payload);
       
       const response = await axios.put('/user/profile', requestData);
 
@@ -504,10 +497,7 @@ const MobileProfilePage = ({ isOpen, onClose, user, onOpenArchive }) => {
           {settings.bannerImage ? (
             <img src={settings.bannerImage} alt="Banner" className={styles.bannerImage} />
           ) : (
-            <div
-              className={styles.bannerColorFallback}
-              style={{ background: settings.bannerColor || 'linear-gradient(135deg, #2a2b2f, #1f2023)' }}
-            />
+            <div className={styles.bannerColorFallback} style={{ background: 'transparent' }} />
           )}
           <div className={styles.bannerOverlay}>
             <div className={styles.userAvatar}>
@@ -565,7 +555,7 @@ const MobileProfilePage = ({ isOpen, onClose, user, onOpenArchive }) => {
                             {settings.bannerImage ? (
                               <img src={settings.bannerImage} alt="Banner" />
                             ) : (
-                              <div style={{ width: '100%', height: '100%', background: settings.bannerColor || 'linear-gradient(135deg, #2a2b2f, #1f2023)' }} />
+                              <div style={{ width: '100%', height: '100%', background: 'transparent' }} />
                             )}
                           </div>
                           <div className={styles.bannerControls}>
@@ -579,23 +569,7 @@ const MobileProfilePage = ({ isOpen, onClose, user, onOpenArchive }) => {
                               />
                               <label htmlFor="banner-upload" className={styles.uploadButton}>Загрузить баннер</label>
                             </div>
-                            {!settings.bannerImage && (
-                              <div className={styles.colorPicker}>
-                                <input
-                                  type="color"
-                                  className={styles.colorInput}
-                                  value={settings.bannerColor || '#2a2b2f'}
-                                  onChange={(e) => handleBannerColorChange(e.target.value)}
-                                />
-                                <input
-                                  type="text"
-                                  className={styles.hexInput}
-                                  value={settings.bannerColor || ''}
-                                  placeholder="#2a2b2f"
-                                  onChange={(e) => handleBannerColorChange(e.target.value)}
-                                />
-                              </div>
-                            )}
+                            {/* Цветовые контролы удалены: баннер либо картинка, либо прозрачность */}
                             {settings.bannerImage && (
                               <button type="button" className={styles.dangerButton} onClick={handleBannerRemove}>
                                 Удалить баннер

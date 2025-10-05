@@ -108,6 +108,13 @@
   inset: 0;
 }
 
+.bannerShade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.15), rgba(0,0,0,0.35));
+  pointer-events: none;
+}
+
 .bannerOverlay {
   position: absolute;
   left: 0;

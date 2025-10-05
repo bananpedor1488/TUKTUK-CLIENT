@@ -13,7 +13,6 @@ const UserProfile = ({ user, onClose }) => {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [bannerImage, setBannerImage] = useState(user?.bannerImage || null);
-  const [bannerColor, setBannerColor] = useState(user?.bannerColor || '');
   const [error, setError] = useState('');
 
   const { updateUser } = useAuth();
@@ -40,7 +39,6 @@ const UserProfile = ({ user, onClose }) => {
     try {
       const response = await axios.put('/user/profile', {
         ...formData,
-        bannerColor: bannerColor || null,
         ...(bannerImage === null ? { bannerImage: null } : {})
       });
       updateUser(response.data.user);
@@ -78,7 +76,7 @@ const UserProfile = ({ user, onClose }) => {
             {bannerImage ? (
               <img src={bannerImage} alt="Banner" className={styles.bannerImage} />
             ) : (
-              <div className={styles.bannerColorFallback} style={{ background: bannerColor || 'linear-gradient(135deg, #2a2b2f, #1f2023)' }} />
+              <div className={styles.bannerColorFallback} style={{ background: 'transparent' }} />
             )}
           </div>
           <div className={styles.avatarSection}>
@@ -105,7 +103,7 @@ const UserProfile = ({ user, onClose }) => {
                 {bannerImage ? (
                   <img src={bannerImage} alt="Banner" />
                 ) : (
-                  <div style={{ width: '100%', height: '100%', background: bannerColor || 'linear-gradient(135deg, #2a2b2f, #1f2023)' }} />
+                  <div style={{ width: '100%', height: '100%', background: 'transparent' }} />
                 )}
               </div>
               <div className={styles.bannerControls}>
@@ -137,8 +135,6 @@ const UserProfile = ({ user, onClose }) => {
                   />
                   <label htmlFor="banner-upload-desktop" className={styles.uploadButton}>Upload Banner</label>
                 </div>
-                <input type="color" className={styles.colorInput} value={bannerColor || '#2a2b2f'} onChange={(e) => setBannerColor(e.target.value)} />
-                <input type="text" className={styles.hexInput} placeholder="#2a2b2f" value={bannerColor || ''} onChange={(e) => setBannerColor(e.target.value)} />
                 {bannerImage && (
                   <button type="button" className={styles.dangerButton} onClick={() => setBannerImage(null)}>Remove Banner</button>
                 )}

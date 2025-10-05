@@ -22,7 +22,6 @@ const SettingsModalTabs = ({ isOpen, onClose, user }) => {
     bio: user?.bio || '',
     avatar: user?.avatar || null,
     bannerImage: user?.bannerImage || null,
-    bannerColor: user?.bannerColor || null,
     
     // Внешний вид
     theme: 'dark',
@@ -98,7 +97,6 @@ const SettingsModalTabs = ({ isOpen, onClose, user }) => {
         bio: user.bio || '',
         avatar: getVersionedAvatar(user?.avatar) || null,
         bannerImage: user.bannerImage || null,
-        bannerColor: user.bannerColor || null,
         theme: 'dark',
         fontSize: 'medium',
         animationType: 'slideFromRight',
@@ -128,8 +126,7 @@ const SettingsModalTabs = ({ isOpen, onClose, user }) => {
                       settings.bio !== originalSettings.bio ||
                       settings.email !== originalSettings.email ||
                       settings.avatar !== originalSettings.avatar ||
-                      settings.bannerImage !== originalSettings.bannerImage ||
-                      settings.bannerColor !== originalSettings.bannerColor;
+                      settings.bannerImage !== originalSettings.bannerImage;
     
     setHasUnsavedChanges(hasChanges);
   }, [settings, originalSettings]);
@@ -217,7 +214,6 @@ const SettingsModalTabs = ({ isOpen, onClose, user }) => {
         displayName: settings.name,
         username: settings.username,
         bio: settings.bio,
-        bannerColor: settings.bannerImage ? null : (settings.bannerColor ?? null),
         ...(settings.bannerImage === null ? { bannerImage: null } : {})
       });
 
@@ -231,9 +227,8 @@ const SettingsModalTabs = ({ isOpen, onClose, user }) => {
           username: settings.username,
           bio: settings.bio,
           avatar: settings.avatar,
-          bannerImage: settings.bannerImage === null ? null : getVersionedAvatar(settings.bannerImage, user?.avatarUpdatedAt || user?.updatedAt),
-          bannerColor: settings.bannerColor
-        });
+          bannerImage: settings.bannerImage === null ? null : getVersionedAvatar(settings.bannerImage, user?.avatarUpdatedAt || user?.updatedAt)
+      });
         
         setHasUnsavedChanges(false);
         
@@ -411,7 +406,7 @@ const SettingsModalTabs = ({ isOpen, onClose, user }) => {
                     {settings.bannerImage ? (
                       <img src={settings.bannerImage} alt="Banner" />
                     ) : (
-                      <div style={{ width: '100%', height: '100%', background: settings.bannerColor || 'linear-gradient(135deg, #2a2b2f, #1f2023)' }} />
+                      <div style={{ width: '100%', height: '100%', background: 'transparent' }} />
                     )}
                   </div>
                   <div className={styles.bannerControls}>
@@ -425,24 +420,7 @@ const SettingsModalTabs = ({ isOpen, onClose, user }) => {
                       />
                       <label htmlFor="desktop-banner-upload" style={{ cursor: 'pointer', display: 'block' }}>Загрузить баннер</label>
                     </button>
-                    {!settings.bannerImage && (
-                      <>
-                        <input
-                          type="color"
-                          className={styles.colorInput}
-                          value={settings.bannerColor || '#2a2b2f'}
-                          onChange={(e) => handleSettingChange('bannerColor', e.target.value)}
-                          title="Цвет баннера"
-                        />
-                        <input
-                          type="text"
-                          className={styles.hexInput}
-                          placeholder="#2a2b2f"
-                          value={settings.bannerColor || ''}
-                          onChange={(e) => handleSettingChange('bannerColor', e.target.value)}
-                        />
-                      </>
-                    )}
+                    {/* Цветовые контролы удалены: баннер либо картинка, либо прозрачность */}
                     {settings.bannerImage && (
                       <button
                         type="button"
