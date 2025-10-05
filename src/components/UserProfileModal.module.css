@@ -85,7 +85,7 @@
 .bannerContainer {
   position: relative;
   width: 100%;
-  height: 180px;
+  height: 240px;
   background: var(--theme-card-background, rgba(255, 255, 255, 0.05));
   overflow: hidden;
   border-radius: 0; /* full-bleed, no rounding */
