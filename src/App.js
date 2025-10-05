@@ -17,6 +17,7 @@ import './App.css';
 import './styles/theme.css';
 import './styles/uikit.css';
 import './styles/messenger.css';
+import PWAInstallButton from './components/PWAInstallButton';
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
             <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
             <div className="App">
               <LoadingScreenNew />
+              <PWAInstallButton />
               <Routes>
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />

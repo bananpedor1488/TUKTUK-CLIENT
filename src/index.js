@@ -10,3 +10,14 @@ root.render(
   </React.StrictMode>
 );
 
+// Register service worker (works on localhost and HTTPS)
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker
+      .register('/service-worker.js')
+      .catch(() => {
+        // noop
+      });
+  });
+}
+
