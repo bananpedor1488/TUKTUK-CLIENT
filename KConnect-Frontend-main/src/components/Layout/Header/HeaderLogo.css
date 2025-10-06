@@ -1,0 +1,88 @@
+@import '../../../uikit.module.css';
+
+/* HeaderLogo - Оптимизированные стили без Material UI */
+
+.header-logo {
+  display: flex;
+  align-items: center;
+  margin-right: 8px;
+  box-sizing: border-box;
+  contain: layout style paint;
+  color: var(--theme-main-color);
+}
+
+.logo-link {
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  align-items: center;
+  transition: all 0.2s ease;
+}
+
+.logo-link:hover {
+  transform: scale(1.02);
+}
+
+.logo-svg {
+  height: 32px;
+  width: auto;
+  transition: all 0.2s ease;
+}
+
+.logo-text {
+  font-weight: var(--font-weight-black);
+  font-size: 1.2rem;
+  margin-left: 8px;
+  display: flex;
+  align-items: center;
+  color: #ffffff;
+}
+
+.logo-text-content {
+  color: #ffffff;
+  opacity: 0.9;
+  line-height: 1.2;
+  font-weight: var(--font-weight-black);
+}
+
+/* Поддержка reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .logo-link {
+    transition: none;
+  }
+
+  .logo-link:hover {
+    transform: none;
+  }
+
+  .logo-svg {
+    transition: none;
+  }
+}
+
+/* Оптимизации для производительности */
+.header-logo {
+  will-change: transform;
+}
+
+.logo-link {
+  will-change: transform;
+}
+
+/* Поддержка высокого DPI */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .logo-svg {
+    /* Более четкое отображение на retina дисплеях */
+  }
+}
+
+/* Поддержка печати */
+@media print {
+  .header-logo {
+    color: black !important;
+  }
+
+  .logo-text-content {
+    color: black !important;
+  }
+}

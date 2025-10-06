@@ -1,0 +1,227 @@
+@import '../../uikit.module.css';
+
+/* StyledTabs - Точные стили панели рекомендаций из MainPage */
+
+.styled-tabs-container {
+  border-radius: 12px;
+  background: var(--theme-background, rgba(255, 255, 255, 0.03));
+  backdrop-filter: var(--theme-backdrop-filter, blur(20px));
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  overflow: hidden;
+  position: relative;
+  z-index: 2;
+  box-sizing: border-box;
+  contain: layout style paint;
+  margin-bottom: 0;
+}
+
+.styled-tabs--default {
+  background: var(--theme-background, rgba(255, 255, 255, 0.03));
+}
+
+.styled-tabs--custom {
+  background: var(--theme-background, rgba(255, 255, 255, 0.03));
+}
+
+.styled-tabs {
+  display: flex;
+  min-height: 48px;
+  position: relative;
+  z-index: 2;
+  padding: 4px;
+}
+
+/* Режим прокрутки - скрываем скроллбар */
+.styled-tabs--scroll-mode {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.styled-tabs--scroll-mode::-webkit-scrollbar {
+  display: none;
+}
+
+/* Режим равномерного распределения */
+.styled-tabs--distribute-mode {
+  overflow: hidden;
+}
+
+.styled-tab {
+  background: transparent;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.875rem;
+  text-transform: none;
+  border-radius: 8px;
+  min-height: 40px;
+  transition: all 0.2s ease;
+  color: rgba(255, 255, 255, 0.7);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 16px;
+  box-sizing: border-box;
+  margin: 0 2px;
+  font-family: inherit;
+  white-space: nowrap; /* Предотвращаем перенос текста */
+}
+
+/* Режим прокрутки - табы не растягиваются */
+.styled-tab--scroll-mode {
+  flex-shrink: 0;
+}
+
+/* Режим равномерного распределения - табы растягиваются */
+.styled-tab--distribute-mode {
+  flex: 1;
+}
+
+.styled-tab:hover {
+  color: rgba(255, 255, 255, 0.9);
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.styled-tab--active {
+  color: #1a1a1a;
+  background-color: #d0bcff;
+}
+
+.styled-tab--active:hover {
+  background-color: #c0a8ff;
+}
+
+.styled-tab-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.styled-tab-icon {
+  margin-right: 8px;
+  font-size: 1.2em;
+  flex-shrink: 0; /* Предотвращаем сжатие иконки */
+}
+
+.styled-tab-label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+.styled-tab-indicator {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background-color: #d0bcff;
+  border-radius: 3px;
+  transition: all 0.2s ease;
+}
+
+/* Мобильные оптимизации */
+@media (max-width: 768px) {
+  .styled-tabs-container {
+    min-width: 280px;
+    border-radius: 12px;
+    margin-bottom: 16px;
+  }
+
+  .styled-tab {
+    font-size: 0.8rem;
+    min-height: 40px;
+    padding: 0 12px; /* Увеличиваем padding для лучшего touch target */
+    margin: 0 1px;
+  }
+
+  .styled-tab-content {
+    gap: 4px;
+  }
+
+  .styled-tab-icon {
+    margin-right: 4px;
+    font-size: 1em;
+  }
+
+  .styled-tab-label {
+    font-size: 0.8rem;
+  }
+}
+
+/* Очень маленькие экраны */
+@media (max-width: 480px) {
+  .styled-tabs-container {
+    min-width: 100%;
+    border-radius: 8px;
+  }
+
+  .styled-tab {
+    font-size: 0.75rem;
+    min-height: 36px;
+    padding: 0 10px; /* Увеличиваем padding для лучшего touch target */
+    margin: 0 1px;
+  }
+
+  .styled-tab-label {
+    font-size: 0.75rem;
+  }
+}
+
+/* Поддержка reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .styled-tab {
+    transition: none;
+  }
+
+  .styled-tab-indicator {
+    transition: none;
+  }
+}
+
+/* Оптимизации для производительности */
+.styled-tabs-container {
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+.styled-tab {
+  will-change: color, background-color;
+}
+
+/* Поддержка высокого DPI */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .styled-tabs-container {
+    border-width: 0.5px;
+  }
+}
+
+/* Поддержка печати */
+@media print {
+  .styled-tabs-container {
+    background: white !important;
+    border: 1px solid #ccc !important;
+    box-shadow: none !important;
+  }
+
+  .styled-tab {
+    color: black !important;
+    background: white !important;
+  }
+
+  .styled-tab--active {
+    color: #333 !important;
+    background: #f5f5f5 !important;
+  }
+
+  .styled-tab-indicator {
+    background: #333 !important;
+  }
+}

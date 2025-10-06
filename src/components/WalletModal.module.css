@@ -1,7 +1,9 @@
 .overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   z-index: 2000;
   display: flex;
   align-items: center;
@@ -10,13 +12,16 @@
 }
 
 .modal {
-  background: var(--theme-card-background, var(--theme-background));
-  border: 1px solid var(--theme-border-color, rgba(255,255,255,0.12));
-  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 20px;
   width: 100%;
-  max-width: 520px;
+  max-width: 560px;
   max-height: 90vh;
   overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.35);
 }
 
 .header {
@@ -24,7 +29,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 16px 20px;
-  border-bottom: 1px solid var(--theme-border-color, rgba(255,255,255,0.12));
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .title {
@@ -50,19 +55,49 @@
   gap: 16px;
 }
 
-.balanceCard {
+/* Balance hero */
+.balanceHero {
+  background: linear-gradient(135deg, rgba(208,188,255,0.15) 0%, rgba(208,188,255,0.06) 100%);
+  border: 1px solid rgba(208,188,255,0.28);
+  border-radius: 16px;
+  padding: 18px;
+}
+.balanceHeader {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px;
-  border: 1px solid var(--theme-border-color, rgba(255,255,255,0.12));
-  border-radius: 10px;
+}
+.balanceCaption { color: var(--theme-text-secondary); font-size: 13px; }
+.balanceValueLarge { color: var(--theme-text-primary); font-weight: 800; font-size: 34px; line-height: 1.15; }
+
+/* Actions */
+.actionsRow {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+  flex-wrap: wrap;
+}
+.actionBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.16);
+  background: rgba(255,255,255,0.04);
+  color: var(--theme-text-primary);
+}
+.actionBtnPrimary {
+  border: none;
+  background: var(--theme-main-color, #d0bcff);
+  color: #000;
+  font-weight: 700;
 }
 
 .label { color: var(--theme-text-secondary); font-size: 14px; }
 .value { color: var(--theme-text-primary); font-weight: 600; font-size: 16px; }
 
 .row { display: flex; gap: 8px; align-items: center; }
-.input { flex: 1; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--theme-border-color, rgba(255,255,255,0.14)); background: var(--theme-input-background, rgba(255,255,255,0.04)); color: var(--theme-text-primary); }
-.button { padding: 10px 14px; border-radius: 10px; border: none; background: var(--theme-main-color, #d0bcff); color: #000; font-weight: 600; cursor: pointer; }
+.input { flex: 1; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--theme-border-color, rgba(255,255,255,0.14)); background: var(--theme-input-background, rgba(255,255,255,0.04)); color: var(--theme-text-primary); }
+.button { padding: 12px 16px; border-radius: 12px; border: none; background: var(--theme-main-color, #d0bcff); color: #000; font-weight: 700; cursor: pointer; }
 .button:disabled { opacity: .6; cursor: not-allowed; }
