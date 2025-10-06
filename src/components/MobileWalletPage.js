@@ -112,45 +112,7 @@ const MobileWalletPage = ({ isOpen, onClose, user }) => {
           </section>
         )}
 
-        {/* Premium */}
-        <section className={styles.section}>
-          <div className={styles.sectionHeader}>
-            <FaMeteor />
-            <h3 className={styles.sectionTitle}>Premium</h3>
-          </div>
-          <div className={styles.sectionBody}>
-            <div className={styles.row}>
-              <span className={styles.info}>Статус</span>
-              <span className={styles.badge}>{user?.isPremium ? 'Активен' : 'Не активен'}</span>
-            </div>
-            {!user?.isPremium && (
-              <div className={styles.row}>
-                <button
-                  className={styles.buttonPrimary}
-                  disabled={busy || balance < 300}
-                  onClick={async () => {
-                    try {
-                      setBusy(true);
-                      await WalletService.purchasePremium();
-                      const b = await WalletService.getBalance();
-                      setBalance(typeof b === 'number' ? b : (b?.balance ?? 0));
-                      success && success('Premium активирован');
-                    } catch (e) {
-                      error && error(e?.response?.data?.message || 'Не удалось активировать Premium');
-                    } finally {
-                      setBusy(false);
-                    }
-                  }}
-                >
-                  Купить за 300 B
-                </button>
-                {balance < 300 && (
-                  <span className={styles.info}>Недостаточно средств</span>
-                )}
-              </div>
-            )}
-          </div>
-        </section>
+        
 
         {/* Промокоды */}
         <section className={styles.section}>
