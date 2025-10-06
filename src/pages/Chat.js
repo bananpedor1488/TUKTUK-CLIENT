@@ -11,6 +11,7 @@ import UserProfileModal from '../components/UserProfileModal';
 import SettingsModalTabs from '../components/SettingsModalTabs';
 import UserAvatarDropdown from '../components/UserAvatarDropdown';
 import WalletModal from '../components/WalletModal';
+import WalletPage from '../components/WalletPage';
 import MobileWalletPage from '../components/MobileWalletPage';
 import ArchivedChatList from '../components/ArchivedChatList';
 import MobileNavigation from '../components/MobileNavigation';
@@ -483,8 +484,10 @@ const Chat = () => {
       />
 
       {/* Wallet Modal */}
-      {/* Desktop Wallet Modal */}
-      <WalletModal isOpen={showWallet && !isMobile} onClose={() => setShowWallet(false)} user={user} />
+        {/* Desktop Wallet Page */}
+        {showWallet && !isMobile && (
+          <WalletPage onClose={() => setShowWallet(false)} user={user} />
+        )}
 
       {/* Mobile Wallet Page */}
       <MobileWalletPage
