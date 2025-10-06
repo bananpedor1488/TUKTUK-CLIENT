@@ -241,7 +241,7 @@
 .nameRow {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 0;
 }
 
 .premiumBadge {
@@ -250,6 +250,7 @@
   justify-content: center;
   color: var(--theme-main-color, #d0bcff);
   filter: drop-shadow(0 1px 2px rgba(0,0,0,0.2));
+  margin-left: 4px;
 }
 
 .userEmail {

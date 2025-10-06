@@ -222,6 +222,21 @@
   color: var(--theme-text-primary);
 }
 
+/* Row for name + premium icon */
+.nameRow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0; /* no general gap to avoid double spacing */
+}
+
+/* Premium badge next to name */
+.premiumBadge {
+  color: var(--theme-text-accent, #d0bcff);
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 4px; /* compact spacing like chat list */
+}
+
 .nameRow {
   color: var(--theme-text-secondary, #c2c2c2);
 }
