@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { FiUsers, FiCircle, FiZap } from 'react-icons/fi';
+import { FaMeteor } from 'react-icons/fa';
 import { formatLastSeen, formatChatTime } from '../utils/timeUtils';
 import { useAuth } from '../contexts/AuthContext';
 import { useSocket } from '../contexts/SocketContext';
@@ -502,7 +503,17 @@ const ChatList = ({ chats, selectedChat, onChatSelect, isLoading, showAIChat, on
 
             {/* Центральная часть - Основное содержание */}
             <div className={styles.chatContent}>
-              <div className={styles.chatName}>{getChatName(chat)}</div>
+              <div className={styles.chatName}>
+                <span className={styles.nameRow}>
+                  {getChatName(chat)}
+                  {chat.type === 'private' && (() => {
+                    const otherParticipant = chat.participants?.find(p => p && p._id !== user._id);
+                    return otherParticipant?.isPremium ? (
+                      <FaMeteor className={styles.premiumBadge} size={14} />
+                    ) : null;
+                  })()}
+                </span>
+              </div>
               <div className={styles.lastMessage}>{getLastMessagePreview(chat)}</div>
             </div>
 

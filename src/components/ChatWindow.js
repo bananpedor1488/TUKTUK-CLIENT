@@ -15,6 +15,7 @@ import styles from './ChatWindow.module.css';
 import ImageViewerModal from './ImageViewerModal';
 import CallService from '../services/CallService';
 import { FiPhone, FiVideo } from 'react-icons/fi';
+import { FaMeteor } from 'react-icons/fa';
 import { requestMediaPermissions, getOptimalConstraints } from '../utils/webrtc';
 
 const ChatWindow = ({ chat, onChatUpdate, onBackToChatList }) => {
@@ -722,7 +723,17 @@ const ChatWindow = ({ chat, onChatUpdate, onBackToChatList }) => {
             )}
           </div>
           <div className={styles.chatDetails} onClick={() => setIsProfileOpen(true)}>
-            <h2 className={styles.chatName}>{getChatName()}</h2>
+            <h2 className={styles.chatName}>
+              <span className={styles.nameRow}>
+                {getChatName()}
+                {chat.type !== 'group' && (() => {
+                  const other = getOtherParticipant();
+                  return other?.isPremium ? (
+                    <FaMeteor className={styles.premiumBadge} size={16} />
+                  ) : null;
+                })()}
+              </span>
+            </h2>
             <p className={styles.chatStatus}>{getOnlineStatus()}</p>
           </div>
         </div>

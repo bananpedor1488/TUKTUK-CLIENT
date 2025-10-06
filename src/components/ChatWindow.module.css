@@ -158,6 +158,19 @@
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
+/* Row to align name with premium icon */
+.nameRow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.premiumBadge {
+  color: var(--theme-text-accent, #d0bcff);
+  display: inline-block;
+  vertical-align: middle;
+}
+
 .chatStatus {
   font-size: 14px;
   color: var(--theme-text-secondary);
