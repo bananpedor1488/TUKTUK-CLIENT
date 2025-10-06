@@ -11,7 +11,7 @@
 .nameRow {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 0;
 }
 
 /* Иконка премиума рядом с именем */
@@ -19,7 +19,7 @@
   color: var(--theme-text-accent, #d0bcff);
   display: inline-block;
   vertical-align: middle;
-  margin-left: 6px; /* страхуемся, если gap не применится */
+  margin-left: 4px; /* компактнее, без двойного отступа */
 }
 
 /* Состояния загрузки и пустого списка */
