@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { FiArrowLeft, FiUser, FiBell, FiShield, FiLogOut, FiEdit3, FiSave, FiSettings, FiEye, FiVolume2, FiVolumeX, FiBellOff, FiEyeOff, FiCheck, FiX, FiAlertCircle } from 'react-icons/fi';
-import { FaMeteor } from 'react-icons/fa';
+import { FaMeteor, FaCoins } from 'react-icons/fa';
 import ThemeToggle from './ThemeToggle/ThemeToggle';
 import axios from '../services/axiosConfig';
 import { useToast } from '../contexts/ToastContext';
 import { useAuth } from '../contexts/AuthContext';
 import { updateTokens } from '../utils/tokenManager';
 import styles from './MobileProfilePage.module.css';
+import WalletService from '../services/WalletService';
 
 const MobileProfilePage = ({ isOpen, onClose, user, onOpenArchive }) => {
   const [activeSection, setActiveSection] = useState(null);
@@ -47,6 +48,10 @@ const MobileProfilePage = ({ isOpen, onClose, user, onOpenArchive }) => {
   const toast = useToast();
   const { success, error, warning } = toast || {};
   const { updateUser } = useAuth();
+  const [balance, setBalance] = useState(0);
+  const [promoCode, setPromoCode] = useState('');
+  const [creatingPromo, setCreatingPromo] = useState({ type: 'premium', amount: 300 });
+  const [busy, setBusy] = useState(false);
 
   // Обновляем настройки при изменении пользователя
   useEffect(() => {
@@ -95,6 +100,17 @@ const MobileProfilePage = ({ isOpen, onClose, user, onOpenArchive }) => {
       setActiveSection(null);
     }
   }, [user]);
+
+  // Load wallet balance when page opens
+  useEffect(() => {
+    if (!isOpen) return;
+    (async () => {
+      try {
+        const b = await WalletService.getBalance();
+        if (typeof b === 'number') setBalance(b);
+      } catch {}
+    })();
+  }, [isOpen]);
 
   // Banner handlers (component scope)
   const handleBannerUpload = async (event) => {
@@ -182,7 +198,8 @@ const MobileProfilePage = ({ isOpen, onClose, user, onOpenArchive }) => {
     { id: 'notifications', label: 'Уведомления', icon: FiBell },
     { id: 'sound', label: 'Звук и вибрация', icon: FiVolume2 },
     { id: 'additional', label: 'Дополнительно', icon: FiSettings },
-    { id: 'security', label: 'Безопасность', icon: FiShield }
+    { id: 'security', label: 'Безопасность', icon: FiShield },
+    { id: 'premium', label: 'Premium', icon: FaMeteor }
   ];
 
   const handleSettingChange = (key, value) => {
@@ -1077,6 +1094,129 @@ const MobileProfilePage = ({ isOpen, onClose, user, onOpenArchive }) => {
                           >
                             <div className={styles.toggleSlider}></div>
                           </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {section.id === 'premium' && (
+                    <div className={styles.sectionPanel}>
+                      <div className={styles.settingCard}>
+                        <div className={styles.settingInfo}>
+                          <h3 className={styles.settingLabel}>Баланс</h3>
+                          <p className={styles.settingDescription}>Ваши B‑коины</p>
+                        </div>
+                        <div className={styles.settingControl}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                            <FaCoins />
+                            <strong>{balance} B</strong>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className={styles.settingCard}>
+                        <div className={styles.settingInfo}>
+                          <h3 className={styles.settingLabel}>Premium статус</h3>
+                          <p className={styles.settingDescription}>Активируйте Premium за 300 B</p>
+                        </div>
+                        <div className={styles.settingControl}>
+                          <button
+                            className={styles.actionButton}
+                            disabled={busy || balance < 300 || user?.isPremium}
+                            onClick={async () => {
+                              try {
+                                setBusy(true);
+                                await WalletService.purchasePremium();
+                                const b = await WalletService.getBalance();
+                                setBalance(b);
+                                success && success('Premium активирован');
+                              } catch (e) {
+                                error && error(e?.response?.data?.message || 'Не удалось активировать Premium');
+                              } finally {
+                                setBusy(false);
+                              }
+                            }}
+                          >
+                            {user?.isPremium ? 'Уже активирован' : 'Купить за 300 B'}
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className={styles.settingCard}>
+                        <div className={styles.settingInfo}>
+                          <h3 className={styles.settingLabel}>Промокоды</h3>
+                          <p className={styles.settingDescription}>Активируйте или создайте промокод</p>
+                        </div>
+                        <div className={styles.settingControl}>
+                          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                            <input
+                              className={styles.textInput}
+                              placeholder="Введите код"
+                              value={promoCode}
+                              onChange={(e) => setPromoCode(e.target.value)}
+                              style={{ maxWidth: 200 }}
+                            />
+                            <button
+                              className={styles.actionButton}
+                              disabled={busy || !promoCode.trim()}
+                              onClick={async () => {
+                                try {
+                                  setBusy(true);
+                                  await WalletService.redeemPromo(promoCode.trim());
+                                  const b = await WalletService.getBalance();
+                                  setBalance(b);
+                                  setPromoCode('');
+                                  success && success('Промокод активирован');
+                                } catch (e) {
+                                  error && error(e?.response?.data?.message || 'Не удалось активировать промокод');
+                                } finally {
+                                  setBusy(false);
+                                }
+                              }}
+                            >
+                              Активировать
+                            </button>
+                          </div>
+
+                          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 10 }}>
+                            <select
+                              className={styles.select}
+                              value={creatingPromo.type}
+                              onChange={(e) => setCreatingPromo(p => ({ ...p, type: e.target.value }))}
+                              style={{ maxWidth: 180 }}
+                            >
+                              <option value="premium">Premium</option>
+                              <option value="coins">B‑коины</option>
+                            </select>
+                            {creatingPromo.type === 'coins' && (
+                              <input
+                                className={styles.textInput}
+                                type="number"
+                                min={1}
+                                value={creatingPromo.amount}
+                                onChange={(e) => setCreatingPromo(p => ({ ...p, amount: Number(e.target.value) }))}
+                                placeholder="Сумма B"
+                                style={{ maxWidth: 160 }}
+                              />
+                            )}
+                            <button
+                              className={styles.actionButton}
+                              disabled={busy}
+                              onClick={async () => {
+                                try {
+                                  setBusy(true);
+                                  const res = await WalletService.createPromo(creatingPromo);
+                                  success && success(`Создано: ${res?.code || 'код'}`);
+                                } catch (e) {
+                                  error && error(e?.response?.data?.message || 'Не удалось создать промокод');
+                                } finally {
+                                  setBusy(false);
+                                }
+                              }}
+                            >
+                              Создать
+                            </button>
+                          </div>
                         </div>
                       </div>
                     </div>

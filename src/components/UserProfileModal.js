@@ -1,14 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FiX, FiUser, FiCalendar, FiMapPin, FiAtSign, FiPhone, FiVideo } from 'react-icons/fi';
 import { FaMeteor } from 'react-icons/fa';
+import { FaCoins } from 'react-icons/fa';
 import CallService from '../services/CallService';
 import axios from '../services/axiosConfig';
 import CallModal from './calls/CallModal';
 import { useToast } from '../contexts/ToastContext';
 import styles from './UserProfileModal.module.css';
+import WalletService from '../services/WalletService';
 
 const UserProfileModal = ({ user, isOpen, onClose, isOwnProfile = false }) => {
   const [isEditing, setIsEditing] = useState(false);
+  const [activeTab, setActiveTab] = useState('info'); // 'info' | 'premium'
+  const [balance, setBalance] = useState(0);
+  const [promoCode, setPromoCode] = useState('');
+  const [creatingPromo, setCreatingPromo] = useState({ type: 'premium', amount: 300 });
+  const [isBusy, setIsBusy] = useState(false);
   const [callUI, setCallUI] = useState({ isOpen: false, call: null, isIncoming: false });
   const [profileData, setProfileData] = useState({
     displayName: user?.displayName || '',
@@ -84,6 +91,16 @@ const UserProfileModal = ({ user, isOpen, onClose, isOwnProfile = false }) => {
     setIsEditing(false);
   };
 
+  useEffect(() => {
+    if (!isOpen) return;
+    (async () => {
+      try {
+        const b = await WalletService.getBalance();
+        if (typeof b === 'number') setBalance(b);
+      } catch {}
+    })();
+  }, [isOpen]);
+
   const handleCancel = () => {
     setProfileData({
       displayName: user?.displayName || '',
@@ -109,6 +126,23 @@ const UserProfileModal = ({ user, isOpen, onClose, isOwnProfile = false }) => {
         </div>
 
         <div className={styles.content}>
+          {/* Tabs */}
+          <div className={styles.editButtons}>
+            <button
+              className={activeTab === 'info' ? styles.saveButton : styles.cancelButton}
+              onClick={() => setActiveTab('info')}
+            >
+              Профиль
+            </button>
+            <button
+              className={activeTab === 'premium' ? styles.saveButton : styles.cancelButton}
+              onClick={() => setActiveTab('premium')}
+            >
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                <FaMeteor /> Premium
+              </span>
+            </button>
+          </div>
           {/* Баннер с оверлеем (аватар + имя) */}
           <div className={styles.bannerContainer}>
             {bannerImage ? (
@@ -162,7 +196,8 @@ const UserProfileModal = ({ user, isOpen, onClose, isOwnProfile = false }) => {
 
           {/* Управление баннером перенесено в Настройки -> Профиль */}
 
-          {/* Информация профиля */}
+          {/* Tabs content */}
+          {activeTab === 'info' && (
           <div className={styles.profileInfo}>
             <div className={styles.infoSection}>
               <h4 className={styles.sectionTitle}>Личная информация</h4>
@@ -248,10 +283,138 @@ const UserProfileModal = ({ user, isOpen, onClose, isOwnProfile = false }) => {
                 )}
               </div>
             </div>
-
-            
-
           </div>
+          )}
+
+          {activeTab === 'premium' && (
+            <div className={styles.profileInfo}>
+              <div className={styles.infoSection}>
+                <h4 className={styles.sectionTitle}>Premium и баланс</h4>
+                <div className={styles.infoItem}>
+                  <FaCoins className={styles.infoIcon} />
+                  <div className={styles.infoContent}>
+                    <div className={styles.infoLabel}>Баланс B‑коинов</div>
+                    <div className={styles.infoValue}>
+                      {balance} B
+                    </div>
+                  </div>
+                </div>
+
+                <div className={styles.infoItem}>
+                  <FaMeteor className={styles.infoIcon} />
+                  <div className={styles.infoContent}>
+                    <div className={styles.infoLabel}>Premium статус</div>
+                    <div className={styles.infoValue} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      {user?.isPremium ? 'Активен' : 'Не активен'}
+                      {!user?.isPremium && (
+                        <button
+                          className={styles.editButton}
+                          disabled={isBusy || balance < 300}
+                          onClick={async () => {
+                            try {
+                              setIsBusy(true);
+                              await WalletService.purchasePremium();
+                              const b = await WalletService.getBalance();
+                              setBalance(b);
+                              success && success('Premium активирован');
+                            } catch (e) {
+                              alert(e?.response?.data?.message || 'Не удалось активировать Premium');
+                            } finally {
+                              setIsBusy(false);
+                            }
+                          }}
+                        >
+                          Купить за 300 B
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className={styles.infoSection}>
+                <h4 className={styles.sectionTitle}>Промокоды</h4>
+                <div className={styles.infoItem}>
+                  <div className={styles.infoContent}>
+                    <div className={styles.infoLabel}>Активировать промокод</div>
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      <input
+                        className={styles.infoInput}
+                        placeholder="Введите код"
+                        value={promoCode}
+                        onChange={(e) => setPromoCode(e.target.value)}
+                      />
+                      <button
+                        className={styles.editButton}
+                        disabled={isBusy || !promoCode.trim()}
+                        onClick={async () => {
+                          try {
+                            setIsBusy(true);
+                            const res = await WalletService.redeemPromo(promoCode.trim());
+                            const b = await WalletService.getBalance();
+                            setBalance(b);
+                            success && success(res?.message || 'Промокод активирован');
+                            setPromoCode('');
+                          } catch (e) {
+                            alert(e?.response?.data?.message || 'Не удалось активировать промокод');
+                          } finally {
+                            setIsBusy(false);
+                          }
+                        }}
+                      >
+                        Активировать
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className={styles.infoItem}>
+                  <div className={styles.infoContent}>
+                    <div className={styles.infoLabel}>Создать промокод</div>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                      <select
+                        className={styles.infoInput}
+                        value={creatingPromo.type}
+                        onChange={(e) => setCreatingPromo(p => ({ ...p, type: e.target.value }))}
+                        style={{ maxWidth: 180 }}
+                      >
+                        <option value="premium">Premium</option>
+                        <option value="coins">B‑коины</option>
+                      </select>
+                      {creatingPromo.type === 'coins' && (
+                        <input
+                          className={styles.infoInput}
+                          type="number"
+                          min={1}
+                          value={creatingPromo.amount}
+                          onChange={(e) => setCreatingPromo(p => ({ ...p, amount: Number(e.target.value) }))}
+                          placeholder="Сумма B"
+                          style={{ maxWidth: 180 }}
+                        />
+                      )}
+                      <button
+                        className={styles.editButton}
+                        disabled={isBusy}
+                        onClick={async () => {
+                          try {
+                            setIsBusy(true);
+                            const res = await WalletService.createPromo(creatingPromo);
+                            success && success(`Создано: ${res?.code || 'код'}`);
+                          } catch (e) {
+                            alert(e?.response?.data?.message || 'Не удалось создать промокод');
+                          } finally {
+                            setIsBusy(false);
+                          }
+                        }}
+                      >
+                        Создать
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Edit profile footer removed by request */}

@@ -1,11 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { FaMeteor } from 'react-icons/fa';
 import { FiUser, FiSettings, FiLogOut, FiChevronDown } from 'react-icons/fi';
+import { FaCoins } from 'react-icons/fa';
 import { FiArchive } from 'react-icons/fi';
 import styles from './UserAvatarDropdown.module.css';
 import { getUserAvatarUrl } from '../utils/avatarUrl';
 
-const UserAvatarDropdown = ({ user, onProfileClick, onSettingsClick, onLogout, onArchiveClick, isConnected }) => {
+const UserAvatarDropdown = ({ user, onProfileClick, onSettingsClick, onLogout, onArchiveClick, onWalletClick, isConnected }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
 
@@ -35,6 +36,8 @@ const UserAvatarDropdown = ({ user, onProfileClick, onSettingsClick, onLogout, o
       onSettingsClick();
     } else if (action === 'archive' && onArchiveClick) {
       onArchiveClick();
+    } else if (action === 'wallet' && onWalletClick) {
+      onWalletClick();
     } else if (action === 'logout' && onLogout) {
       onLogout();
     }
@@ -102,6 +105,14 @@ const UserAvatarDropdown = ({ user, onProfileClick, onSettingsClick, onLogout, o
           </div>
 
           <div className={styles.dropdownMenu}>
+            <button 
+              className={styles.menuItem}
+              onClick={() => handleMenuItemClick('wallet')}
+            >
+              <FaCoins size={16} />
+              <span>Кошелёк</span>
+            </button>
+
             <button 
               className={styles.menuItem}
               onClick={() => handleMenuItemClick('profile')}

@@ -10,6 +10,7 @@ import AIChatWindow from '../components/AIChatWindow';
 import UserProfileModal from '../components/UserProfileModal';
 import SettingsModalTabs from '../components/SettingsModalTabs';
 import UserAvatarDropdown from '../components/UserAvatarDropdown';
+import WalletModal from '../components/WalletModal';
 import ArchivedChatList from '../components/ArchivedChatList';
 import MobileNavigation from '../components/MobileNavigation';
 import MobileProfilePage from '../components/MobileProfilePage';
@@ -33,6 +34,7 @@ const Chat = () => {
   const [showMobileNav, setShowMobileNav] = useState(true); // Состояние для показа/скрытия мобильной навигации
   const [showAIChat, setShowAIChat] = useState(false); // Состояние для показа чата с ИИ
   const [showMobileProfile, setShowMobileProfile] = useState(false); // Состояние для показа мобильной страницы профиля
+  const [showWallet, setShowWallet] = useState(false);
 
   const { user, logout, isAuthenticated } = useAuth();
   const { socket, isConnected } = useSocket();
@@ -355,6 +357,7 @@ const Chat = () => {
               onProfileClick={handleProfileClick}
               onSettingsClick={handleDesktopSettingsClick}
               onArchiveClick={handleOpenArchived}
+              onWalletClick={() => setShowWallet(true)}
               onLogout={handleLogout}
               isConnected={isConnected}
             />
@@ -451,6 +454,7 @@ const Chat = () => {
           <MobileNavigation
             onNavigate={handleNavigation}
             onProfileClick={handleProfileClick}
+            onWalletClick={() => setShowWallet(true)}
             isVisible={showMobileNav}
           />
         );
@@ -470,6 +474,9 @@ const Chat = () => {
         onClose={handleMobileProfileClose}
         user={user}
       />
+
+      {/* Wallet Modal */}
+      <WalletModal isOpen={showWallet} onClose={() => setShowWallet(false)} />
 
     </div>
   );

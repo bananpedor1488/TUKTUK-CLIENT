@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { FiMessageCircle, FiUsers, FiUser } from 'react-icons/fi';
+import { FaCoins } from 'react-icons/fa';
 import styles from './MobileNavigation.module.css';
 
-const MobileNavigation = ({ onNavigate, onProfileClick, isVisible = true }) => {
+const MobileNavigation = ({ onNavigate, onProfileClick, onWalletClick, isVisible = true }) => {
   const [activeTab, setActiveTab] = useState('messages');
 
   // УЛЬТРА-ЖЕСТКАЯ ПРОВЕРКА - НЕ РЕНДЕРИТЬ НА ПК НИ ПРИ КАКИХ ОБСТОЯТЕЛЬСТВАХ
@@ -48,6 +49,17 @@ const MobileNavigation = ({ onNavigate, onProfileClick, isVisible = true }) => {
             <FiMessageCircle size={20} />
           </div>
           <span className={styles.navLabel}>Сообщения</span>
+        </div>
+
+        {/* Кошелёк */}
+        <div 
+          className={styles.navItem}
+          onClick={() => onWalletClick && onWalletClick()}
+        >
+          <div className={styles.navIcon}>
+            <FaCoins size={20} />
+          </div>
+          <span className={styles.navLabel}>Кошелёк</span>
         </div>
 
         {/* Профиль */}

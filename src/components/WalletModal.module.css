@@ -1,0 +1,68 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.modal {
+  background: var(--theme-card-background, var(--theme-background));
+  border: 1px solid var(--theme-border-color, rgba(255,255,255,0.12));
+  border-radius: 14px;
+  width: 100%;
+  max-width: 520px;
+  max-height: 90vh;
+  overflow: hidden;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--theme-border-color, rgba(255,255,255,0.12));
+}
+
+.title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--theme-text-primary);
+}
+
+.closeButton {
+  background: transparent;
+  border: none;
+  color: var(--theme-text-secondary);
+  cursor: pointer;
+  border-radius: 8px;
+  padding: 6px;
+}
+
+.content {
+  padding: 16px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.balanceCard {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid var(--theme-border-color, rgba(255,255,255,0.12));
+  border-radius: 10px;
+}
+
+.label { color: var(--theme-text-secondary); font-size: 14px; }
+.value { color: var(--theme-text-primary); font-weight: 600; font-size: 16px; }
+
+.row { display: flex; gap: 8px; align-items: center; }
+.input { flex: 1; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--theme-border-color, rgba(255,255,255,0.14)); background: var(--theme-input-background, rgba(255,255,255,0.04)); color: var(--theme-text-primary); }
+.button { padding: 10px 14px; border-radius: 10px; border: none; background: var(--theme-main-color, #d0bcff); color: #000; font-weight: 600; cursor: pointer; }
+.button:disabled { opacity: .6; cursor: not-allowed; }
