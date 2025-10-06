@@ -3,6 +3,7 @@ import { FiArrowLeft } from 'react-icons/fi';
 import { FaCoins, FaMeteor } from 'react-icons/fa';
 import WalletService from '../services/WalletService';
 import styles from './MobileWalletPage.module.css';
+import { useToast } from '../contexts/ToastContext';
 
 const MobileWalletPage = ({ isOpen, onClose, user }) => {
   const [balance, setBalance] = useState(0);
@@ -12,6 +13,8 @@ const MobileWalletPage = ({ isOpen, onClose, user }) => {
   const [createAmount, setCreateAmount] = useState(300);
   const [grantAmount, setGrantAmount] = useState(100);
   const [grantMode, setGrantMode] = useState('add');
+  const toast = useToast();
+  const { success, error } = toast || {};
 
   useEffect(() => {
     if (!isOpen) return;
@@ -86,6 +89,9 @@ const MobileWalletPage = ({ isOpen, onClose, user }) => {
                       await WalletService.grantToAll(grantAmount, grantMode);
                       const b = await WalletService.getBalance();
                       setBalance(typeof b === 'number' ? b : (b?.balance ?? 0));
+                      success && success(`Выдано всем: ${grantAmount} B (${grantMode})`);
+                    } catch (e) {
+                      error && error(e?.response?.data?.message || 'Не удалось выдать монеты');
                     } finally {
                       setBusy(false);
                     }
@@ -120,6 +126,9 @@ const MobileWalletPage = ({ isOpen, onClose, user }) => {
                       await WalletService.purchasePremium();
                       const b = await WalletService.getBalance();
                       setBalance(typeof b === 'number' ? b : (b?.balance ?? 0));
+                      success && success('Premium активирован');
+                    } catch (e) {
+                      error && error(e?.response?.data?.message || 'Не удалось активировать Premium');
                     } finally {
                       setBusy(false);
                     }
@@ -154,10 +163,13 @@ const MobileWalletPage = ({ isOpen, onClose, user }) => {
                 onClick={async () => {
                   try {
                     setBusy(true);
-                    await WalletService.redeemPromo(promo.trim());
+                    const res = await WalletService.redeemPromo(promo.trim());
                     const b = await WalletService.getBalance();
                     setBalance(typeof b === 'number' ? b : (b?.balance ?? 0));
                     setPromo('');
+                    success && success(res?.message || 'Промокод активирован');
+                  } catch (e) {
+                    error && error(e?.response?.data?.message || 'Не удалось активировать промокод');
                   } finally {
                     setBusy(false);
                   }
@@ -195,9 +207,9 @@ const MobileWalletPage = ({ isOpen, onClose, user }) => {
                   try {
                     setBusy(true);
                     const res = await WalletService.createPromo({ type: createType, amount: createAmount });
-                    if (res?.code) {
-                      window.alert(`Создан промокод: ${res.code}`);
-                    }
+                    res?.code && success && success(`Промокод создан: ${res.code}`);
+                  } catch (e) {
+                    error && error(e?.response?.data?.message || 'Не удалось создать промокод');
                   } finally {
                     setBusy(false);
                   }

@@ -29,7 +29,7 @@ const UserProfileModal = ({ user, isOpen, onClose, isOwnProfile = false }) => {
 
   // Toast helpers (like on mobile)
   const toast = useToast();
-  const { success } = toast || {};
+  const { success, error } = toast || {};
 
   const handleInputChange = (field, value) => {
     setProfileData(prev => ({
@@ -318,7 +318,7 @@ const UserProfileModal = ({ user, isOpen, onClose, isOwnProfile = false }) => {
                               setBalance(b);
                               success && success('Premium активирован');
                             } catch (e) {
-                              alert(e?.response?.data?.message || 'Не удалось активировать Premium');
+                              error && error(e?.response?.data?.message || 'Не удалось активировать Premium');
                             } finally {
                               setIsBusy(false);
                             }
@@ -356,7 +356,7 @@ const UserProfileModal = ({ user, isOpen, onClose, isOwnProfile = false }) => {
                             success && success(res?.message || 'Промокод активирован');
                             setPromoCode('');
                           } catch (e) {
-                            alert(e?.response?.data?.message || 'Не удалось активировать промокод');
+                            error && error(e?.response?.data?.message || 'Не удалось активировать промокод');
                           } finally {
                             setIsBusy(false);
                           }
@@ -401,7 +401,7 @@ const UserProfileModal = ({ user, isOpen, onClose, isOwnProfile = false }) => {
                             const res = await WalletService.createPromo(creatingPromo);
                             success && success(`Создано: ${res?.code || 'код'}`);
                           } catch (e) {
-                            alert(e?.response?.data?.message || 'Не удалось создать промокод');
+                            error && error(e?.response?.data?.message || 'Не удалось создать промокод');
                           } finally {
                             setIsBusy(false);
                           }

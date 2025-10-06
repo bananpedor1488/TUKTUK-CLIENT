@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { FiX } from 'react-icons/fi';
 import { FaCoins } from 'react-icons/fa';
 import WalletService from '../services/WalletService';
+import { useToast } from '../contexts/ToastContext';
 import styles from './WalletModal.module.css';
 
 const WalletModal = ({ isOpen, onClose, user }) => {
@@ -10,6 +11,8 @@ const WalletModal = ({ isOpen, onClose, user }) => {
   const [busy, setBusy] = useState(false);
   const [grantAmount, setGrantAmount] = useState(100);
   const [grantMode, setGrantMode] = useState('add');
+  const toast = useToast();
+  const { success, error } = toast || {};
 
   useEffect(() => {
     if (!isOpen) return;
@@ -54,10 +57,13 @@ const WalletModal = ({ isOpen, onClose, user }) => {
                 onClick={async () => {
                   try {
                     setBusy(true);
-                    await WalletService.redeemPromo(promo.trim());
+                    const res = await WalletService.redeemPromo(promo.trim());
                     const b = await WalletService.getBalance();
                     setBalance(b);
                     setPromo('');
+                    success && success(res?.message || 'Промокод активирован');
+                  } catch (e) {
+                    error && error(e?.response?.data?.message || 'Не удалось активировать промокод');
                   } finally {
                     setBusy(false);
                   }
@@ -95,9 +101,12 @@ const WalletModal = ({ isOpen, onClose, user }) => {
                   onClick={async () => {
                     try {
                       setBusy(true);
-                      await WalletService.grantToAll(grantAmount, grantMode);
+                      const res = await WalletService.grantToAll(grantAmount, grantMode);
                       const b = await WalletService.getBalance();
                       setBalance(b);
+                      success && success(`Выдано всем: ${res?.value ?? grantAmount} B (${res?.mode || grantMode})`);
+                    } catch (e) {
+                      error && error(e?.response?.data?.message || 'Не удалось выдать монеты');
                     } finally {
                       setBusy(false);
                     }
