@@ -46,6 +46,29 @@
   gap: 16px;
 }
 
+/* Hero balance */
+.hero {
+  background: linear-gradient(135deg, rgba(208,188,255,0.15) 0%, rgba(208,188,255,0.06) 100%);
+  border: 1px solid rgba(208,188,255,0.28);
+  border-radius: 16px;
+  padding: 16px;
+}
+.heroHead { display: flex; align-items: center; gap: 10px; }
+.caption { color: var(--theme-text-secondary); font-size: 12px; }
+.valueBig { color: var(--theme-text-primary); font-weight: 800; font-size: 34px; line-height: 1.15; }
+
+/* Circle quick actions */
+.circleActions { display: flex; gap: 16px; margin-top: 10px; }
+.circleItem { display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 64px; }
+.circleIcon { width: 52px; height: 52px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); }
+.circleLabel { font-size: 11px; color: var(--theme-text-secondary); }
+
+/* Currency toggle */
+.heroFooter { display: flex; justify-content: flex-end; margin-top: 10px; }
+.pillToggle { display: inline-flex; gap: 4px; background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; padding: 4px; }
+.pillBtn { padding: 6px 10px; border-radius: 8px; color: var(--theme-text-secondary); }
+.pillBtnActive { background: rgba(255,255,255,0.14); color: var(--theme-text-primary); }
+
 .section {
   background: var(--theme-card-background, rgba(255,255,255,0.05));
   border: 1px solid var(--theme-border-color, rgba(255,255,255,0.1));
@@ -86,6 +109,21 @@
 .buttonPrimary:disabled, .buttonGhost:disabled { opacity: .6; }
 
 .badge { padding: 4px 10px; border-radius: 999px; background: rgba(208,188,255,0.15); border: 1px solid rgba(208,188,255,0.3); color: var(--theme-text-primary); font-size: 12px; font-weight: 600; }
+
+/* Forecast card */
+.forecastValue { color: #30d158; font-weight: 800; font-size: 20px; }
+.forecastDesc { color: var(--theme-text-secondary); font-size: 12px; margin-top: 4px; }
+.accordionHeader { display: flex; align-items: center; justify-content: space-between; padding-top: 8px; cursor: pointer; }
+.accordionTitle { font-weight: 700; color: var(--theme-text-primary); font-size: 14px; }
+.accordionIcon { transform: rotate(0deg); transition: transform .2s ease; }
+.accordionIconOpen { transform: rotate(180deg); }
+.accordionBody { color: var(--theme-text-secondary); font-size: 13px; padding-top: 6px; }
+
+/* Tabs */
+.tabs { display: flex; gap: 8px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; padding: 6px; }
+.tab { padding: 8px 12px; border-radius: 10px; color: var(--theme-text-secondary); }
+.tabActive { background: var(--theme-main-color, #d0bcff); color: #000; font-weight: 700; }
+.emptyState { padding: 16px; border: 1px dashed rgba(255,255,255,0.16); border-radius: 12px; color: var(--theme-text-secondary); text-align: center; }
 
 @keyframes slideInFromBottom {
   from { transform: translateY(8%); opacity: 0; }

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { FiArrowLeft } from 'react-icons/fi';
-import { FaCoins, FaMeteor } from 'react-icons/fa';
+import { FaCoins, FaMeteor, FaWallet, FaPlus, FaChevronDown } from 'react-icons/fa';
 import WalletService from '../services/WalletService';
 import styles from './MobileWalletPage.module.css';
 import { useToast } from '../contexts/ToastContext';
@@ -13,6 +13,9 @@ const MobileWalletPage = ({ isOpen, onClose, user }) => {
   const [createAmount, setCreateAmount] = useState(300);
   const [grantAmount, setGrantAmount] = useState(100);
   const [grantMode, setGrantMode] = useState('add');
+  const [currency, setCurrency] = useState('kballs');
+  const [tabsIndex, setTabsIndex] = useState(0);
+  const [howOpen, setHowOpen] = useState(false);
   const toast = useToast();
   const { success, error } = toast || {};
 
@@ -37,19 +40,24 @@ const MobileWalletPage = ({ isOpen, onClose, user }) => {
       </div>
 
       <div className={styles.content}>
-        {/* Баланс */}
-        <section className={styles.section}>
-          <div className={styles.sectionHeader}>
+        {/* Hero Баланс */}
+        <section className={styles.hero}>
+          <div className={styles.heroHead}>
             <FaCoins />
-            <h3 className={styles.sectionTitle}>Баланс</h3>
-          </div>
-          <div className={styles.sectionBody}>
-            <div className={styles.row}>
-              <span className={styles.info}>Ваши B‑коины</span>
-              <span className={styles.value}>{balance} B</span>
+            <div>
+              <div className={styles.caption}>Баланс</div>
+              <div className={styles.valueBig}>{balance} B</div>
             </div>
-            <div className={styles.row}>
-              <span className={styles.badge}>B‑coins • виртуальная валюта</span>
+          </div>
+          <div className={styles.circleActions}>
+            <div className={styles.circleItem}><div className={styles.circleIcon}><FaWallet /></div><div className={styles.circleLabel}>Оплатить</div></div>
+            <div className={styles.circleItem}><div className={styles.circleIcon}><FaPlus /></div><div className={styles.circleLabel}>Пополнить</div></div>
+            <div className={styles.circleItem}><div className={styles.circleIcon}><FaMeteor /></div><div className={styles.circleLabel}>Перевести</div></div>
+          </div>
+          <div className={styles.heroFooter}>
+            <div className={styles.pillToggle}>
+              <div className={`${styles.pillBtn} ${currency==='kballs'?styles.pillBtnActive:''}`} onClick={()=>setCurrency('kballs')}>Kballs</div>
+              <div className={`${styles.pillBtn} ${currency==='mcoin'?styles.pillBtnActive:''}`} onClick={()=>setCurrency('mcoin')}>MCoin</div>
             </div>
           </div>
         </section>
