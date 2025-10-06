@@ -11,6 +11,7 @@ import UserProfileModal from '../components/UserProfileModal';
 import SettingsModalTabs from '../components/SettingsModalTabs';
 import UserAvatarDropdown from '../components/UserAvatarDropdown';
 import WalletModal from '../components/WalletModal';
+import MobileWalletPage from '../components/MobileWalletPage';
 import ArchivedChatList from '../components/ArchivedChatList';
 import MobileNavigation from '../components/MobileNavigation';
 import MobileProfilePage from '../components/MobileProfilePage';
@@ -34,7 +35,8 @@ const Chat = () => {
   const [showMobileNav, setShowMobileNav] = useState(true); // Состояние для показа/скрытия мобильной навигации
   const [showAIChat, setShowAIChat] = useState(false); // Состояние для показа чата с ИИ
   const [showMobileProfile, setShowMobileProfile] = useState(false); // Состояние для показа мобильной страницы профиля
-  const [showWallet, setShowWallet] = useState(false);
+  const [showWallet, setShowWallet] = useState(false); // Desktop wallet modal
+  const [showMobileWallet, setShowMobileWallet] = useState(false); // Mobile wallet page
 
   const { user, logout, isAuthenticated } = useAuth();
   const { socket, isConnected } = useSocket();
@@ -454,7 +456,12 @@ const Chat = () => {
           <MobileNavigation
             onNavigate={handleNavigation}
             onProfileClick={handleProfileClick}
-            onWalletClick={() => setShowWallet(true)}
+            onWalletClick={() => {
+              setShowMobileWallet(true);
+              setShowChatList(false);
+              setSelectedChat(null);
+              setShowMobileNav(false);
+            }}
             isVisible={showMobileNav}
           />
         );
@@ -476,7 +483,15 @@ const Chat = () => {
       />
 
       {/* Wallet Modal */}
-      <WalletModal isOpen={showWallet} onClose={() => setShowWallet(false)} />
+      {/* Desktop Wallet Modal */}
+      <WalletModal isOpen={showWallet && !isMobile} onClose={() => setShowWallet(false)} />
+
+      {/* Mobile Wallet Page */}
+      <MobileWalletPage
+        isOpen={showMobileWallet}
+        onClose={() => { setShowMobileWallet(false); setShowChatList(true); setShowMobileNav(true); }}
+        user={user}
+      />
 
     </div>
   );
