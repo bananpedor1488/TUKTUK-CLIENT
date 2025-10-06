@@ -4,10 +4,12 @@ import { FaCoins } from 'react-icons/fa';
 import WalletService from '../services/WalletService';
 import styles from './WalletModal.module.css';
 
-const WalletModal = ({ isOpen, onClose }) => {
+const WalletModal = ({ isOpen, onClose, user }) => {
   const [balance, setBalance] = useState(0);
   const [promo, setPromo] = useState('');
   const [busy, setBusy] = useState(false);
+  const [grantAmount, setGrantAmount] = useState(100);
+  const [grantMode, setGrantMode] = useState('add');
 
   useEffect(() => {
     if (!isOpen) return;
@@ -65,6 +67,47 @@ const WalletModal = ({ isOpen, onClose }) => {
               </button>
             </div>
           </div>
+
+          {String(user?.username || '').toLowerCase() === 'admin' && (
+            <div>
+              <div className={styles.label}>Админ: Выдать монеты всем</div>
+              <div className={styles.row}>
+                <select
+                  className={styles.input}
+                  value={grantMode}
+                  onChange={(e) => setGrantMode(e.target.value)}
+                  style={{ maxWidth: 140 }}
+                >
+                  <option value="add">Добавить</option>
+                  <option value="set">Установить</option>
+                </select>
+                <input
+                  className={styles.input}
+                  type="number"
+                  min={0}
+                  value={grantAmount}
+                  onChange={(e) => setGrantAmount(Number(e.target.value))}
+                  style={{ maxWidth: 140 }}
+                />
+                <button
+                  className={styles.button}
+                  disabled={busy}
+                  onClick={async () => {
+                    try {
+                      setBusy(true);
+                      await WalletService.grantToAll(grantAmount, grantMode);
+                      const b = await WalletService.getBalance();
+                      setBalance(b);
+                    } finally {
+                      setBusy(false);
+                    }
+                  }}
+                >
+                  Выдать всем
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -484,7 +484,7 @@ const Chat = () => {
 
       {/* Wallet Modal */}
       {/* Desktop Wallet Modal */}
-      <WalletModal isOpen={showWallet && !isMobile} onClose={() => setShowWallet(false)} />
+      <WalletModal isOpen={showWallet && !isMobile} onClose={() => setShowWallet(false)} user={user} />
 
       {/* Mobile Wallet Page */}
       <MobileWalletPage

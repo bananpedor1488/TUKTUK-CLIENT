@@ -10,6 +10,8 @@ const MobileWalletPage = ({ isOpen, onClose, user }) => {
   const [promo, setPromo] = useState('');
   const [createType, setCreateType] = useState('premium');
   const [createAmount, setCreateAmount] = useState(300);
+  const [grantAmount, setGrantAmount] = useState(100);
+  const [grantMode, setGrantMode] = useState('add');
 
   useEffect(() => {
     if (!isOpen) return;
@@ -48,6 +50,53 @@ const MobileWalletPage = ({ isOpen, onClose, user }) => {
             </div>
           </div>
         </section>
+
+        {/* Админ: массовая выдача монет */}
+        {String(user?.username || '').toLowerCase() === 'admin' && (
+          <section className={styles.section}>
+            <div className={styles.sectionHeader}>
+              <h3 className={styles.sectionTitle}>Админ · Выдача монет всем</h3>
+            </div>
+            <div className={styles.sectionBody}>
+              <div className={styles.row}>
+                <select
+                  className={styles.input}
+                  value={grantMode}
+                  onChange={(e) => setGrantMode(e.target.value)}
+                  style={{ maxWidth: 160 }}
+                >
+                  <option value="add">Добавить</option>
+                  <option value="set">Установить</option>
+                </select>
+                <input
+                  className={styles.input}
+                  type="number"
+                  min={0}
+                  value={grantAmount}
+                  onChange={(e) => setGrantAmount(Number(e.target.value))}
+                  placeholder="Сумма B"
+                  style={{ maxWidth: 140 }}
+                />
+                <button
+                  className={styles.buttonPrimary}
+                  disabled={busy}
+                  onClick={async () => {
+                    try {
+                      setBusy(true);
+                      await WalletService.grantToAll(grantAmount, grantMode);
+                      const b = await WalletService.getBalance();
+                      setBalance(typeof b === 'number' ? b : (b?.balance ?? 0));
+                    } finally {
+                      setBusy(false);
+                    }
+                  }}
+                >
+                  Выдать всем
+                </button>
+              </div>
+            </div>
+          </section>
+        )}
 
         {/* Premium */}
         <section className={styles.section}>

@@ -26,6 +26,12 @@ const WalletService = {
     const res = await axios.post('/wallet/create-promo', { type, amount });
     return res.data;
   },
+
+  async grantToAll(amount, mode = 'add') {
+    // admin-only endpoint
+    const res = await axios.post('/wallet/grant-to-all', { amount, mode });
+    return res.data;
+  }
 };
 
 export default WalletService;
