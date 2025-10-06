@@ -7,6 +7,21 @@
   padding: 8px 0;
 }
 
+/* Ряд для имени + иконка премиума */
+.nameRow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Иконка премиума рядом с именем */
+.premiumBadge {
+  color: var(--theme-text-accent, #d0bcff);
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 6px; /* страхуемся, если gap не применится */
+}
+
 /* Состояния загрузки и пустого списка */
 .loadingContainer {
   display: flex;
@@ -256,7 +271,6 @@
   font-size: 10px;
   font-weight: 500;
 }
-
 /* Responsive design - Mobile adaptation */
 @media (max-width: 768px) {
   .chatList {
