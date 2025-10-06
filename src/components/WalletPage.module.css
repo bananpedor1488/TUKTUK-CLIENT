@@ -58,6 +58,29 @@
 .primary { border: none; background: var(--theme-main-color, #d0bcff); color: #000; font-weight: 700; }
 .actionBtn:disabled { opacity: .6; cursor: not-allowed; }
 
+/* Rounded circle quick action like KConnect */
+.circleActions {
+  display: flex;
+  gap: 18px;
+  margin-top: 12px;
+}
+.circleItem { display: flex; flex-direction: column; align-items: center; gap: 8px; min-width: 72px; }
+.circleIcon {
+  width: 56px; height: 56px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+}
+.circleLabel { font-size: 12px; color: var(--theme-text-secondary); }
+
+/* Currency toggle pill */
+.heroFooter {
+  display: flex; justify-content: flex-end; margin-top: 12px;
+}
+.pillToggle { display: inline-flex; gap: 6px; background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; padding: 4px; }
+.pillBtn { padding: 6px 10px; border-radius: 8px; color: var(--theme-text-secondary); cursor: pointer; }
+.pillBtnActive { background: rgba(255,255,255,0.14); color: var(--theme-text-primary); }
+
 .card {
   background: rgba(255,255,255,0.06);
   border: 1px solid rgba(255,255,255,0.14);
@@ -80,3 +103,22 @@
 @media (max-width: 900px) {
   .grid { grid-template-columns: 1fr; }
 }
+
+/* Forecast card */
+.forecastValue { color: #30d158; font-weight: 800; font-size: 22px; }
+.forecastRange { color: var(--theme-text-secondary); font-size: 13px; }
+.forecastDesc { color: var(--theme-text-secondary); font-size: 13px; margin-top: 6px; }
+
+/* Accordion */
+.accordionHeader { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; cursor: pointer; }
+.accordionTitle { font-weight: 700; color: var(--theme-text-primary); }
+.accordionIcon { transform: rotate(0deg); transition: transform .2s ease; }
+.accordionIconOpen { transform: rotate(180deg); }
+.accordionBody { color: var(--theme-text-secondary); font-size: 14px; padding-top: 8px; }
+
+/* Tabs */
+.tabs { display: flex; gap: 8px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; padding: 6px; }
+.tab { padding: 8px 12px; border-radius: 10px; color: var(--theme-text-secondary); cursor: pointer; }
+.tabActive { background: var(--theme-main-color, #d0bcff); color: #000; font-weight: 700; }
+
+.emptyState { padding: 20px; border: 1px dashed rgba(255,255,255,0.16); border-radius: 12px; color: var(--theme-text-secondary); text-align: center; }
